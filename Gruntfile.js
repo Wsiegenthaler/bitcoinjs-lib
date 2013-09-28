@@ -29,8 +29,15 @@ module.exports = function(grunt) {
             'src/crypto-js/src/CryptoMath.js',
             'src/crypto-js/src/BlockModes.js',
             'src/crypto-js/src/SHA256.js',
+            'src/crypto-js/src/SHA1.js',
+            'src/crypto-js/src/MD5.js',
+            'src/crypto-js/src/AES.js',
+            'src/crypto-js/src/PBKDF2.js',
+            'src/crypto-js/src/HMAC.js',
 
             'src/crypto-js-etc/ripemd160.js',
+
+            'src/node-scrypt-js/scrypt.js',
 
             'src/jsbn/prng4.js',
             'src/jsbn/rng.js',

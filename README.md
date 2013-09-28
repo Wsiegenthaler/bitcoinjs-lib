@@ -31,3 +31,11 @@ http://www-cs-students.stanford.edu/~tjw/jsbn/
 CryptoJS (c) 2009–2012 by Jeff Mott  
 Released under New BSD license  
 http://code.google.com/p/crypto-js/
+
+node-scrypt-js (c) 2010-2011 Intalio Pte, All Rights Reserved
+Released under MIT license  
+https://github.com/cheongwy/node-scrypt-js
+
+bitaddress.org (c) 2011-2012 bitaddress.org
+Released under MIT license  
+https://github.com/Zeilap/bitaddress.org

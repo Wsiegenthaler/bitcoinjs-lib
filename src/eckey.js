@@ -143,6 +143,13 @@ Bitcoin.ECKey = (function () {
   };
 
   /**
+   * Private key encoded per BIP-38 (password encrypted, checksum,  base58)
+   */
+  ECKey.prototype.getEncryptedFormat = function (passphrase) {
+    return Bitcoin.BIP38.encode(this, passphrase);
+  }
+
+  /**
    * Private key encoded as hexadecimal string.
    */
   ECKey.prototype.getHexFormat = function () {
@@ -234,6 +241,13 @@ Bitcoin.ECKey = (function () {
   };
 
   /**
+   * Parse and decrypt a key encoded as a BIP38 string.
+   */
+  ECKey.decodeEncryptedFormat = function (base58Encrypted, passphrase) {
+    return Bitcoin.BIP38.decode(base58Encrypted, passphrase);
+  }
+
+  /**
    * Detects keys in hex format (64 characters [0-9A-F]).
    */
   ECKey.isHexFormat = function (key) {
@@ -282,5 +296,11 @@ Bitcoin.ECKey = (function () {
     return ((testBytes[0] === 0x00 || testBytes[0] === 0x01) && (validChars22 || validChars26 || validChars30));
   };
 
+  /**
+   * Detects keys encrypted according to BIP-38 (58 base58 characters starting with 6P)
+   */
+  ECKey.isBIP38Format = function (string) { return Bitcoin.BIP38.isBIP38Format(string); };
+
   return ECKey;
 })();
+
