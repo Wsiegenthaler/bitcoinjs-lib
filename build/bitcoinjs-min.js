@@ -5,24 +5,4612 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license.
  */
-(function(){var e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",t=window.Crypto={},n=t.util={rotl:function(e,t){return e<<t|e>>>32-t},rotr:function(e,t){return e<<32-t|e>>>t},endian:function(e){if(e.constructor==Number)return n.rotl(e,8)&16711935|n.rotl(e,24)&4278255360;for(var t=0;t<e.length;t++)e[t]=n.endian(e[t]);return e},randomBytes:function(e){for(var t=[];e>0;e--)t.push(Math.floor(Math.random()*256));return t},bytesToWords:function(e){for(var t=[],n=0,r=0;n<e.length;n++,r+=8)t[r>>>5]|=e[n]<<24-r%32;return t},wordsToBytes:function(e){for(var t=[],n=0;n<e.length*32;n+=8)t.push(e[n>>>5]>>>24-n%32&255);return t},bytesToHex:function(e){for(var t=[],n=0;n<e.length;n++)t.push((e[n]>>>4).toString(16)),t.push((e[n]&15).toString(16));return t.join("")},hexToBytes:function(e){for(var t=[],n=0;n<e.length;n+=2)t.push(parseInt(e.substr(n,2),16));return t},bytesToBase64:function(t){if(typeof btoa=="function")return btoa(s.bytesToString(t));for(var n=[],r=0;r<t.length;r+=3){var i=t[r]<<16|t[r+1]<<8|t[r+2];for(var o=0;o<4;o++)r*8+o*6<=t.length*8?n.push(e.charAt(i>>>6*(3-o)&63)):n.push("=")}return n.join("")},base64ToBytes:function(t){if(typeof atob=="function")return s.stringToBytes(atob(t));t=t.replace(/[^A-Z0-9+\/]/ig,"");for(var n=[],r=0,i=0;r<t.length;i=++r%4){if(i==0)continue;n.push((e.indexOf(t.charAt(r-1))&Math.pow(2,-2*i+8)-1)<<i*2|e.indexOf(t.charAt(r))>>>6-i*2)}return n}};t.mode={};var r=t.charenc={},i=r.UTF8={stringToBytes:function(e){return s.stringToBytes(unescape(encodeURIComponent(e)))},bytesToString:function(e){return decodeURIComponent(escape(s.bytesToString(e)))}},s=r.Binary={stringToBytes:function(e){for(var t=[],n=0;n<e.length;n++)t.push(e.charCodeAt(n));return t},bytesToString:function(e){for(var t=[],n=0;n<e.length;n++)t.push(String.fromCharCode(e[n]));return t.join("")}}})();
-(function(){var e=Crypto,t=e.util,n=e.charenc,r=n.UTF8,i=n.Binary,s=[1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298],o=e.SHA256=function(e,n){var r=t.wordsToBytes(o._sha256(e));return n&&n.asBytes?r:n&&n.asString?i.bytesToString(r):t.bytesToHex(r)};o._sha256=function(e){e.constructor==String&&(e=r.stringToBytes(e));var n=t.bytesToWords(e),i=e.length*8,o=[1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225],u=[],a,f,l,c,h,p,d,v,m,g,y,b;n[i>>5]|=128<<24-i%32,n[(i+64>>9<<4)+15]=i;for(var m=0;m<n.length;m+=16){a=o[0],f=o[1],l=o[2],c=o[3],h=o[4],p=o[5],d=o[6],v=o[7];for(var g=0;g<64;g++){if(g<16)u[g]=n[g+m];else{var w=u[g-15],E=u[g-2],S=(w<<25|w>>>7)^(w<<14|w>>>18)^w>>>3,x=(E<<15|E>>>17)^(E<<13|E>>>19)^E>>>10;u[g]=S+(u[g-7]>>>0)+x+(u[g-16]>>>0)}var T=h&p^~h&d,N=a&f^a&l^f&l,C=(a<<30|a>>>2)^(a<<19|a>>>13)^(a<<10|a>>>22),k=(h<<26|h>>>6)^(h<<21|h>>>11)^(h<<7|h>>>25);y=(v>>>0)+k+T+s[g]+(u[g]>>>0),b=C+N,v=d,d=p,p=h,h=c+y,c=l,l=f,f=a,a=y+b}o[0]+=a,o[1]+=f,o[2]+=l,o[3]+=c,o[4]+=h,o[5]+=p,o[6]+=d,o[7]+=v}return o},o._blocksize=16})();
-(function(){function o(e,t,n,r){return 0<=e&&e<=15?t^n^r:16<=e&&e<=31?t&n|~t&r:32<=e&&e<=47?(t|~n)^r:48<=e&&e<=63?t&r|n&~r:64<=e&&e<=79?t^(n|~r):"rmd160_f: j out of range"}function u(e){return 0<=e&&e<=15?0:16<=e&&e<=31?1518500249:32<=e&&e<=47?1859775393:48<=e&&e<=63?2400959708:64<=e&&e<=79?2840853838:"rmd160_K1: j out of range"}function a(e){return 0<=e&&e<=15?1352829926:16<=e&&e<=31?1548603684:32<=e&&e<=47?1836072691:48<=e&&e<=63?2053994217:64<=e&&e<=79?0:"rmd160_K2: j out of range"}function p(e,t){var n=(e&65535)+(t&65535),r=(e>>16)+(t>>16)+(n>>16);return r<<16|n&65535}function d(e,t){return e<<t|e>>>32-t}var e=Crypto,t=e.util,n=e.charenc,r=n.UTF8,i=n.Binary;t.bytesToLWords=function(e){var t=Array(e.length>>2);for(var n=0;n<t.length;n++)t[n]=0;for(var n=0;n<e.length*8;n+=8)t[n>>5]|=(e[n/8]&255)<<n%32;return t},t.lWordsToBytes=function(e){var t=[];for(var n=0;n<e.length*32;n+=8)t.push(e[n>>5]>>>n%32&255);return t};var s=e.RIPEMD160=function(e,n){var r=t.lWordsToBytes(s._rmd160(e));return n&&n.asBytes?r:n&&n.asString?i.bytesToString(r):t.bytesToHex(r)};s._rmd160=function(e){e.constructor==String&&(e=r.stringToBytes(e));var n=t.bytesToLWords(e),i=e.length*8;n[i>>5]|=128<<i%32,n[(i+64>>>9<<4)+14]=i;var s=1732584193,v=4023233417,m=2562383102,g=271733878,y=3285377520;for(var b=0;b<n.length;b+=16){var w,E=s,S=v,x=m,T=g,N=y,C=s,k=v,L=m,A=g,O=y;for(var M=0;M<=79;++M)w=p(E,o(M,S,x,T)),w=p(w,n[b+f[M]]),w=p(w,u(M)),w=p(d(w,c[M]),N),E=N,N=T,T=d(x,10),x=S,S=w,w=p(C,o(79-M,k,L,A)),w=p(w,n[b+l[M]]),w=p(w,a(M)),w=p(d(w,h[M]),O),C=O,O=A,A=d(L,10),L=k,k=w;w=p(v,p(x,A)),v=p(m,p(T,O)),m=p(g,p(N,C)),g=p(y,p(E,k)),y=p(s,p(S,L)),s=w}return[s,v,m,g,y]};var f=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13],l=[5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11],c=[11,14,15,12,5,8,7,9,11,13,14,15,6,7,9,8,7,6,8,13,11,9,7,15,7,12,15,9,11,7,13,12,11,13,6,7,14,9,13,15,14,8,13,6,5,12,7,5,11,12,14,15,14,15,9,8,9,14,5,6,8,6,5,12,9,15,5,11,6,8,13,12,5,12,13,14,11,8,5,6],h=[8,9,9,11,13,15,15,5,7,7,8,11,14,14,12,6,9,13,15,7,12,8,9,11,7,7,12,7,6,15,13,11,9,7,15,11,8,6,6,14,12,13,5,14,13,13,7,5,15,5,8,11,14,14,6,14,6,9,12,9,12,5,15,8,8,5,12,9,12,5,14,6,8,13,6,5,15,13,11,11]})();
-function Arcfour(){this.i=0,this.j=0,this.S=new Array}function ARC4init(e){var t,n,r;for(t=0;t<256;++t)this.S[t]=t;n=0;for(t=0;t<256;++t)n=n+this.S[t]+e[t%e.length]&255,r=this.S[t],this.S[t]=this.S[n],this.S[n]=r;this.i=0,this.j=0}function ARC4next(){var e;return this.i=this.i+1&255,this.j=this.j+this.S[this.i]&255,e=this.S[this.i],this.S[this.i]=this.S[this.j],this.S[this.j]=e,this.S[e+this.S[this.i]&255]}function prng_newstate(){return new Arcfour}Arcfour.prototype.init=ARC4init,Arcfour.prototype.next=ARC4next;var rng_psize=256;
-function rng_seed_int(e){rng_pool[rng_pptr++]^=e&255,rng_pool[rng_pptr++]^=e>>8&255,rng_pool[rng_pptr++]^=e>>16&255,rng_pool[rng_pptr++]^=e>>24&255,rng_pptr>=rng_psize&&(rng_pptr-=rng_psize)}function rng_seed_time(){rng_seed_int((new Date).getTime())}function rng_get_byte(){if(rng_state==null){rng_seed_time(),rng_state=prng_newstate(),rng_state.init(rng_pool);for(rng_pptr=0;rng_pptr<rng_pool.length;++rng_pptr)rng_pool[rng_pptr]=0;rng_pptr=0}return rng_state.next()}function rng_get_bytes(e){var t;for(t=0;t<e.length;++t)e[t]=rng_get_byte()}function SecureRandom(){}var rng_state,rng_pool,rng_pptr;if(rng_pool==null){rng_pool=new Array,rng_pptr=0;var t;if(navigator.appName=="Netscape"&&navigator.appVersion<"5"&&window.crypto){var z=window.crypto.random(32);for(t=0;t<z.length;++t)rng_pool[rng_pptr++]=z.charCodeAt(t)&255}while(rng_pptr<rng_psize)t=Math.floor(65536*Math.random()),rng_pool[rng_pptr++]=t>>>8,rng_pool[rng_pptr++]=t&255;rng_pptr=0,rng_seed_time()}SecureRandom.prototype.nextBytes=rng_get_bytes;
-function BigInteger(e,t,n){e!=null&&("number"==typeof e?this.fromNumber(e,t,n):t==null&&"string"!=typeof e?this.fromString(e,256):this.fromString(e,t))}function nbi(){return new BigInteger(null)}function am1(e,t,n,r,i,s){while(--s>=0){var o=t*this[e++]+n[r]+i;i=Math.floor(o/67108864),n[r++]=o&67108863}return i}function am2(e,t,n,r,i,s){var o=t&32767,u=t>>15;while(--s>=0){var a=this[e]&32767,f=this[e++]>>15,l=u*a+f*o;a=o*a+((l&32767)<<15)+n[r]+(i&1073741823),i=(a>>>30)+(l>>>15)+u*f+(i>>>30),n[r++]=a&1073741823}return i}function am3(e,t,n,r,i,s){var o=t&16383,u=t>>14;while(--s>=0){var a=this[e]&16383,f=this[e++]>>14,l=u*a+f*o;a=o*a+((l&16383)<<14)+n[r]+i,i=(a>>28)+(l>>14)+u*f,n[r++]=a&268435455}return i}function int2char(e){return BI_RM.charAt(e)}function intAt(e,t){var n=BI_RC[e.charCodeAt(t)];return n==null?-1:n}function bnpCopyTo(e){for(var t=this.t-1;t>=0;--t)e[t]=this[t];e.t=this.t,e.s=this.s}function bnpFromInt(e){this.t=1,this.s=e<0?-1:0,e>0?this[0]=e:e<-1?this[0]=e+DV:this.t=0}function nbv(e){var t=nbi();return t.fromInt(e),t}function bnpFromString(e,t){var n;if(t==16)n=4;else if(t==8)n=3;else if(t==256)n=8;else if(t==2)n=1;else if(t==32)n=5;else{if(t!=4){this.fromRadix(e,t);return}n=2}this.t=0,this.s=0;var r=e.length,i=!1,s=0;while(--r>=0){var o=n==8?e[r]&255:intAt(e,r);if(o<0){e.charAt(r)=="-"&&(i=!0);continue}i=!1,s==0?this[this.t++]=o:s+n>this.DB?(this[this.t-1]|=(o&(1<<this.DB-s)-1)<<s,this[this.t++]=o>>this.DB-s):this[this.t-1]|=o<<s,s+=n,s>=this.DB&&(s-=this.DB)}n==8&&(e[0]&128)!=0&&(this.s=-1,s>0&&(this[this.t-1]|=(1<<this.DB-s)-1<<s)),this.clamp(),i&&BigInteger.ZERO.subTo(this,this)}function bnpClamp(){var e=this.s&this.DM;while(this.t>0&&this[this.t-1]==e)--this.t}function bnToString(e){if(this.s<0)return"-"+this.negate().toString(e);var t;if(e==16)t=4;else if(e==8)t=3;else if(e==2)t=1;else if(e==32)t=5;else{if(e!=4)return this.toRadix(e);t=2}var n=(1<<t)-1,r,i=!1,s="",o=this.t,u=this.DB-o*this.DB%t;if(o-->0){u<this.DB&&(r=this[o]>>u)>0&&(i=!0,s=int2char(r));while(o>=0)u<t?(r=(this[o]&(1<<u)-1)<<t-u,r|=this[--o]>>(u+=this.DB-t)):(r=this[o]>>(u-=t)&n,u<=0&&(u+=this.DB,--o)),r>0&&(i=!0),i&&(s+=int2char(r))}return i?s:"0"}function bnNegate(){var e=nbi();return BigInteger.ZERO.subTo(this,e),e}function bnAbs(){return this.s<0?this.negate():this}function bnCompareTo(e){var t=this.s-e.s;if(t!=0)return t;var n=this.t;t=n-e.t;if(t!=0)return this.s<0?-t:t;while(--n>=0)if((t=this[n]-e[n])!=0)return t;return 0}function nbits(e){var t=1,n;return(n=e>>>16)!=0&&(e=n,t+=16),(n=e>>8)!=0&&(e=n,t+=8),(n=e>>4)!=0&&(e=n,t+=4),(n=e>>2)!=0&&(e=n,t+=2),(n=e>>1)!=0&&(e=n,t+=1),t}function bnBitLength(){return this.t<=0?0:this.DB*(this.t-1)+nbits(this[this.t-1]^this.s&this.DM)}function bnpDLShiftTo(e,t){var n;for(n=this.t-1;n>=0;--n)t[n+e]=this[n];for(n=e-1;n>=0;--n)t[n]=0;t.t=this.t+e,t.s=this.s}function bnpDRShiftTo(e,t){for(var n=e;n<this.t;++n)t[n-e]=this[n];t.t=Math.max(this.t-e,0),t.s=this.s}function bnpLShiftTo(e,t){var n=e%this.DB,r=this.DB-n,i=(1<<r)-1,s=Math.floor(e/this.DB),o=this.s<<n&this.DM,u;for(u=this.t-1;u>=0;--u)t[u+s+1]=this[u]>>r|o,o=(this[u]&i)<<n;for(u=s-1;u>=0;--u)t[u]=0;t[s]=o,t.t=this.t+s+1,t.s=this.s,t.clamp()}function bnpRShiftTo(e,t){t.s=this.s;var n=Math.floor(e/this.DB);if(n>=this.t){t.t=0;return}var r=e%this.DB,i=this.DB-r,s=(1<<r)-1;t[0]=this[n]>>r;for(var o=n+1;o<this.t;++o)t[o-n-1]|=(this[o]&s)<<i,t[o-n]=this[o]>>r;r>0&&(t[this.t-n-1]|=(this.s&s)<<i),t.t=this.t-n,t.clamp()}function bnpSubTo(e,t){var n=0,r=0,i=Math.min(e.t,this.t);while(n<i)r+=this[n]-e[n],t[n++]=r&this.DM,r>>=this.DB;if(e.t<this.t){r-=e.s;while(n<this.t)r+=this[n],t[n++]=r&this.DM,r>>=this.DB;r+=this.s}else{r+=this.s;while(n<e.t)r-=e[n],t[n++]=r&this.DM,r>>=this.DB;r-=e.s}t.s=r<0?-1:0,r<-1?t[n++]=this.DV+r:r>0&&(t[n++]=r),t.t=n,t.clamp()}function bnpMultiplyTo(e,t){var n=this.abs(),r=e.abs(),i=n.t;t.t=i+r.t;while(--i>=0)t[i]=0;for(i=0;i<r.t;++i)t[i+n.t]=n.am(0,r[i],t,i,0,n.t);t.s=0,t.clamp(),this.s!=e.s&&BigInteger.ZERO.subTo(t,t)}function bnpSquareTo(e){var t=this.abs(),n=e.t=2*t.t;while(--n>=0)e[n]=0;for(n=0;n<t.t-1;++n){var r=t.am(n,t[n],e,2*n,0,1);(e[n+t.t]+=t.am(n+1,2*t[n],e,2*n+1,r,t.t-n-1))>=t.DV&&(e[n+t.t]-=t.DV,e[n+t.t+1]=1)}e.t>0&&(e[e.t-1]+=t.am(n,t[n],e,2*n,0,1)),e.s=0,e.clamp()}function bnpDivRemTo(e,t,n){var r=e.abs();if(r.t<=0)return;var i=this.abs();if(i.t<r.t){t!=null&&t.fromInt(0),n!=null&&this.copyTo(n);return}n==null&&(n=nbi());var s=nbi(),o=this.s,u=e.s,a=this.DB-nbits(r[r.t-1]);a>0?(r.lShiftTo(a,s),i.lShiftTo(a,n)):(r.copyTo(s),i.copyTo(n));var f=s.t,l=s[f-1];if(l==0)return;var c=l*(1<<this.F1)+(f>1?s[f-2]>>this.F2:0),h=this.FV/c,p=(1<<this.F1)/c,d=1<<this.F2,v=n.t,m=v-f,g=t==null?nbi():t;s.dlShiftTo(m,g),n.compareTo(g)>=0&&(n[n.t++]=1,n.subTo(g,n)),BigInteger.ONE.dlShiftTo(f,g),g.subTo(s,s);while(s.t<f)s[s.t++]=0;while(--m>=0){var y=n[--v]==l?this.DM:Math.floor(n[v]*h+(n[v-1]+d)*p);if((n[v]+=s.am(0,y,n,m,0,f))<y){s.dlShiftTo(m,g),n.subTo(g,n);while(n[v]<--y)n.subTo(g,n)}}t!=null&&(n.drShiftTo(f,t),o!=u&&BigInteger.ZERO.subTo(t,t)),n.t=f,n.clamp(),a>0&&n.rShiftTo(a,n),o<0&&BigInteger.ZERO.subTo(n,n)}function bnMod(e){var t=nbi();return this.abs().divRemTo(e,null,t),this.s<0&&t.compareTo(BigInteger.ZERO)>0&&e.subTo(t,t),t}function Classic(e){this.m=e}function cConvert(e){return e.s<0||e.compareTo(this.m)>=0?e.mod(this.m):e}function cRevert(e){return e}function cReduce(e){e.divRemTo(this.m,null,e)}function cMulTo(e,t,n){e.multiplyTo(t,n),this.reduce(n)}function cSqrTo(e,t){e.squareTo(t),this.reduce(t)}function bnpInvDigit(){if(this.t<1)return 0;var e=this[0];if((e&1)==0)return 0;var t=e&3;return t=t*(2-(e&15)*t)&15,t=t*(2-(e&255)*t)&255,t=t*(2-((e&65535)*t&65535))&65535,t=t*(2-e*t%this.DV)%this.DV,t>0?this.DV-t:-t}function Montgomery(e){this.m=e,this.mp=e.invDigit(),this.mpl=this.mp&32767,this.mph=this.mp>>15,this.um=(1<<e.DB-15)-1,this.mt2=2*e.t}function montConvert(e){var t=nbi();return e.abs().dlShiftTo(this.m.t,t),t.divRemTo(this.m,null,t),e.s<0&&t.compareTo(BigInteger.ZERO)>0&&this.m.subTo(t,t),t}function montRevert(e){var t=nbi();return e.copyTo(t),this.reduce(t),t}function montReduce(e){while(e.t<=this.mt2)e[e.t++]=0;for(var t=0;t<this.m.t;++t){var n=e[t]&32767,r=n*this.mpl+((n*this.mph+(e[t]>>15)*this.mpl&this.um)<<15)&e.DM;n=t+this.m.t,e[n]+=this.m.am(0,r,e,t,0,this.m.t);while(e[n]>=e.DV)e[n]-=e.DV,e[++n]++}e.clamp(),e.drShiftTo(this.m.t,e),e.compareTo(this.m)>=0&&e.subTo(this.m,e)}function montSqrTo(e,t){e.squareTo(t),this.reduce(t)}function montMulTo(e,t,n){e.multiplyTo(t,n),this.reduce(n)}function bnpIsEven(){return(this.t>0?this[0]&1:this.s)==0}function bnpExp(e,t){if(e>4294967295||e<1)return BigInteger.ONE;var n=nbi(),r=nbi(),i=t.convert(this),s=nbits(e)-1;i.copyTo(n);while(--s>=0){t.sqrTo(n,r);if((e&1<<s)>0)t.mulTo(r,i,n);else{var o=n;n=r,r=o}}return t.revert(n)}function bnModPowInt(e,t){var n;return e<256||t.isEven()?n=new Classic(t):n=new Montgomery(t),this.exp(e,n)}var dbits,canary=0xdeadbeefcafe,j_lm=(canary&16777215)==15715070;j_lm&&navigator.appName=="Microsoft Internet Explorer"?(BigInteger.prototype.am=am2,dbits=30):j_lm&&navigator.appName!="Netscape"?(BigInteger.prototype.am=am1,dbits=26):(BigInteger.prototype.am=am3,dbits=28),BigInteger.prototype.DB=dbits,BigInteger.prototype.DM=(1<<dbits)-1,BigInteger.prototype.DV=1<<dbits;var BI_FP=52;BigInteger.prototype.FV=Math.pow(2,BI_FP),BigInteger.prototype.F1=BI_FP-dbits,BigInteger.prototype.F2=2*dbits-BI_FP;var BI_RM="0123456789abcdefghijklmnopqrstuvwxyz",BI_RC=new Array,rr,vv;rr="0".charCodeAt(0);for(vv=0;vv<=9;++vv)BI_RC[rr++]=vv;rr="a".charCodeAt(0);for(vv=10;vv<36;++vv)BI_RC[rr++]=vv;rr="A".charCodeAt(0);for(vv=10;vv<36;++vv)BI_RC[rr++]=vv;Classic.prototype.convert=cConvert,Classic.prototype.revert=cRevert,Classic.prototype.reduce=cReduce,Classic.prototype.mulTo=cMulTo,Classic.prototype.sqrTo=cSqrTo,Montgomery.prototype.convert=montConvert,Montgomery.prototype.revert=montRevert,Montgomery.prototype.reduce=montReduce,Montgomery.prototype.mulTo=montMulTo,Montgomery.prototype.sqrTo=montSqrTo,BigInteger.prototype.copyTo=bnpCopyTo,BigInteger.prototype.fromInt=bnpFromInt,BigInteger.prototype.fromString=bnpFromString,BigInteger.prototype.clamp=bnpClamp,BigInteger.prototype.dlShiftTo=bnpDLShiftTo,BigInteger.prototype.drShiftTo=bnpDRShiftTo,BigInteger.prototype.lShiftTo=bnpLShiftTo,BigInteger.prototype.rShiftTo=bnpRShiftTo,BigInteger.prototype.subTo=bnpSubTo,BigInteger.prototype.multiplyTo=bnpMultiplyTo,BigInteger.prototype.squareTo=bnpSquareTo,BigInteger.prototype.divRemTo=bnpDivRemTo,BigInteger.prototype.invDigit=bnpInvDigit,BigInteger.prototype.isEven=bnpIsEven,BigInteger.prototype.exp=bnpExp,BigInteger.prototype.toString=bnToString,BigInteger.prototype.negate=bnNegate,BigInteger.prototype.abs=bnAbs,BigInteger.prototype.compareTo=bnCompareTo,BigInteger.prototype.bitLength=bnBitLength,BigInteger.prototype.mod=bnMod,BigInteger.prototype.modPowInt=bnModPowInt,BigInteger.ZERO=nbv(0),BigInteger.ONE=nbv(1);
-function bnClone(){var e=nbi();return this.copyTo(e),e}function bnIntValue(){if(this.s<0){if(this.t==1)return this[0]-this.DV;if(this.t==0)return-1}else{if(this.t==1)return this[0];if(this.t==0)return 0}return(this[1]&(1<<32-this.DB)-1)<<this.DB|this[0]}function bnByteValue(){return this.t==0?this.s:this[0]<<24>>24}function bnShortValue(){return this.t==0?this.s:this[0]<<16>>16}function bnpChunkSize(e){return Math.floor(Math.LN2*this.DB/Math.log(e))}function bnSigNum(){return this.s<0?-1:this.t<=0||this.t==1&&this[0]<=0?0:1}function bnpToRadix(e){e==null&&(e=10);if(this.signum()==0||e<2||e>36)return"0";var t=this.chunkSize(e),n=Math.pow(e,t),r=nbv(n),i=nbi(),s=nbi(),o="";this.divRemTo(r,i,s);while(i.signum()>0)o=(n+s.intValue()).toString(e).substr(1)+o,i.divRemTo(r,i,s);return s.intValue().toString(e)+o}function bnpFromRadix(e,t){this.fromInt(0),t==null&&(t=10);var n=this.chunkSize(t),r=Math.pow(t,n),i=!1,s=0,o=0;for(var u=0;u<e.length;++u){var a=intAt(e,u);if(a<0){e.charAt(u)=="-"&&this.signum()==0&&(i=!0);continue}o=t*o+a,++s>=n&&(this.dMultiply(r),this.dAddOffset(o,0),s=0,o=0)}s>0&&(this.dMultiply(Math.pow(t,s)),this.dAddOffset(o,0)),i&&BigInteger.ZERO.subTo(this,this)}function bnpFromNumber(e,t,n){if("number"==typeof t)if(e<2)this.fromInt(1);else{this.fromNumber(e,n),this.testBit(e-1)||this.bitwiseTo(BigInteger.ONE.shiftLeft(e-1),op_or,this),this.isEven()&&this.dAddOffset(1,0);while(!this.isProbablePrime(t))this.dAddOffset(2,0),this.bitLength()>e&&this.subTo(BigInteger.ONE.shiftLeft(e-1),this)}else{var r=new Array,i=e&7;r.length=(e>>3)+1,t.nextBytes(r),i>0?r[0]&=(1<<i)-1:r[0]=0,this.fromString(r,256)}}function bnToByteArray(){var e=this.t,t=new Array;t[0]=this.s;var n=this.DB-e*this.DB%8,r,i=0;if(e-->0){n<this.DB&&(r=this[e]>>n)!=(this.s&this.DM)>>n&&(t[i++]=r|this.s<<this.DB-n);while(e>=0){n<8?(r=(this[e]&(1<<n)-1)<<8-n,r|=this[--e]>>(n+=this.DB-8)):(r=this[e]>>(n-=8)&255,n<=0&&(n+=this.DB,--e)),(r&128)!=0&&(r|=-256),i==0&&(this.s&128)!=(r&128)&&++i;if(i>0||r!=this.s)t[i++]=r}}return t}function bnEquals(e){return this.compareTo(e)==0}function bnMin(e){return this.compareTo(e)<0?this:e}function bnMax(e){return this.compareTo(e)>0?this:e}function bnpBitwiseTo(e,t,n){var r,i,s=Math.min(e.t,this.t);for(r=0;r<s;++r)n[r]=t(this[r],e[r]);if(e.t<this.t){i=e.s&this.DM;for(r=s;r<this.t;++r)n[r]=t(this[r],i);n.t=this.t}else{i=this.s&this.DM;for(r=s;r<e.t;++r)n[r]=t(i,e[r]);n.t=e.t}n.s=t(this.s,e.s),n.clamp()}function op_and(e,t){return e&t}function bnAnd(e){var t=nbi();return this.bitwiseTo(e,op_and,t),t}function op_or(e,t){return e|t}function bnOr(e){var t=nbi();return this.bitwiseTo(e,op_or,t),t}function op_xor(e,t){return e^t}function bnXor(e){var t=nbi();return this.bitwiseTo(e,op_xor,t),t}function op_andnot(e,t){return e&~t}function bnAndNot(e){var t=nbi();return this.bitwiseTo(e,op_andnot,t),t}function bnNot(){var e=nbi();for(var t=0;t<this.t;++t)e[t]=this.DM&~this[t];return e.t=this.t,e.s=~this.s,e}function bnShiftLeft(e){var t=nbi();return e<0?this.rShiftTo(-e,t):this.lShiftTo(e,t),t}function bnShiftRight(e){var t=nbi();return e<0?this.lShiftTo(-e,t):this.rShiftTo(e,t),t}function lbit(e){if(e==0)return-1;var t=0;return(e&65535)==0&&(e>>=16,t+=16),(e&255)==0&&(e>>=8,t+=8),(e&15)==0&&(e>>=4,t+=4),(e&3)==0&&(e>>=2,t+=2),(e&1)==0&&++t,t}function bnGetLowestSetBit(){for(var e=0;e<this.t;++e)if(this[e]!=0)return e*this.DB+lbit(this[e]);return this.s<0?this.t*this.DB:-1}function cbit(e){var t=0;while(e!=0)e&=e-1,++t;return t}function bnBitCount(){var e=0,t=this.s&this.DM;for(var n=0;n<this.t;++n)e+=cbit(this[n]^t);return e}function bnTestBit(e){var t=Math.floor(e/this.DB);return t>=this.t?this.s!=0:(this[t]&1<<e%this.DB)!=0}function bnpChangeBit(e,t){var n=BigInteger.ONE.shiftLeft(e);return this.bitwiseTo(n,t,n),n}function bnSetBit(e){return this.changeBit(e,op_or)}function bnClearBit(e){return this.changeBit(e,op_andnot)}function bnFlipBit(e){return this.changeBit(e,op_xor)}function bnpAddTo(e,t){var n=0,r=0,i=Math.min(e.t,this.t);while(n<i)r+=this[n]+e[n],t[n++]=r&this.DM,r>>=this.DB;if(e.t<this.t){r+=e.s;while(n<this.t)r+=this[n],t[n++]=r&this.DM,r>>=this.DB;r+=this.s}else{r+=this.s;while(n<e.t)r+=e[n],t[n++]=r&this.DM,r>>=this.DB;r+=e.s}t.s=r<0?-1:0,r>0?t[n++]=r:r<-1&&(t[n++]=this.DV+r),t.t=n,t.clamp()}function bnAdd(e){var t=nbi();return this.addTo(e,t),t}function bnSubtract(e){var t=nbi();return this.subTo(e,t),t}function bnMultiply(e){var t=nbi();return this.multiplyTo(e,t),t}function bnSquare(){var e=nbi();return this.squareTo(e),e}function bnDivide(e){var t=nbi();return this.divRemTo(e,t,null),t}function bnRemainder(e){var t=nbi();return this.divRemTo(e,null,t),t}function bnDivideAndRemainder(e){var t=nbi(),n=nbi();return this.divRemTo(e,t,n),new Array(t,n)}function bnpDMultiply(e){this[this.t]=this.am(0,e-1,this,0,0,this.t),++this.t,this.clamp()}function bnpDAddOffset(e,t){if(e==0)return;while(this.t<=t)this[this.t++]=0;this[t]+=e;while(this[t]>=this.DV)this[t]-=this.DV,++t>=this.t&&(this[this.t++]=0),++this[t]}function NullExp(){}function nNop(e){return e}function nMulTo(e,t,n){e.multiplyTo(t,n)}function nSqrTo(e,t){e.squareTo(t)}function bnPow(e){return this.exp(e,new NullExp)}function bnpMultiplyLowerTo(e,t,n){var r=Math.min(this.t+e.t,t);n.s=0,n.t=r;while(r>0)n[--r]=0;var i;for(i=n.t-this.t;r<i;++r)n[r+this.t]=this.am(0,e[r],n,r,0,this.t);for(i=Math.min(e.t,t);r<i;++r)this.am(0,e[r],n,r,0,t-r);n.clamp()}function bnpMultiplyUpperTo(e,t,n){--t;var r=n.t=this.t+e.t-t;n.s=0;while(--r>=0)n[r]=0;for(r=Math.max(t-this.t,0);r<e.t;++r)n[this.t+r-t]=this.am(t-r,e[r],n,0,0,this.t+r-t);n.clamp(),n.drShiftTo(1,n)}function Barrett(e){this.r2=nbi(),this.q3=nbi(),BigInteger.ONE.dlShiftTo(2*e.t,this.r2),this.mu=this.r2.divide(e),this.m=e}function barrettConvert(e){if(e.s<0||e.t>2*this.m.t)return e.mod(this.m);if(e.compareTo(this.m)<0)return e;var t=nbi();return e.copyTo(t),this.reduce(t),t}function barrettRevert(e){return e}function barrettReduce(e){e.drShiftTo(this.m.t-1,this.r2),e.t>this.m.t+1&&(e.t=this.m.t+1,e.clamp()),this.mu.multiplyUpperTo(this.r2,this.m.t+1,this.q3),this.m.multiplyLowerTo(this.q3,this.m.t+1,this.r2);while(e.compareTo(this.r2)<0)e.dAddOffset(1,this.m.t+1);e.subTo(this.r2,e);while(e.compareTo(this.m)>=0)e.subTo(this.m,e)}function barrettSqrTo(e,t){e.squareTo(t),this.reduce(t)}function barrettMulTo(e,t,n){e.multiplyTo(t,n),this.reduce(n)}function bnModPow(e,t){var n=e.bitLength(),r,i=nbv(1),s;if(n<=0)return i;n<18?r=1:n<48?r=3:n<144?r=4:n<768?r=5:r=6,n<8?s=new Classic(t):t.isEven()?s=new Barrett(t):s=new Montgomery(t);var o=new Array,u=3,a=r-1,f=(1<<r)-1;o[1]=s.convert(this);if(r>1){var l=nbi();s.sqrTo(o[1],l);while(u<=f)o[u]=nbi(),s.mulTo(l,o[u-2],o[u]),u+=2}var c=e.t-1,h,p=!0,d=nbi(),v;n=nbits(e[c])-1;while(c>=0){n>=a?h=e[c]>>n-a&f:(h=(e[c]&(1<<n+1)-1)<<a-n,c>0&&(h|=e[c-1]>>this.DB+n-a)),u=r;while((h&1)==0)h>>=1,--u;(n-=u)<0&&(n+=this.DB,--c);if(p)o[h].copyTo(i),p=!1;else{while(u>1)s.sqrTo(i,d),s.sqrTo(d,i),u-=2;u>0?s.sqrTo(i,d):(v=i,i=d,d=v),s.mulTo(d,o[h],i)}while(c>=0&&(e[c]&1<<n)==0)s.sqrTo(i,d),v=i,i=d,d=v,--n<0&&(n=this.DB-1,--c)}return s.revert(i)}function bnGCD(e){var t=this.s<0?this.negate():this.clone(),n=e.s<0?e.negate():e.clone();if(t.compareTo(n)<0){var r=t;t=n,n=r}var i=t.getLowestSetBit(),s=n.getLowestSetBit();if(s<0)return t;i<s&&(s=i),s>0&&(t.rShiftTo(s,t),n.rShiftTo(s,n));while(t.signum()>0)(i=t.getLowestSetBit())>0&&t.rShiftTo(i,t),(i=n.getLowestSetBit())>0&&n.rShiftTo(i,n),t.compareTo(n)>=0?(t.subTo(n,t),t.rShiftTo(1,t)):(n.subTo(t,n),n.rShiftTo(1,n));return s>0&&n.lShiftTo(s,n),n}function bnpModInt(e){if(e<=0)return 0;var t=this.DV%e,n=this.s<0?e-1:0;if(this.t>0)if(t==0)n=this[0]%e;else for(var r=this.t-1;r>=0;--r)n=(t*n+this[r])%e;return n}function bnModInverse(e){var t=e.isEven();if(this.isEven()&&t||e.signum()==0)return BigInteger.ZERO;var n=e.clone(),r=this.clone(),i=nbv(1),s=nbv(0),o=nbv(0),u=nbv(1);while(n.signum()!=0){while(n.isEven()){n.rShiftTo(1,n);if(t){if(!i.isEven()||!s.isEven())i.addTo(this,i),s.subTo(e,s);i.rShiftTo(1,i)}else s.isEven()||s.subTo(e,s);s.rShiftTo(1,s)}while(r.isEven()){r.rShiftTo(1,r);if(t){if(!o.isEven()||!u.isEven())o.addTo(this,o),u.subTo(e,u);o.rShiftTo(1,o)}else u.isEven()||u.subTo(e,u);u.rShiftTo(1,u)}n.compareTo(r)>=0?(n.subTo(r,n),t&&i.subTo(o,i),s.subTo(u,s)):(r.subTo(n,r),t&&o.subTo(i,o),u.subTo(s,u))}return r.compareTo(BigInteger.ONE)!=0?BigInteger.ZERO:u.compareTo(e)>=0?u.subtract(e):u.signum()<0?(u.addTo(e,u),u.signum()<0?u.add(e):u):u}function bnIsProbablePrime(e){var t,n=this.abs();if(n.t==1&&n[0]<=lowprimes[lowprimes.length-1]){for(t=0;t<lowprimes.length;++t)if(n[0]==lowprimes[t])return!0;return!1}if(n.isEven())return!1;t=1;while(t<lowprimes.length){var r=lowprimes[t],i=t+1;while(i<lowprimes.length&&r<lplim)r*=lowprimes[i++];r=n.modInt(r);while(t<i)if(r%lowprimes[t++]==0)return!1}return n.millerRabin(e)}function bnpMillerRabin(e){var t=this.subtract(BigInteger.ONE),n=t.getLowestSetBit();if(n<=0)return!1;var r=t.shiftRight(n);e=e+1>>1,e>lowprimes.length&&(e=lowprimes.length);var i=nbi();for(var s=0;s<e;++s){i.fromInt(lowprimes[Math.floor(Math.random()*lowprimes.length)]);var o=i.modPow(r,this);if(o.compareTo(BigInteger.ONE)!=0&&o.compareTo(t)!=0){var u=1;while(u++<n&&o.compareTo(t)!=0){o=o.modPowInt(2,this);if(o.compareTo(BigInteger.ONE)==0)return!1}if(o.compareTo(t)!=0)return!1}}return!0}NullExp.prototype.convert=nNop,NullExp.prototype.revert=nNop,NullExp.prototype.mulTo=nMulTo,NullExp.prototype.sqrTo=nSqrTo,Barrett.prototype.convert=barrettConvert,Barrett.prototype.revert=barrettRevert,Barrett.prototype.reduce=barrettReduce,Barrett.prototype.mulTo=barrettMulTo,Barrett.prototype.sqrTo=barrettSqrTo;var lowprimes=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997],lplim=(1<<26)/lowprimes[lowprimes.length-1];BigInteger.prototype.chunkSize=bnpChunkSize,BigInteger.prototype.toRadix=bnpToRadix,BigInteger.prototype.fromRadix=bnpFromRadix,BigInteger.prototype.fromNumber=bnpFromNumber,BigInteger.prototype.bitwiseTo=bnpBitwiseTo,BigInteger.prototype.changeBit=bnpChangeBit,BigInteger.prototype.addTo=bnpAddTo,BigInteger.prototype.dMultiply=bnpDMultiply,BigInteger.prototype.dAddOffset=bnpDAddOffset,BigInteger.prototype.multiplyLowerTo=bnpMultiplyLowerTo,BigInteger.prototype.multiplyUpperTo=bnpMultiplyUpperTo,BigInteger.prototype.modInt=bnpModInt,BigInteger.prototype.millerRabin=bnpMillerRabin,BigInteger.prototype.clone=bnClone,BigInteger.prototype.intValue=bnIntValue,BigInteger.prototype.byteValue=bnByteValue,BigInteger.prototype.shortValue=bnShortValue,BigInteger.prototype.signum=bnSigNum,BigInteger.prototype.toByteArray=bnToByteArray,BigInteger.prototype.equals=bnEquals,BigInteger.prototype.min=bnMin,BigInteger.prototype.max=bnMax,BigInteger.prototype.and=bnAnd,BigInteger.prototype.or=bnOr,BigInteger.prototype.xor=bnXor,BigInteger.prototype.andNot=bnAndNot,BigInteger.prototype.not=bnNot,BigInteger.prototype.shiftLeft=bnShiftLeft,BigInteger.prototype.shiftRight=bnShiftRight,BigInteger.prototype.getLowestSetBit=bnGetLowestSetBit,BigInteger.prototype.bitCount=bnBitCount,BigInteger.prototype.testBit=bnTestBit,BigInteger.prototype.setBit=bnSetBit,BigInteger.prototype.clearBit=bnClearBit,BigInteger.prototype.flipBit=bnFlipBit,BigInteger.prototype.add=bnAdd,BigInteger.prototype.subtract=bnSubtract,BigInteger.prototype.multiply=bnMultiply,BigInteger.prototype.divide=bnDivide,BigInteger.prototype.remainder=bnRemainder,BigInteger.prototype.divideAndRemainder=bnDivideAndRemainder,BigInteger.prototype.modPow=bnModPow,BigInteger.prototype.modInverse=bnModInverse,BigInteger.prototype.pow=bnPow,BigInteger.prototype.gcd=bnGCD,BigInteger.prototype.isProbablePrime=bnIsProbablePrime,BigInteger.prototype.square=bnSquare;
-function ECFieldElementFp(e,t){this.x=t,this.q=e}function feFpEquals(e){return e==this?!0:this.q.equals(e.q)&&this.x.equals(e.x)}function feFpToBigInteger(){return this.x}function feFpNegate(){return new ECFieldElementFp(this.q,this.x.negate().mod(this.q))}function feFpAdd(e){return new ECFieldElementFp(this.q,this.x.add(e.toBigInteger()).mod(this.q))}function feFpSubtract(e){return new ECFieldElementFp(this.q,this.x.subtract(e.toBigInteger()).mod(this.q))}function feFpMultiply(e){return new ECFieldElementFp(this.q,this.x.multiply(e.toBigInteger()).mod(this.q))}function feFpSquare(){return new ECFieldElementFp(this.q,this.x.square().mod(this.q))}function feFpDivide(e){return new ECFieldElementFp(this.q,this.x.multiply(e.toBigInteger().modInverse(this.q)).mod(this.q))}function ECPointFp(e,t,n,r){this.curve=e,this.x=t,this.y=n,r==null?this.z=BigInteger.ONE:this.z=r,this.zinv=null}function pointFpGetX(){return this.zinv==null&&(this.zinv=this.z.modInverse(this.curve.q)),this.curve.fromBigInteger(this.x.toBigInteger().multiply(this.zinv).mod(this.curve.q))}function pointFpGetY(){return this.zinv==null&&(this.zinv=this.z.modInverse(this.curve.q)),this.curve.fromBigInteger(this.y.toBigInteger().multiply(this.zinv).mod(this.curve.q))}function pointFpEquals(e){if(e==this)return!0;if(this.isInfinity())return e.isInfinity();if(e.isInfinity())return this.isInfinity();var t,n;return t=e.y.toBigInteger().multiply(this.z).subtract(this.y.toBigInteger().multiply(e.z)).mod(this.curve.q),t.equals(BigInteger.ZERO)?(n=e.x.toBigInteger().multiply(this.z).subtract(this.x.toBigInteger().multiply(e.z)).mod(this.curve.q),n.equals(BigInteger.ZERO)):!1}function pointFpIsInfinity(){return this.x==null&&this.y==null?!0:this.z.equals(BigInteger.ZERO)&&!this.y.toBigInteger().equals(BigInteger.ZERO)}function pointFpNegate(){return new ECPointFp(this.curve,this.x,this.y.negate(),this.z)}function pointFpAdd(e){if(this.isInfinity())return e;if(e.isInfinity())return this;var t=e.y.toBigInteger().multiply(this.z).subtract(this.y.toBigInteger().multiply(e.z)).mod(this.curve.q),n=e.x.toBigInteger().multiply(this.z).subtract(this.x.toBigInteger().multiply(e.z)).mod(this.curve.q);if(BigInteger.ZERO.equals(n))return BigInteger.ZERO.equals(t)?this.twice():this.curve.getInfinity();var r=new BigInteger("3"),i=this.x.toBigInteger(),s=this.y.toBigInteger(),o=e.x.toBigInteger(),u=e.y.toBigInteger(),a=n.square(),f=a.multiply(n),l=i.multiply(a),c=t.square().multiply(this.z),h=c.subtract(l.shiftLeft(1)).multiply(e.z).subtract(f).multiply(n).mod(this.curve.q),p=l.multiply(r).multiply(t).subtract(s.multiply(f)).subtract(c.multiply(t)).multiply(e.z).add(t.multiply(f)).mod(this.curve.q),d=f.multiply(this.z).multiply(e.z).mod(this.curve.q);return new ECPointFp(this.curve,this.curve.fromBigInteger(h),this.curve.fromBigInteger(p),d)}function pointFpTwice(){if(this.isInfinity())return this;if(this.y.toBigInteger().signum()==0)return this.curve.getInfinity();var e=new BigInteger("3"),t=this.x.toBigInteger(),n=this.y.toBigInteger(),r=n.multiply(this.z),i=r.multiply(n).mod(this.curve.q),s=this.curve.a.toBigInteger(),o=t.square().multiply(e);BigInteger.ZERO.equals(s)||(o=o.add(this.z.square().multiply(s))),o=o.mod(this.curve.q);var u=o.square().subtract(t.shiftLeft(3).multiply(i)).shiftLeft(1).multiply(r).mod(this.curve.q),a=o.multiply(e).multiply(t).subtract(i.shiftLeft(1)).shiftLeft(2).multiply(i).subtract(o.square().multiply(o)).mod(this.curve.q),f=r.square().multiply(r).shiftLeft(3).mod(this.curve.q);return new ECPointFp(this.curve,this.curve.fromBigInteger(u),this.curve.fromBigInteger(a),f)}function pointFpMultiply(e){if(this.isInfinity())return this;if(e.signum()==0)return this.curve.getInfinity();var t=e,n=t.multiply(new BigInteger("3")),r=this.negate(),i=this,s;for(s=n.bitLength()-2;s>0;--s){i=i.twice();var o=n.testBit(s),u=t.testBit(s);o!=u&&(i=i.add(o?this:r))}return i}function pointFpMultiplyTwo(e,t,n){var r;e.bitLength()>n.bitLength()?r=e.bitLength()-1:r=n.bitLength()-1;var i=this.curve.getInfinity(),s=this.add(t);while(r>=0)i=i.twice(),e.testBit(r)?n.testBit(r)?i=i.add(s):i=i.add(this):n.testBit(r)&&(i=i.add(t)),--r;return i}function ECCurveFp(e,t,n){this.q=e,this.a=this.fromBigInteger(t),this.b=this.fromBigInteger(n),this.infinity=new ECPointFp(this,null,null)}function curveFpGetQ(){return this.q}function curveFpGetA(){return this.a}function curveFpGetB(){return this.b}function curveFpEquals(e){return e==this?!0:this.q.equals(e.q)&&this.a.equals(e.a)&&this.b.equals(e.b)}function curveFpGetInfinity(){return this.infinity}function curveFpFromBigInteger(e){return new ECFieldElementFp(this.q,e)}function curveFpDecodePointHex(e){switch(parseInt(e.substr(0,2),16)){case 0:return this.infinity;case 2:case 3:return null;case 4:case 6:case 7:var t=(e.length-2)/2,n=e.substr(2,t),r=e.substr(t+2,t);return new ECPointFp(this,this.fromBigInteger(new BigInteger(n,16)),this.fromBigInteger(new BigInteger(r,16)));default:return null}}ECFieldElementFp.prototype.equals=feFpEquals,ECFieldElementFp.prototype.toBigInteger=feFpToBigInteger,ECFieldElementFp.prototype.negate=feFpNegate,ECFieldElementFp.prototype.add=feFpAdd,ECFieldElementFp.prototype.subtract=feFpSubtract,ECFieldElementFp.prototype.multiply=feFpMultiply,ECFieldElementFp.prototype.square=feFpSquare,ECFieldElementFp.prototype.divide=feFpDivide,ECPointFp.prototype.getX=pointFpGetX,ECPointFp.prototype.getY=pointFpGetY,ECPointFp.prototype.equals=pointFpEquals,ECPointFp.prototype.isInfinity=pointFpIsInfinity,ECPointFp.prototype.negate=pointFpNegate,ECPointFp.prototype.add=pointFpAdd,ECPointFp.prototype.twice=pointFpTwice,ECPointFp.prototype.multiply=pointFpMultiply,ECPointFp.prototype.multiplyTwo=pointFpMultiplyTwo,ECCurveFp.prototype.getQ=curveFpGetQ,ECCurveFp.prototype.getA=curveFpGetA,ECCurveFp.prototype.getB=curveFpGetB,ECCurveFp.prototype.equals=curveFpEquals,ECCurveFp.prototype.getInfinity=curveFpGetInfinity,ECCurveFp.prototype.fromBigInteger=curveFpFromBigInteger,ECCurveFp.prototype.decodePointHex=curveFpDecodePointHex;
-function X9ECParameters(e,t,n,r){this.curve=e,this.g=t,this.n=n,this.h=r}function x9getCurve(){return this.curve}function x9getG(){return this.g}function x9getN(){return this.n}function x9getH(){return this.h}function fromHex(e){return new BigInteger(e,16)}function secp128r1(){var e=fromHex("FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFF"),t=fromHex("FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFC"),n=fromHex("E87579C11079F43DD824993C2CEE5ED3"),r=fromHex("FFFFFFFE0000000075A30D1B9038A115"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("04161FF7528B899B2D0C28607CA52C5B86CF5AC8395BAFEB13C02DA292DDED7A83");return new X9ECParameters(s,o,r,i)}function secp160k1(){var e=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73"),t=BigInteger.ZERO,n=fromHex("7"),r=fromHex("0100000000000000000001B8FA16DFAB9ACA16B6B3"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("043B4C382CE37AA192A4019E763036F4F5DD4D7EBB938CF935318FDCED6BC28286531733C3F03C4FEE");return new X9ECParameters(s,o,r,i)}function secp160r1(){var e=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF"),t=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC"),n=fromHex("1C97BEFC54BD7A8B65ACF89F81D4D4ADC565FA45"),r=fromHex("0100000000000000000001F4C8F927AED3CA752257"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("044A96B5688EF573284664698968C38BB913CBFC8223A628553168947D59DCC912042351377AC5FB32");return new X9ECParameters(s,o,r,i)}function secp192k1(){var e=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37"),t=BigInteger.ZERO,n=fromHex("3"),r=fromHex("FFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("04DB4FF10EC057E9AE26B07D0280B7F4341DA5D1B1EAE06C7D9B2F2F6D9C5628A7844163D015BE86344082AA88D95E2F9D");return new X9ECParameters(s,o,r,i)}function secp192r1(){var e=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF"),t=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC"),n=fromHex("64210519E59C80E70FA7E9AB72243049FEB8DEECC146B9B1"),r=fromHex("FFFFFFFFFFFFFFFFFFFFFFFF99DEF836146BC9B1B4D22831"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("04188DA80EB03090F67CBF20EB43A18800F4FF0AFD82FF101207192B95FFC8DA78631011ED6B24CDD573F977A11E794811");return new X9ECParameters(s,o,r,i)}function secp224r1(){var e=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001"),t=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFE"),n=fromHex("B4050A850C04B3ABF54132565044B0B7D7BFD8BA270B39432355FFB4"),r=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2E0B8F03E13DD29455C5C2A3D"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("04B70E0CBD6BB4BF7F321390B94A03C1D356C21122343280D6115C1D21BD376388B5F723FB4C22DFE6CD4375A05A07476444D5819985007E34");return new X9ECParameters(s,o,r,i)}function secp256k1(){var e=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"),t=BigInteger.ZERO,n=fromHex("7"),r=fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("0479BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8");return new X9ECParameters(s,o,r,i)}function secp256r1(){var e=fromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF"),t=fromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC"),n=fromHex("5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B"),r=fromHex("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551"),i=BigInteger.ONE,s=new ECCurveFp(e,t,n),o=s.decodePointHex("046B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C2964FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5");return new X9ECParameters(s,o,r,i)}function getSECCurveByName(e){return e=="secp128r1"?secp128r1():e=="secp160k1"?secp160k1():e=="secp160r1"?secp160r1():e=="secp192k1"?secp192k1():e=="secp192r1"?secp192r1():e=="secp224r1"?secp224r1():e=="secp256k1"?secp256k1():e=="secp256r1"?secp256r1():null}X9ECParameters.prototype.getCurve=x9getCurve,X9ECParameters.prototype.getG=x9getG,X9ECParameters.prototype.getN=x9getN,X9ECParameters.prototype.getH=x9getH;
-var EventEmitter=function(){};EventEmitter.prototype.on=function(e,t,n){n||(n=this),this._listeners||(this._listeners={}),this._listeners[e]||(this._listeners[e]=[]),this._unbinders||(this._unbinders={}),this._unbinders[e]||(this._unbinders[e]=[]);var r=function(e){t.apply(n,[e])};this._unbinders[e].push(t),this._listeners[e].push(r)},EventEmitter.prototype.trigger=function(e,t){t===undefined&&(t={}),this._listeners||(this._listeners={});if(!this._listeners[e])return;var n=this._listeners[e].length;while(n--)this._listeners[e][n](t)},EventEmitter.prototype.removeListener=function(e,t){this._unbinders||(this._unbinders={});if(!this._unbinders[e])return;var n=this._unbinders[e].length;while(n--)this._unbinders[e][n]===t&&(this._unbinders[e].splice(n,1),this._listeners[e].splice(n,1))},EventEmitter.augment=function(e){for(var t in EventEmitter.prototype)e[t]||(e[t]=EventEmitter.prototype[t])};
-(function(e){var t=e;"object"!=typeof module&&(t.EventEmitter=EventEmitter)})("object"==typeof module?module.exports:window.Bitcoin={});
-BigInteger.valueOf=nbv,BigInteger.prototype.toByteArrayUnsigned=function(){var e=this.abs().toByteArray();return e.length?(e[0]==0&&(e=e.slice(1)),e.map(function(e){return e<0?e+256:e})):e},BigInteger.fromByteArrayUnsigned=function(e){return e.length?e[0]&128?new BigInteger([0].concat(e)):new BigInteger(e):e.valueOf(0)},BigInteger.prototype.toByteArraySigned=function(){var e=this.abs().toByteArrayUnsigned(),t=this.compareTo(BigInteger.ZERO)<0;return t?e[0]&128?e.unshift(128):e[0]|=128:e[0]&128&&e.unshift(0),e},BigInteger.fromByteArraySigned=function(e){return e[0]&128?(e[0]&=127,BigInteger.fromByteArrayUnsigned(e).negate()):BigInteger.fromByteArrayUnsigned(e)};var names=["log","debug","info","warn","error","assert","dir","dirxml","group","groupEnd","time","timeEnd","count","trace","profile","profileEnd"];"undefined"==typeof window.console&&(window.console={});for(var i=0;i<names.length;++i)"undefined"==typeof window.console[names[i]]&&(window.console[names[i]]=function(){});Bitcoin.Util={isArray:Array.isArray||function(e){return Object.prototype.toString.call(e)==="[object Array]"},makeFilledArray:function(e,t){var n=[],r=0;while(r<e)n[r++]=t;return n},numToVarInt:function(e){return e<253?[e]:e<=65536?[253,e>>>8,e&255]:e<=1?[254].concat(Crypto.util.wordsToBytes([e])):[255].concat(Crypto.util.wordsToBytes([e>>>32,e]))},valueToBigInt:function(e){return e instanceof BigInteger?e:BigInteger.fromByteArrayUnsigned(e)},formatValue:function(e){var t=this.valueToBigInt(e).toString(),n=t.length>8?t.substr(0,t.length-8):"0",r=t.length>8?t.substr(t.length-8):t;while(r.length<8)r="0"+r;r=r.replace(/0*$/,"");while(r.length<2)r+="0";return n+"."+r},parseValue:function(e){var t=e.split("."),n=t[0],r=t[1]||"0";while(r.length<8)r+="0";r=r.replace(/^0+/g,"");var i=BigInteger.valueOf(parseInt(n));return i=i.multiply(BigInteger.valueOf(1e8)),i=i.add(BigInteger.valueOf(parseInt(r))),i},sha256ripe160:function(e){return Crypto.RIPEMD160(Crypto.SHA256(e,{asBytes:!0}),{asBytes:!0})}};for(var i in Crypto.util)Crypto.util.hasOwnProperty(i)&&(Bitcoin.Util[i]=Crypto.util[i]);
-(function(e){e.Base58={alphabet:"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",validRegex:/^[1-9A-HJ-NP-Za-km-z]+$/,base:BigInteger.valueOf(58),encode:function(e){var n=BigInteger.fromByteArrayUnsigned(e),r=[];while(n.compareTo(t.base)>=0){var i=n.mod(t.base);r.unshift(t.alphabet[i.intValue()]),n=n.subtract(i).divide(t.base)}r.unshift(t.alphabet[n.intValue()]);for(var s=0;s<e.length;s++){if(e[s]!=0)break;r.unshift(t.alphabet[0])}return r.join("")},decode:function(e){var n=BigInteger.valueOf(0),r=0;for(var i=e.length-1;i>=0;i--){var s=t.alphabet.indexOf(e[i]);if(s<0)throw"Invalid character";n=n.add(BigInteger.valueOf(s).multiply(t.base.pow(e.length-1-i))),e[i]=="1"?r++:r=0}var o=n.toByteArrayUnsigned();while(r-->0)o.unshift(0);return o}};var t=e.Base58})("undefined"!=typeof Bitcoin?Bitcoin:module.exports);
-Bitcoin.Address=function(e){"string"==typeof e&&(e=Bitcoin.Address.decodeString(e)),this.hash=e,this.version=0},Bitcoin.Address.prototype.toString=function(){var e=this.hash.slice(0);e.unshift(this.version);var t=Crypto.SHA256(Crypto.SHA256(e,{asBytes:!0}),{asBytes:!0}),n=e.concat(t.slice(0,4));return Bitcoin.Base58.encode(n)},Bitcoin.Address.prototype.getHashBase64=function(){return Crypto.util.bytesToBase64(this.hash)},Bitcoin.Address.decodeString=function(e){var t=Bitcoin.Base58.decode(e),n=t.slice(0,21),r=Crypto.SHA256(Crypto.SHA256(n,{asBytes:!0}),{asBytes:!0});if(r[0]!=t[21]||r[1]!=t[22]||r[2]!=t[23]||r[3]!=t[24])throw"Checksum validation failed!";var i=n.shift();if(i!=0)throw"Version "+i+" not supported!";return n};
-function integerToBytes(e,t){var n=e.toByteArrayUnsigned();if(t<n.length)n=n.slice(n.length-t);else while(t>n.length)n.unshift(0);return n}function dmp(e){return e instanceof BigInteger||(e=e.toBigInteger()),Crypto.util.bytesToHex(e.toByteArrayUnsigned())}ECFieldElementFp.prototype.getByteLength=function(){return Math.floor((this.toBigInteger().bitLength()+7)/8)},ECPointFp.prototype.getEncoded=function(e){var t=this.getX().toBigInteger(),n=this.getY().toBigInteger(),r=integerToBytes(t,32);return e?n.isEven()?r.unshift(2):r.unshift(3):(r.unshift(4),r=r.concat(integerToBytes(n,32))),r},ECPointFp.decodeFrom=function(e,t){var n=t[0],r=t.length-1,i=t.slice(1,1+r/2),s=t.slice(1+r/2,1+r);i.unshift(0),s.unshift(0);var o=new BigInteger(i),u=new BigInteger(s);return new ECPointFp(e,e.fromBigInteger(o),e.fromBigInteger(u))},ECPointFp.prototype.add2D=function(e){if(this.isInfinity())return e;if(e.isInfinity())return this;if(this.x.equals(e.x))return this.y.equals(e.y)?this.twice():this.curve.getInfinity();var t=e.x.subtract(this.x),n=e.y.subtract(this.y),r=n.divide(t),i=r.square().subtract(this.x).subtract(e.x),s=r.multiply(this.x.subtract(i)).subtract(this.y);return new ECPointFp(this.curve,i,s)},ECPointFp.prototype.twice2D=function(){if(this.isInfinity())return this;if(this.y.toBigInteger().signum()==0)return this.curve.getInfinity();var e=this.curve.fromBigInteger(BigInteger.valueOf(2)),t=this.curve.fromBigInteger(BigInteger.valueOf(3)),n=this.x.square().multiply(t).add(this.curve.a).divide(this.y.multiply(e)),r=n.square().subtract(this.x.multiply(e)),i=n.multiply(this.x.subtract(r)).subtract(this.y);return new ECPointFp(this.curve,r,i)},ECPointFp.prototype.multiply2D=function(e){if(this.isInfinity())return this;if(e.signum()==0)return this.curve.getInfinity();var t=e,n=t.multiply(new BigInteger("3")),r=this.negate(),i=this,s;for(s=n.bitLength()-2;s>0;--s){i=i.twice();var o=n.testBit(s),u=t.testBit(s);o!=u&&(i=i.add2D(o?this:r))}return i},ECPointFp.prototype.isOnCurve=function(){var e=this.getX().toBigInteger(),t=this.getY().toBigInteger(),n=this.curve.getA().toBigInteger(),r=this.curve.getB().toBigInteger(),i=this.curve.getQ(),s=t.multiply(t).mod(i),o=e.multiply(e).multiply(e).add(n.multiply(e)).add(r).mod(i);return s.equals(o)},ECPointFp.prototype.toString=function(){return"("+this.getX().toBigInteger().toString()+","+this.getY().toBigInteger().toString()+")"},ECPointFp.prototype.validate=function(){var e=this.curve.getQ();if(this.isInfinity())throw new Error("Point is at infinity.");var t=this.getX().toBigInteger(),n=this.getY().toBigInteger();if(t.compareTo(BigInteger.ONE)<0||t.compareTo(e.subtract(BigInteger.ONE))>0)throw new Error("x coordinate out of bounds");if(n.compareTo(BigInteger.ONE)<0||n.compareTo(e.subtract(BigInteger.ONE))>0)throw new Error("y coordinate out of bounds");if(!this.isOnCurve())throw new Error("Point is not on the curve.");if(this.multiply(e).isInfinity())throw new Error("Point is not a scalar multiple of G.");return!0},Bitcoin.ECDSA=function(){function r(e,t,n,r){var i=Math.max(t.bitLength(),r.bitLength()),s=e.add2D(n),o=e.curve.getInfinity();for(var u=i-1;u>=0;--u)o=o.twice2D(),o.z=BigInteger.ONE,t.testBit(u)?r.testBit(u)?o=o.add2D(s):o=o.add2D(e):r.testBit(u)&&(o=o.add2D(n));return o}var e=getSECCurveByName("secp256k1"),t=new SecureRandom,n=null,i={getBigRandom:function(e){return(new BigInteger(e.bitLength(),t)).mod(e.subtract(BigInteger.ONE)).add(BigInteger.ONE)},sign:function(t,n){var r=n,s=e.getN(),o=BigInteger.fromByteArrayUnsigned(t);do var u=i.getBigRandom(s),a=e.getG(),f=a.multiply(u),l=f.getX().toBigInteger().mod(s);while(l.compareTo(BigInteger.ZERO)<=0);var c=u.modInverse(s).multiply(o.add(r.multiply(l))).mod(s);return i.serializeSig(l,c)},verify:function(t,n,r){var s,o;if(Bitcoin.Util.isArray(n)){var u=i.parseSig(n);s=u.r,o=u.s}else{if("object"!=typeof n||!n.r||!n.s)throw"Invalid value for signature";s=n.r,o=n.s}var a;if(r instanceof ECPointFp)a=r;else{if(!Bitcoin.Util.isArray(r))throw"Invalid format for pubkey value, must be byte array or ECPointFp";a=ECPointFp.decodeFrom(e.getCurve(),r)}var f=BigInteger.fromByteArrayUnsigned(t);return i.verifyRaw(f,s,o,a)},verifyRaw:function(t,n,r,i){var s=e.getN(),o=e.getG();if(n.compareTo(BigInteger.ONE)<0||n.compareTo(s)>=0)return!1;if(r.compareTo(BigInteger.ONE)<0||r.compareTo(s)>=0)return!1;var u=r.modInverse(s),a=t.multiply(u).mod(s),f=n.multiply(u).mod(s),l=o.multiply(a).add(i.multiply(f)),c=l.getX().toBigInteger().mod(s);return c.equals(n)},serializeSig:function(e,t){var n=e.toByteArraySigned(),r=t.toByteArraySigned(),i=[];return i.push(2),i.push(n.length),i=i.concat(n),i.push(2),i.push(r.length),i=i.concat(r),i.unshift(i.length),i.unshift(48),i},parseSig:function(e){var t;if(e[0]!=48)throw new Error("Signature not a valid DERSequence");t=2;if(e[t]!=2)throw new Error("First element in signature must be a DERInteger");var n=e.slice(t+2,t+2+e[t+1]);t+=2+e[t+1];if(e[t]!=2)throw new Error("Second element in signature must be a DERInteger");var r=e.slice(t+2,t+2+e[t+1]);t+=2+e[t+1];var i=BigInteger.fromByteArrayUnsigned(n),s=BigInteger.fromByteArrayUnsigned(r);return{r:i,s:s}},parseSigCompact:function(t){if(t.length!==65)throw"Signature has the wrong length";var n=t[0]-27;if(n<0||n>7)throw"Invalid signature type";var r=e.getN(),i=BigInteger.fromByteArrayUnsigned(t.slice(1,33)).mod(r),s=BigInteger.fromByteArrayUnsigned(t.slice(33,65)).mod(r);return{r:i,s:s,i:n}},recoverPubKey:function(t,s,o,u){u&=3;var a=u&1,f=u>>1,l=e.getN(),c=e.getG(),h=e.getCurve(),p=h.getQ(),d=h.getA().toBigInteger(),v=h.getB().toBigInteger();n||(n=p.add(BigInteger.ONE).divide(BigInteger.valueOf(4)));var m=f?t.add(l):t,g=m.multiply(m).multiply(m).add(d.multiply(m)).add(v).mod(p),y=g.modPow(n,p),b=y.isEven()?u%2:(u+1)%2,w=(y.isEven()?!a:a)?y:p.subtract(y),E=new ECPointFp(h,h.fromBigInteger(m),h.fromBigInteger(w));E.validate();var S=BigInteger.fromByteArrayUnsigned(o),x=BigInteger.ZERO.subtract(S).mod(l),T=t.modInverse(l),N=r(E,s,c,x).multiply(T);console.log("G.x: ",Crypto.util.bytesToHex(c.x.toBigInteger().toByteArrayUnsigned())),console.log("G.y: ",Crypto.util.bytesToHex(c.y.toBigInteger().toByteArrayUnsigned())),console.log("s: ",Crypto.util.bytesToHex(T.toByteArrayUnsigned())),console.log("Q.x: ",Crypto.util.bytesToHex(N.x.toBigInteger().toByteArrayUnsigned())),console.log("Q.y: ",Crypto.util.bytesToHex(N.y.toBigInteger().toByteArrayUnsigned())),N.validate();if(!i.verifyRaw(S,t,s,N))throw"Pubkey recovery unsuccessful";var C=new Bitcoin.ECKey;return C.pub=N,C},calcPubkeyRecoveryParam:function(e,t,n,r){for(var i=0;i<4;i++)try{var s=Bitcoin.ECDSA.recoverPubKey(t,n,r,i);if(s.getBitcoinAddress().toString()==e)return i}catch(o){}throw"Unable to find valid recovery factor"}};return i}();
-Bitcoin.ECKey=function(){var e=Bitcoin.ECDSA,t=getSECCurveByName("secp256k1"),n=new SecureRandom,r=function(n){if(!n){var i=t.getN();this.priv=e.getBigRandom(i)}else n instanceof BigInteger?this.priv=n:Bitcoin.Util.isArray(n)?this.priv=BigInteger.fromByteArrayUnsigned(n):"string"==typeof n&&(n.length==51&&n[0]=="5"?this.priv=BigInteger.fromByteArrayUnsigned(r.decodeString(n)):this.priv=BigInteger.fromByteArrayUnsigned(Crypto.util.base64ToBytes(n)));this.compressed=!!r.compressByDefault};return r.compressByDefault=!1,r.prototype.setCompressed=function(e){this.compressed=!!e},r.prototype.getPub=function(){return this.getPubPoint().getEncoded(this.compressed)},r.prototype.getPubPoint=function(){return this.pub||(this.pub=t.getG().multiply(this.priv)),this.pub},r.prototype.getPubKeyHash=function(){return this.pubKeyHash?this.pubKeyHash:this.pubKeyHash=Bitcoin.Util.sha256ripe160(this.getPub())},r.prototype.getBitcoinAddress=function(){var e=this.getPubKeyHash(),t=new Bitcoin.Address(e);return t},r.prototype.getExportedPrivateKey=function(){var e=this.priv.toByteArrayUnsigned();while(e.length<32)e.unshift(0);e.unshift(128);var t=Crypto.SHA256(Crypto.SHA256(e,{asBytes:!0}),{asBytes:!0}),n=e.concat(t.slice(0,4));return Bitcoin.Base58.encode(n)},r.prototype.setPub=function(e){this.pub=ECPointFp.decodeFrom(t.getCurve(),e)},r.prototype.toString=function(e){return e==="base64"?Crypto.util.bytesToBase64(this.priv.toByteArrayUnsigned()):Crypto.util.bytesToHex(this.priv.toByteArrayUnsigned())},r.prototype.sign=function(t){return e.sign(t,this.priv)},r.prototype.verify=function(t,n){return e.verify(t,n,this.getPub())},r.decodeString=function(e){var t=Bitcoin.Base58.decode(e),n=t.slice(0,33),r=Crypto.SHA256(Crypto.SHA256(n,{asBytes:!0}),{asBytes:!0});if(r[0]!=t[33]||r[1]!=t[34]||r[2]!=t[35]||r[3]!=t[36])throw"Checksum validation failed!";var i=n.shift();if(i!=128)throw"Version "+i+" not supported!";return n},r}();
-(function(){var e=Bitcoin.Opcode=function(e){this.code=e};e.prototype.toString=function(){return e.reverseMap[this.code]},e.map={OP_0:0,OP_FALSE:0,OP_PUSHDATA1:76,OP_PUSHDATA2:77,OP_PUSHDATA4:78,OP_1NEGATE:79,OP_RESERVED:80,OP_1:81,OP_TRUE:81,OP_2:82,OP_3:83,OP_4:84,OP_5:85,OP_6:86,OP_7:87,OP_8:88,OP_9:89,OP_10:90,OP_11:91,OP_12:92,OP_13:93,OP_14:94,OP_15:95,OP_16:96,OP_NOP:97,OP_VER:98,OP_IF:99,OP_NOTIF:100,OP_VERIF:101,OP_VERNOTIF:102,OP_ELSE:103,OP_ENDIF:104,OP_VERIFY:105,OP_RETURN:106,OP_TOALTSTACK:107,OP_FROMALTSTACK:108,OP_2DROP:109,OP_2DUP:110,OP_3DUP:111,OP_2OVER:112,OP_2ROT:113,OP_2SWAP:114,OP_IFDUP:115,OP_DEPTH:116,OP_DROP:117,OP_DUP:118,OP_NIP:119,OP_OVER:120,OP_PICK:121,OP_ROLL:122,OP_ROT:123,OP_SWAP:124,OP_TUCK:125,OP_CAT:126,OP_SUBSTR:127,OP_LEFT:128,OP_RIGHT:129,OP_SIZE:130,OP_INVERT:131,OP_AND:132,OP_OR:133,OP_XOR:134,OP_EQUAL:135,OP_EQUALVERIFY:136,OP_RESERVED1:137,OP_RESERVED2:138,OP_1ADD:139,OP_1SUB:140,OP_2MUL:141,OP_2DIV:142,OP_NEGATE:143,OP_ABS:144,OP_NOT:145,OP_0NOTEQUAL:146,OP_ADD:147,OP_SUB:148,OP_MUL:149,OP_DIV:150,OP_MOD:151,OP_LSHIFT:152,OP_RSHIFT:153,OP_BOOLAND:154,OP_BOOLOR:155,OP_NUMEQUAL:156,OP_NUMEQUALVERIFY:157,OP_NUMNOTEQUAL:158,OP_LESSTHAN:159,OP_GREATERTHAN:160,OP_LESSTHANOREQUAL:161,OP_GREATERTHANOREQUAL:162,OP_MIN:163,OP_MAX:164,OP_WITHIN:165,OP_RIPEMD160:166,OP_SHA1:167,OP_SHA256:168,OP_HASH160:169,OP_HASH256:170,OP_CODESEPARATOR:171,OP_CHECKSIG:172,OP_CHECKSIGVERIFY:173,OP_CHECKMULTISIG:174,OP_CHECKMULTISIGVERIFY:175,OP_NOP1:176,OP_NOP2:177,OP_NOP3:178,OP_NOP4:179,OP_NOP5:180,OP_NOP6:181,OP_NOP7:182,OP_NOP8:183,OP_NOP9:184,OP_NOP10:185,OP_PUBKEYHASH:253,OP_PUBKEY:254,OP_INVALIDOPCODE:255},e.reverseMap=[];for(var t in e.map)e.reverseMap[e.map[t]]=t})();
-(function(){var Opcode=Bitcoin.Opcode;for(var i in Opcode.map)eval("var "+i+" = "+Opcode.map[i]+";");var Script=Bitcoin.Script=function(e){if(!e)this.buffer=[];else if("string"==typeof e)this.buffer=Crypto.util.base64ToBytes(e);else if(Bitcoin.Util.isArray(e))this.buffer=e;else{if(!(e instanceof Script))throw new Error("Invalid script");this.buffer=e.buffer}this.parse()};Script.prototype.parse=function(){function n(n){e.chunks.push(e.buffer.slice(t,t+n)),t+=n}var e=this;this.chunks=[];var t=0;while(t<this.buffer.length){var r=this.buffer[t++];r>=240&&(r=r<<8|this.buffer[t++]);var i;r>0&&r<OP_PUSHDATA1?n(r):r==OP_PUSHDATA1?(i=this.buffer[t++],n(i)):r==OP_PUSHDATA2?(i=this.buffer[t++]<<8|this.buffer[t++],n(i)):r==OP_PUSHDATA4?(i=this.buffer[t++]<<24|this.buffer[t++]<<16|this.buffer[t++]<<8|this.buffer[t++],n(i)):this.chunks.push(r)}},Script.prototype.getOutType=function(){return this.chunks[this.chunks.length-1]==OP_CHECKMULTISIG&&this.chunks[this.chunks.length-2]<=3?"Multisig":this.chunks.length==5&&this.chunks[0]==OP_DUP&&this.chunks[1]==OP_HASH160&&this.chunks[3]==OP_EQUALVERIFY&&this.chunks[4]==OP_CHECKSIG?"Address":this.chunks.length==2&&this.chunks[1]==OP_CHECKSIG?"Pubkey":"Strange"},Script.prototype.simpleOutHash=function(){switch(this.getOutType()){case"Address":return this.chunks[2];case"Pubkey":return Bitcoin.Util.sha256ripe160(this.chunks[0]);default:throw new Error("Encountered non-standard scriptPubKey")}},Script.prototype.simpleOutPubKeyHash=Script.prototype.simpleOutHash,Script.prototype.getInType=function(){return this.chunks.length==1&&Bitcoin.Util.isArray(this.chunks[0])?"Pubkey":this.chunks.length==2&&Bitcoin.Util.isArray(this.chunks[0])&&Bitcoin.Util.isArray(this.chunks[1])?"Address":"Strange"},Script.prototype.simpleInPubKey=function(){switch(this.getInType()){case"Address":return this.chunks[1];case"Pubkey":throw new Error("Script does not contain pubkey.");default:throw new Error("Encountered non-standard scriptSig")}},Script.prototype.simpleInHash=function(){return Bitcoin.Util.sha256ripe160(this.simpleInPubKey())},Script.prototype.simpleInPubKeyHash=Script.prototype.simpleInHash,Script.prototype.writeOp=function(e){this.buffer.push(e),this.chunks.push(e)},Script.prototype.writeBytes=function(e){e.length<OP_PUSHDATA1?this.buffer.push(e.length):e.length<=255?(this.buffer.push(OP_PUSHDATA1),this.buffer.push(e.length)):e.length<=65535?(this.buffer.push(OP_PUSHDATA2),this.buffer.push(e.length&255),this.buffer.push(e.length>>>8&255)):(this.buffer.push(OP_PUSHDATA4),this.buffer.push(e.length&255),this.buffer.push(e.length>>>8&255),this.buffer.push(e.length>>>16&255),this.buffer.push(e.length>>>24&255)),this.buffer=this.buffer.concat(e),this.chunks.push(e)},Script.createOutputScript=function(e){var t=new Script;return t.writeOp(OP_DUP),t.writeOp(OP_HASH160),t.writeBytes(e.hash),t.writeOp(OP_EQUALVERIFY),t.writeOp(OP_CHECKSIG),t},Script.prototype.extractAddresses=function(e){switch(this.getOutType()){case"Address":return e.push(new Address(this.chunks[2])),1;case"Pubkey":return e.push(new Address(Util.sha256ripe160(this.chunks[0]))),1;case"Multisig":for(var t=1;t<this.chunks.length-2;++t)e.push(new Address(Util.sha256ripe160(this.chunks[t])));return this.chunks[0]-OP_1+1;default:throw new Error("Encountered non-standard scriptPubKey")}},Script.createMultiSigOutputScript=function(e,t){var n=new Bitcoin.Script;n.writeOp(OP_1+e-1);for(var r=0;r<t.length;++r)n.writeBytes(t[r]);return n.writeOp(OP_1+t.length-1),n.writeOp(OP_CHECKMULTISIG),n},Script.createInputScript=function(e,t){var n=new Script;return n.writeBytes(e),n.writeBytes(t),n},Script.prototype.clone=function(){return new Script(this.buffer)}})();
-(function(){var e=Bitcoin.Script,t=Bitcoin.Transaction=function(e){this.version=1,this.lock_time=0,this.ins=[],this.outs=[],this.timestamp=null,this.block=null;if(e){e.hash&&(this.hash=e.hash),e.version&&(this.version=e.version),e.lock_time&&(this.lock_time=e.lock_time);if(e.ins&&e.ins.length)for(var t=0;t<e.ins.length;t++)this.addInput(new u(e.ins[t]));if(e.outs&&e.outs.length)for(var t=0;t<e.outs.length;t++)this.addOutput(new a(e.outs[t]));e.timestamp&&(this.timestamp=e.timestamp),e.block&&(this.block=e.block)}};t.objectify=function(e){var n=[];for(var r=0;r<e.length;r++)n.push(new t(e[r]));return n},t.prototype.addInput=function(e,t){arguments[0]instanceof u?this.ins.push(arguments[0]):this.ins.push(new u({outpoint:{hash:e.hash,index:t},script:new Bitcoin.Script,sequence:4294967295}))},t.prototype.addOutput=function(t,n){if(arguments[0]instanceof a)this.outs.push(arguments[0]);else{if(n instanceof BigInteger){n=n.toByteArrayUnsigned().reverse();while(n.length<8)n.push(0)}else Bitcoin.Util.isArray(n);this.outs.push(new a({value:n,script:e.createOutputScript(t)}))}},t.prototype.serialize=function(){var e=[];e=e.concat(Crypto.util.wordsToBytes([parseInt(this.version)]).reverse()),e=e.concat(Bitcoin.Util.numToVarInt(this.ins.length));for(var t=0;t<this.ins.length;t++){var n=this.ins[t];e=e.concat(Crypto.util.base64ToBytes(n.outpoint.hash)),e=e.concat(Crypto.util.wordsToBytes([parseInt(n.outpoint.index)]).reverse());var r=n.script.buffer;e=e.concat(Bitcoin.Util.numToVarInt(r.length)),e=e.concat(r),e=e.concat(Crypto.util.wordsToBytes([parseInt(n.sequence)]).reverse())}e=e.concat(Bitcoin.Util.numToVarInt(this.outs.length));for(var t=0;t<this.outs.length;t++){var i=this.outs[t];e=e.concat(i.value);var r=i.script.buffer;e=e.concat(Bitcoin.Util.numToVarInt(r.length)),e=e.concat(r)}return e=e.concat(Crypto.util.wordsToBytes([parseInt(this.lock_time)]).reverse()),e};var n=171,r=1,i=2,s=3,o=80;t.prototype.hashTransactionForSignature=function(t,n,r){var u=this.clone();for(var a=0;a<u.ins.length;a++)u.ins[a].script=new e;u.ins[n].script=t;if((r&31)==i){u.outs=[];for(var a=0;a<u.ins.length;a++)a!=n&&(u.ins[a].sequence=0)}else(r&31)==s;r&o&&(u.ins=[u.ins[n]]);var f=u.serialize();f=f.concat(Crypto.util.wordsToBytes([parseInt(r)]).reverse());var l=Crypto.SHA256(f,{asBytes:!0});return Crypto.SHA256(l,{asBytes:!0})},t.prototype.getHash=function(){var e=this.serialize();return Crypto.SHA256(Crypto.SHA256(e,{asBytes:!0}),{asBytes:!0})},t.prototype.clone=function(){var e=new t;e.version=this.version,e.lock_time=this.lock_time;for(var n=0;n<this.ins.length;n++){var r=this.ins[n].clone();e.addInput(r)}for(var n=0;n<this.outs.length;n++){var i=this.outs[n].clone();e.addOutput(i)}return e},t.prototype.analyze=function(e){if(e instanceof Bitcoin.Wallet){var t=!0,n=!0,r=null,i=null,s=null;for(var o=this.outs.length-1;o>=0;o--){var u=this.outs[o],a=u.script.simpleOutPubKeyHash();e.hasHash(a)?i=a:n=!1,r=a}for(var o=this.ins.length-1;o>=0;o--){var f=this.ins[o];s=f.script.simpleInPubKeyHash();if(!e.hasHash(s)){t=!1;break}}var l=this.calcImpact(e),c={};return c.impact=l,l.sign>0&&l.value.compareTo(BigInteger.ZERO)>0?(c.type="recv",c.addr=new Bitcoin.Address(i)):t&&n?c.type="self":t?(c.type="sent",c.addr=new Bitcoin.Address(r)):c.type="other",c}return null},t.prototype.getDescription=function(e){var t=this.analyze(e);if(!t)return"";switch(t.type){case"recv":return"Received with "+t.addr;case"sent":return"Payment to "+t.addr;case"self":return"Payment to yourself";case"other":default:return""}},t.prototype.getTotalOutValue=function(){var e=BigInteger.ZERO;for(var t=0;t<this.outs.length;t++){var n=this.outs[t];e=e.add(Bitcoin.Util.valueToBigInt(n.value))}return e},t.prototype.getTotalValue=t.prototype.getTotalOutValue,t.prototype.calcImpact=function(e){if(e instanceof Bitcoin.Wallet){var t=BigInteger.ZERO;for(var n=0;n<this.outs.length;n++){var r=this.outs[n],i=Crypto.util.bytesToBase64(r.script.simpleOutPubKeyHash());e.hasHash(i)&&(t=t.add(Bitcoin.Util.valueToBigInt(r.value)))}var s=BigInteger.ZERO;for(var n=0;n<this.ins.length;n++){var o=this.ins[n],i=Crypto.util.bytesToBase64(o.script.simpleInPubKeyHash());if(e.hasHash(i)){var u=e.txIndex[o.outpoint.hash];u&&(s=s.add(Bitcoin.Util.valueToBigInt(u.outs[o.outpoint.index].value)))}}return t.compareTo(s)>=0?{sign:1,value:t.subtract(s)}:{sign:-1,value:s.subtract(t)}}return BigInteger.ZERO};var u=Bitcoin.TransactionIn=function(t){this.outpoint=t.outpoint,t.script instanceof e?this.script=t.script:this.script=new e(t.script),this.sequence=t.sequence};u.prototype.clone=function(){var e=new u({outpoint:{hash:this.outpoint.hash,index:this.outpoint.index},script:this.script.clone(),sequence:this.sequence});return e};var a=Bitcoin.TransactionOut=function(t){t.script instanceof e?this.script=t.script:this.script=new e(t.script);if(Bitcoin.Util.isArray(t.value))this.value=t.value;else if("string"==typeof t.value){var n=(new BigInteger(t.value,10)).toString(16);while(n.length<16)n="0"+n;this.value=Crypto.util.hexToBytes(n)}};a.prototype.clone=function(){var e=new a({script:this.script.clone(),value:this.value.slice(0)});return e}})();
-Bitcoin.Wallet=function(){var e=Bitcoin.Script,t=Bitcoin.TransactionIn,n=Bitcoin.TransactionOut,r=function(){var e=[];this.addressHashes=[],this.txIndex={},this.unspentOuts=[],this.addressPointer=0,this.addKey=function(t,n){t instanceof Bitcoin.ECKey||(t=new Bitcoin.ECKey(t)),e.push(t),n&&("string"==typeof n&&(n=Crypto.util.base64ToBytes(n)),t.setPub(n)),this.addressHashes.push(t.getBitcoinAddress().getHashBase64())},this.addKeys=function(e,t){"string"==typeof e&&(e=e.split(",")),"string"==typeof t&&(t=t.split(","));var n;if(Array.isArray(t)&&e.length==t.length)for(n=0;n<e.length;n++)this.addKey(e[n],t[n]);else for(n=0;n<e.length;n++)this.addKey(e[n])},this.getKeys=function(){var t=[];for(var n=0;n<e.length;n++)t.push(e[n].toString("base64"));return t},this.getPubKeys=function(){var t=[];for(var n=0;n<e.length;n++)t.push(Crypto.util.bytesToBase64(e[n].getPub()));return t},this.clear=function(){e=[]},this.getLength=function(){return e.length},this.getAllAddresses=function(){var t=[];for(var n=0;n<e.length;n++)t.push(e[n].getBitcoinAddress());return t},this.getCurAddress=function(){return e[this.addressPointer]?e[this.addressPointer].getBitcoinAddress():null},this.getNextAddress=function(){return this.addressPointer++,e[this.addressPointer]||this.generateAddress(),e[this.addressPointer].getBitcoinAddress()},this.signWithKey=function(t,n){t=Crypto.util.bytesToBase64(t);for(var r=0;r<this.addressHashes.length;r++)if(this.addressHashes[r]==t)return e[r].sign(n);throw new Error("Missing key for signature")},this.getPubKeyFromHash=function(t){t=Crypto.util.bytesToBase64(t);for(var n=0;n<this.addressHashes.length;n++)if(this.addressHashes[n]==t)return e[n].getPub();throw new Error("Hash unknown")}};return r.prototype.generateAddress=function(){this.addKey(new Bitcoin.ECKey)},r.prototype.process=function(e){if(this.txIndex[e.hash])return;var r,i,s;for(r=0;r<e.outs.length;r++){var o=new n(e.outs[r]);s=Crypto.util.bytesToBase64(o.script.simpleOutPubKeyHash());for(i=0;i<this.addressHashes.length;i++)if(this.addressHashes[i]===s){this.unspentOuts.push({tx:e,index:r,out:o});break}}for(r=0;r<e.ins.length;r++){var u=new t(e.ins[r]),a=u.script.simpleInPubKey();s=Crypto.util.bytesToBase64(Bitcoin.Util.sha256ripe160(a));for(i=0;i<this.addressHashes.length;i++)if(this.addressHashes[i]===s){for(var f=0;f<this.unspentOuts.length;f++)u.outpoint.hash==this.unspentOuts[f].tx.hash&&u.outpoint.index==this.unspentOuts[f].index&&this.unspentOuts.splice(f,1);break}}this.txIndex[e.hash]=e},r.prototype.getBalance=function(){var e=BigInteger.valueOf(0);for(var t=0;t<this.unspentOuts.length;t++){var n=this.unspentOuts[t].out;e=e.add(Bitcoin.Util.valueToBigInt(n.value))}return e},r.prototype.createSend=function(t,n,r){var i=[],s=n.add(r),o=BigInteger.ZERO,u;for(u=0;u<this.unspentOuts.length;u++){i.push(this.unspentOuts[u]),o=o.add(Bitcoin.Util.valueToBigInt(this.unspentOuts[u].out.value));if(o.compareTo(s)>=0)break}if(o.compareTo(s)<0)throw new Error("Insufficient funds.");var a=o.subtract(s),f=new Bitcoin.Transaction;for(u=0;u<i.length;u++)f.addInput(i[u].tx,i[u].index);f.addOutput(t,n),a.compareTo(BigInteger.ZERO)>0&&f.addOutput(this.getNextAddress(),a);var l=1;for(u=0;u<f.ins.length;u++){var c=f.hashTransactionForSignature(i[u].out.script,u,l),h=i[u].out.script.simpleOutPubKeyHash(),p=this.signWithKey(h,c);p.push(parseInt(l,10)),f.ins[u].script=e.createInputScript(p,this.getPubKeyFromHash(h))}return f},r.prototype.clearTransactions=function(){this.txIndex={},this.unspentOuts=[]},r.prototype.hasHash=function(e){Bitcoin.Util.isArray(e)&&(e=Crypto.util.bytesToBase64(e));for(var t=0;t<this.addressHashes.length;t++)if(this.addressHashes[t]===e)return!0;return!1},r}();
-var TransactionDatabase=function(){this.txs=[],this.txIndex={}};EventEmitter.augment(TransactionDatabase.prototype),TransactionDatabase.prototype.addTransaction=function(e){this.addTransactionNoUpdate(e),$(this).trigger("update")},TransactionDatabase.prototype.addTransactionNoUpdate=function(e){if(this.txIndex[e.hash])return;this.txs.push(new Bitcoin.Transaction(e)),this.txIndex[e.hash]=e},TransactionDatabase.prototype.removeTransaction=function(e){this.removeTransactionNoUpdate(e),$(this).trigger("update")},TransactionDatabase.prototype.removeTransactionNoUpdate=function(e){var t=this.txIndex[e];if(!t)return;for(var n=0,r=this.txs.length;n<r;n++)if(this.txs[n].hash==e){this.txs.splice(n,1);break}delete this.txIndex[e]},TransactionDatabase.prototype.loadTransactions=function(e){for(var t=0;t<e.length;t++)this.addTransactionNoUpdate(e[t]);$(this).trigger("update")},TransactionDatabase.prototype.getTransactions=function(){return this.txs},TransactionDatabase.prototype.clear=function(){this.txs=[],this.txIndex={},$(this).trigger("update")}
+
+if (typeof Crypto == "undefined" || !Crypto.util) {
+    (function() {
+        var base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        var Crypto = window.Crypto = {};
+        var util = Crypto.util = {
+            rotl: function(n, b) {
+                return n << b | n >>> 32 - b;
+            },
+            rotr: function(n, b) {
+                return n << 32 - b | n >>> b;
+            },
+            endian: function(n) {
+                if (n.constructor == Number) {
+                    return util.rotl(n, 8) & 16711935 | util.rotl(n, 24) & 4278255360;
+                }
+                for (var i = 0; i < n.length; i++) n[i] = util.endian(n[i]);
+                return n;
+            },
+            randomBytes: function(n) {
+                for (var bytes = []; n > 0; n--) bytes.push(Math.floor(Math.random() * 256));
+                return bytes;
+            },
+            bytesToWords: function(bytes) {
+                for (var words = [], i = 0, b = 0; i < bytes.length; i++, b += 8) words[b >>> 5] |= (bytes[i] & 255) << 24 - b % 32;
+                return words;
+            },
+            wordsToBytes: function(words) {
+                for (var bytes = [], b = 0; b < words.length * 32; b += 8) bytes.push(words[b >>> 5] >>> 24 - b % 32 & 255);
+                return bytes;
+            },
+            bytesToHex: function(bytes) {
+                for (var hex = [], i = 0; i < bytes.length; i++) {
+                    hex.push((bytes[i] >>> 4).toString(16));
+                    hex.push((bytes[i] & 15).toString(16));
+                }
+                return hex.join("");
+            },
+            hexToBytes: function(hex) {
+                for (var bytes = [], c = 0; c < hex.length; c += 2) bytes.push(parseInt(hex.substr(c, 2), 16));
+                return bytes;
+            },
+            bytesToBase64: function(bytes) {
+                for (var base64 = [], i = 0; i < bytes.length; i += 3) {
+                    var triplet = bytes[i] << 16 | bytes[i + 1] << 8 | bytes[i + 2];
+                    for (var j = 0; j < 4; j++) {
+                        if (i * 8 + j * 6 <= bytes.length * 8) base64.push(base64map.charAt(triplet >>> 6 * (3 - j) & 63)); else base64.push("=");
+                    }
+                }
+                return base64.join("");
+            },
+            base64ToBytes: function(base64) {
+                base64 = base64.replace(/[^A-Z0-9+\/]/gi, "");
+                for (var bytes = [], i = 0, imod4 = 0; i < base64.length; imod4 = ++i % 4) {
+                    if (imod4 == 0) continue;
+                    bytes.push((base64map.indexOf(base64.charAt(i - 1)) & Math.pow(2, -2 * imod4 + 8) - 1) << imod4 * 2 | base64map.indexOf(base64.charAt(i)) >>> 6 - imod4 * 2);
+                }
+                return bytes;
+            }
+        };
+        var charenc = Crypto.charenc = {};
+        var UTF8 = charenc.UTF8 = {
+            stringToBytes: function(str) {
+                return Binary.stringToBytes(unescape(encodeURIComponent(str)));
+            },
+            bytesToString: function(bytes) {
+                return decodeURIComponent(escape(Binary.bytesToString(bytes)));
+            }
+        };
+        var Binary = charenc.Binary = {
+            stringToBytes: function(str) {
+                for (var bytes = [], i = 0; i < str.length; i++) bytes.push(str.charCodeAt(i) & 255);
+                return bytes;
+            },
+            bytesToString: function(bytes) {
+                for (var str = [], i = 0; i < bytes.length; i++) str.push(String.fromCharCode(bytes[i]));
+                return str.join("");
+            }
+        };
+    })();
+}
+
+(function() {
+    var util = Crypto.util;
+    util.u32 = function(n) {
+        return n >>> 0;
+    };
+    util.add = function() {
+        var result = this.u32(arguments[0]);
+        for (var i = 1; i < arguments.length; i++) result = this.u32(result + this.u32(arguments[i]));
+        return result;
+    };
+    util.mult = function(m, n) {
+        return this.add((n & 4294901760) * m, (n & 65535) * m);
+    };
+    util.gt = function(m, n) {
+        return this.u32(m) > this.u32(n);
+    };
+    util.lt = function(m, n) {
+        return this.u32(m) < this.u32(n);
+    };
+})();
+
+(function(C) {
+    var C_pad = C.pad = {};
+    function _requiredPadding(cipher, message) {
+        var blockSizeInBytes = cipher._blocksize * 4;
+        var reqd = blockSizeInBytes - message.length % blockSizeInBytes;
+        return reqd;
+    }
+    var _unpadLength = function(cipher, message, alg, padding) {
+        var pad = message.pop();
+        if (pad == 0) {
+            throw new Error("Invalid zero-length padding specified for " + alg + ". Wrong cipher specification or key used?");
+        }
+        var maxPad = cipher._blocksize * 4;
+        if (pad > maxPad) {
+            throw new Error("Invalid padding length of " + pad + " specified for " + alg + ". Wrong cipher specification or key used?");
+        }
+        for (var i = 1; i < pad; i++) {
+            var b = message.pop();
+            if (padding != undefined && padding != b) {
+                throw new Error("Invalid padding byte of 0x" + b.toString(16) + " specified for " + alg + ". Wrong cipher specification or key used?");
+            }
+        }
+    };
+    C_pad.NoPadding = {
+        pad: function(cipher, message) {},
+        unpad: function(cipher, message) {}
+    };
+    C_pad.ZeroPadding = {
+        pad: function(cipher, message) {
+            var blockSizeInBytes = cipher._blocksize * 4;
+            var reqd = message.length % blockSizeInBytes;
+            if (reqd != 0) {
+                for (reqd = blockSizeInBytes - reqd; reqd > 0; reqd--) {
+                    message.push(0);
+                }
+            }
+        },
+        unpad: function(cipher, message) {
+            while (message[message.length - 1] == 0) {
+                message.pop();
+            }
+        }
+    };
+    C_pad.iso7816 = {
+        pad: function(cipher, message) {
+            var reqd = _requiredPadding(cipher, message);
+            message.push(128);
+            for (;reqd > 1; reqd--) {
+                message.push(0);
+            }
+        },
+        unpad: function(cipher, message) {
+            var padLength;
+            for (padLength = cipher._blocksize * 4; padLength > 0; padLength--) {
+                var b = message.pop();
+                if (b == 128) return;
+                if (b != 0) {
+                    throw new Error("ISO-7816 padding byte must be 0, not 0x" + b.toString(16) + ". Wrong cipher specification or key used?");
+                }
+            }
+            throw new Error("ISO-7816 padded beyond cipher block size. Wrong cipher specification or key used?");
+        }
+    };
+    C_pad.ansix923 = {
+        pad: function(cipher, message) {
+            var reqd = _requiredPadding(cipher, message);
+            for (var i = 1; i < reqd; i++) {
+                message.push(0);
+            }
+            message.push(reqd);
+        },
+        unpad: function(cipher, message) {
+            _unpadLength(cipher, message, "ANSI X.923", 0);
+        }
+    };
+    C_pad.iso10126 = {
+        pad: function(cipher, message) {
+            var reqd = _requiredPadding(cipher, message);
+            for (var i = 1; i < reqd; i++) {
+                message.push(Math.floor(Math.random() * 256));
+            }
+            message.push(reqd);
+        },
+        unpad: function(cipher, message) {
+            _unpadLength(cipher, message, "ISO 10126", undefined);
+        }
+    };
+    C_pad.pkcs7 = {
+        pad: function(cipher, message) {
+            var reqd = _requiredPadding(cipher, message);
+            for (var i = 0; i < reqd; i++) {
+                message.push(reqd);
+            }
+        },
+        unpad: function(cipher, message) {
+            _unpadLength(cipher, message, "PKCS 7", message[message.length - 1]);
+        }
+    };
+    var C_mode = C.mode = {};
+    var Mode = C_mode.Mode = function(padding) {
+        if (padding) {
+            this._padding = padding;
+        }
+    };
+    Mode.prototype = {
+        encrypt: function(cipher, m, iv) {
+            this._padding.pad(cipher, m);
+            this._doEncrypt(cipher, m, iv);
+        },
+        decrypt: function(cipher, m, iv) {
+            this._doDecrypt(cipher, m, iv);
+            this._padding.unpad(cipher, m);
+        },
+        _padding: C_pad.iso7816
+    };
+    var ECB = C_mode.ECB = function() {
+        Mode.apply(this, arguments);
+    };
+    var ECB_prototype = ECB.prototype = new Mode();
+    ECB_prototype._doEncrypt = function(cipher, m, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4;
+        for (var offset = 0; offset < m.length; offset += blockSizeInBytes) {
+            cipher._encryptblock(m, offset);
+        }
+    };
+    ECB_prototype._doDecrypt = function(cipher, c, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4;
+        for (var offset = 0; offset < c.length; offset += blockSizeInBytes) {
+            cipher._decryptblock(c, offset);
+        }
+    };
+    ECB_prototype.fixOptions = function(options) {
+        options.iv = [];
+    };
+    var CBC = C_mode.CBC = function() {
+        Mode.apply(this, arguments);
+    };
+    var CBC_prototype = CBC.prototype = new Mode();
+    CBC_prototype._doEncrypt = function(cipher, m, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4;
+        for (var offset = 0; offset < m.length; offset += blockSizeInBytes) {
+            if (offset == 0) {
+                for (var i = 0; i < blockSizeInBytes; i++) m[i] ^= iv[i];
+            } else {
+                for (var i = 0; i < blockSizeInBytes; i++) m[offset + i] ^= m[offset + i - blockSizeInBytes];
+            }
+            cipher._encryptblock(m, offset);
+        }
+    };
+    CBC_prototype._doDecrypt = function(cipher, c, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4;
+        var prevCryptedBlock = iv;
+        for (var offset = 0; offset < c.length; offset += blockSizeInBytes) {
+            var thisCryptedBlock = c.slice(offset, offset + blockSizeInBytes);
+            cipher._decryptblock(c, offset);
+            for (var i = 0; i < blockSizeInBytes; i++) {
+                c[offset + i] ^= prevCryptedBlock[i];
+            }
+            prevCryptedBlock = thisCryptedBlock;
+        }
+    };
+    var CFB = C_mode.CFB = function() {
+        Mode.apply(this, arguments);
+    };
+    var CFB_prototype = CFB.prototype = new Mode();
+    CFB_prototype._padding = C_pad.NoPadding;
+    CFB_prototype._doEncrypt = function(cipher, m, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4, keystream = iv.slice(0);
+        for (var i = 0; i < m.length; i++) {
+            var j = i % blockSizeInBytes;
+            if (j == 0) cipher._encryptblock(keystream, 0);
+            m[i] ^= keystream[j];
+            keystream[j] = m[i];
+        }
+    };
+    CFB_prototype._doDecrypt = function(cipher, c, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4, keystream = iv.slice(0);
+        for (var i = 0; i < c.length; i++) {
+            var j = i % blockSizeInBytes;
+            if (j == 0) cipher._encryptblock(keystream, 0);
+            var b = c[i];
+            c[i] ^= keystream[j];
+            keystream[j] = b;
+        }
+    };
+    var OFB = C_mode.OFB = function() {
+        Mode.apply(this, arguments);
+    };
+    var OFB_prototype = OFB.prototype = new Mode();
+    OFB_prototype._padding = C_pad.NoPadding;
+    OFB_prototype._doEncrypt = function(cipher, m, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4, keystream = iv.slice(0);
+        for (var i = 0; i < m.length; i++) {
+            if (i % blockSizeInBytes == 0) cipher._encryptblock(keystream, 0);
+            m[i] ^= keystream[i % blockSizeInBytes];
+        }
+    };
+    OFB_prototype._doDecrypt = OFB_prototype._doEncrypt;
+    var CTR = C_mode.CTR = function() {
+        Mode.apply(this, arguments);
+    };
+    var CTR_prototype = CTR.prototype = new Mode();
+    CTR_prototype._padding = C_pad.NoPadding;
+    CTR_prototype._doEncrypt = function(cipher, m, iv) {
+        var blockSizeInBytes = cipher._blocksize * 4;
+        var counter = iv.slice(0);
+        for (var i = 0; i < m.length; ) {
+            var keystream = counter.slice(0);
+            cipher._encryptblock(keystream, 0);
+            for (var j = 0; i < m.length && j < blockSizeInBytes; j++, i++) {
+                m[i] ^= keystream[j];
+            }
+            if (++counter[blockSizeInBytes - 1] == 256) {
+                counter[blockSizeInBytes - 1] = 0;
+                if (++counter[blockSizeInBytes - 2] == 256) {
+                    counter[blockSizeInBytes - 2] = 0;
+                    if (++counter[blockSizeInBytes - 3] == 256) {
+                        counter[blockSizeInBytes - 3] = 0;
+                        ++counter[blockSizeInBytes - 4];
+                    }
+                }
+            }
+        }
+    };
+    CTR_prototype._doDecrypt = CTR_prototype._doEncrypt;
+})(Crypto);
+
+(function() {
+    var C = Crypto, util = C.util, charenc = C.charenc, UTF8 = charenc.UTF8, Binary = charenc.Binary;
+    var K = [ 1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344, 430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298 ];
+    var SHA256 = C.SHA256 = function(message, options) {
+        var digestbytes = util.wordsToBytes(SHA256._sha256(message));
+        return options && options.asBytes ? digestbytes : options && options.asString ? Binary.bytesToString(digestbytes) : util.bytesToHex(digestbytes);
+    };
+    SHA256._sha256 = function(message) {
+        if (message.constructor == String) message = UTF8.stringToBytes(message);
+        var m = util.bytesToWords(message), l = message.length * 8, H = [ 1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225 ], w = [], a, b, c, d, e, f, g, h, i, j, t1, t2;
+        m[l >> 5] |= 128 << 24 - l % 32;
+        m[(l + 64 >> 9 << 4) + 15] = l;
+        for (var i = 0; i < m.length; i += 16) {
+            a = H[0];
+            b = H[1];
+            c = H[2];
+            d = H[3];
+            e = H[4];
+            f = H[5];
+            g = H[6];
+            h = H[7];
+            for (var j = 0; j < 64; j++) {
+                if (j < 16) w[j] = m[j + i]; else {
+                    var gamma0x = w[j - 15], gamma1x = w[j - 2], gamma0 = (gamma0x << 25 | gamma0x >>> 7) ^ (gamma0x << 14 | gamma0x >>> 18) ^ gamma0x >>> 3, gamma1 = (gamma1x << 15 | gamma1x >>> 17) ^ (gamma1x << 13 | gamma1x >>> 19) ^ gamma1x >>> 10;
+                    w[j] = gamma0 + (w[j - 7] >>> 0) + gamma1 + (w[j - 16] >>> 0);
+                }
+                var ch = e & f ^ ~e & g, maj = a & b ^ a & c ^ b & c, sigma0 = (a << 30 | a >>> 2) ^ (a << 19 | a >>> 13) ^ (a << 10 | a >>> 22), sigma1 = (e << 26 | e >>> 6) ^ (e << 21 | e >>> 11) ^ (e << 7 | e >>> 25);
+                t1 = (h >>> 0) + sigma1 + ch + K[j] + (w[j] >>> 0);
+                t2 = sigma0 + maj;
+                h = g;
+                g = f;
+                f = e;
+                e = d + t1 >>> 0;
+                d = c;
+                c = b;
+                b = a;
+                a = t1 + t2 >>> 0;
+            }
+            H[0] += a;
+            H[1] += b;
+            H[2] += c;
+            H[3] += d;
+            H[4] += e;
+            H[5] += f;
+            H[6] += g;
+            H[7] += h;
+        }
+        return H;
+    };
+    SHA256._blocksize = 16;
+    SHA256._digestsize = 32;
+})();
+
+(function() {
+    var C = Crypto, util = C.util, charenc = C.charenc, UTF8 = charenc.UTF8, Binary = charenc.Binary;
+    var SHA1 = C.SHA1 = function(message, options) {
+        var digestbytes = util.wordsToBytes(SHA1._sha1(message));
+        return options && options.asBytes ? digestbytes : options && options.asString ? Binary.bytesToString(digestbytes) : util.bytesToHex(digestbytes);
+    };
+    SHA1._sha1 = function(message) {
+        if (message.constructor == String) message = UTF8.stringToBytes(message);
+        var m = util.bytesToWords(message), l = message.length * 8, w = [], H0 = 1732584193, H1 = -271733879, H2 = -1732584194, H3 = 271733878, H4 = -1009589776;
+        m[l >> 5] |= 128 << 24 - l % 32;
+        m[(l + 64 >>> 9 << 4) + 15] = l;
+        for (var i = 0; i < m.length; i += 16) {
+            var a = H0, b = H1, c = H2, d = H3, e = H4;
+            for (var j = 0; j < 80; j++) {
+                if (j < 16) w[j] = m[i + j]; else {
+                    var n = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
+                    w[j] = n << 1 | n >>> 31;
+                }
+                var t = (H0 << 5 | H0 >>> 27) + H4 + (w[j] >>> 0) + (j < 20 ? (H1 & H2 | ~H1 & H3) + 1518500249 : j < 40 ? (H1 ^ H2 ^ H3) + 1859775393 : j < 60 ? (H1 & H2 | H1 & H3 | H2 & H3) - 1894007588 : (H1 ^ H2 ^ H3) - 899497514);
+                H4 = H3;
+                H3 = H2;
+                H2 = H1 << 30 | H1 >>> 2;
+                H1 = H0;
+                H0 = t;
+            }
+            H0 += a;
+            H1 += b;
+            H2 += c;
+            H3 += d;
+            H4 += e;
+        }
+        return [ H0, H1, H2, H3, H4 ];
+    };
+    SHA1._blocksize = 16;
+    SHA1._digestsize = 20;
+})();
+
+(function() {
+    var C = Crypto, util = C.util, charenc = C.charenc, UTF8 = charenc.UTF8, Binary = charenc.Binary;
+    var MD5 = C.MD5 = function(message, options) {
+        var digestbytes = util.wordsToBytes(MD5._md5(message));
+        return options && options.asBytes ? digestbytes : options && options.asString ? Binary.bytesToString(digestbytes) : util.bytesToHex(digestbytes);
+    };
+    MD5._md5 = function(message) {
+        if (message.constructor == String) message = UTF8.stringToBytes(message);
+        var m = util.bytesToWords(message), l = message.length * 8, a = 1732584193, b = -271733879, c = -1732584194, d = 271733878;
+        for (var i = 0; i < m.length; i++) {
+            m[i] = (m[i] << 8 | m[i] >>> 24) & 16711935 | (m[i] << 24 | m[i] >>> 8) & 4278255360;
+        }
+        m[l >>> 5] |= 128 << l % 32;
+        m[(l + 64 >>> 9 << 4) + 14] = l;
+        var FF = MD5._ff, GG = MD5._gg, HH = MD5._hh, II = MD5._ii;
+        for (var i = 0; i < m.length; i += 16) {
+            var aa = a, bb = b, cc = c, dd = d;
+            a = FF(a, b, c, d, m[i + 0], 7, -680876936);
+            d = FF(d, a, b, c, m[i + 1], 12, -389564586);
+            c = FF(c, d, a, b, m[i + 2], 17, 606105819);
+            b = FF(b, c, d, a, m[i + 3], 22, -1044525330);
+            a = FF(a, b, c, d, m[i + 4], 7, -176418897);
+            d = FF(d, a, b, c, m[i + 5], 12, 1200080426);
+            c = FF(c, d, a, b, m[i + 6], 17, -1473231341);
+            b = FF(b, c, d, a, m[i + 7], 22, -45705983);
+            a = FF(a, b, c, d, m[i + 8], 7, 1770035416);
+            d = FF(d, a, b, c, m[i + 9], 12, -1958414417);
+            c = FF(c, d, a, b, m[i + 10], 17, -42063);
+            b = FF(b, c, d, a, m[i + 11], 22, -1990404162);
+            a = FF(a, b, c, d, m[i + 12], 7, 1804603682);
+            d = FF(d, a, b, c, m[i + 13], 12, -40341101);
+            c = FF(c, d, a, b, m[i + 14], 17, -1502002290);
+            b = FF(b, c, d, a, m[i + 15], 22, 1236535329);
+            a = GG(a, b, c, d, m[i + 1], 5, -165796510);
+            d = GG(d, a, b, c, m[i + 6], 9, -1069501632);
+            c = GG(c, d, a, b, m[i + 11], 14, 643717713);
+            b = GG(b, c, d, a, m[i + 0], 20, -373897302);
+            a = GG(a, b, c, d, m[i + 5], 5, -701558691);
+            d = GG(d, a, b, c, m[i + 10], 9, 38016083);
+            c = GG(c, d, a, b, m[i + 15], 14, -660478335);
+            b = GG(b, c, d, a, m[i + 4], 20, -405537848);
+            a = GG(a, b, c, d, m[i + 9], 5, 568446438);
+            d = GG(d, a, b, c, m[i + 14], 9, -1019803690);
+            c = GG(c, d, a, b, m[i + 3], 14, -187363961);
+            b = GG(b, c, d, a, m[i + 8], 20, 1163531501);
+            a = GG(a, b, c, d, m[i + 13], 5, -1444681467);
+            d = GG(d, a, b, c, m[i + 2], 9, -51403784);
+            c = GG(c, d, a, b, m[i + 7], 14, 1735328473);
+            b = GG(b, c, d, a, m[i + 12], 20, -1926607734);
+            a = HH(a, b, c, d, m[i + 5], 4, -378558);
+            d = HH(d, a, b, c, m[i + 8], 11, -2022574463);
+            c = HH(c, d, a, b, m[i + 11], 16, 1839030562);
+            b = HH(b, c, d, a, m[i + 14], 23, -35309556);
+            a = HH(a, b, c, d, m[i + 1], 4, -1530992060);
+            d = HH(d, a, b, c, m[i + 4], 11, 1272893353);
+            c = HH(c, d, a, b, m[i + 7], 16, -155497632);
+            b = HH(b, c, d, a, m[i + 10], 23, -1094730640);
+            a = HH(a, b, c, d, m[i + 13], 4, 681279174);
+            d = HH(d, a, b, c, m[i + 0], 11, -358537222);
+            c = HH(c, d, a, b, m[i + 3], 16, -722521979);
+            b = HH(b, c, d, a, m[i + 6], 23, 76029189);
+            a = HH(a, b, c, d, m[i + 9], 4, -640364487);
+            d = HH(d, a, b, c, m[i + 12], 11, -421815835);
+            c = HH(c, d, a, b, m[i + 15], 16, 530742520);
+            b = HH(b, c, d, a, m[i + 2], 23, -995338651);
+            a = II(a, b, c, d, m[i + 0], 6, -198630844);
+            d = II(d, a, b, c, m[i + 7], 10, 1126891415);
+            c = II(c, d, a, b, m[i + 14], 15, -1416354905);
+            b = II(b, c, d, a, m[i + 5], 21, -57434055);
+            a = II(a, b, c, d, m[i + 12], 6, 1700485571);
+            d = II(d, a, b, c, m[i + 3], 10, -1894986606);
+            c = II(c, d, a, b, m[i + 10], 15, -1051523);
+            b = II(b, c, d, a, m[i + 1], 21, -2054922799);
+            a = II(a, b, c, d, m[i + 8], 6, 1873313359);
+            d = II(d, a, b, c, m[i + 15], 10, -30611744);
+            c = II(c, d, a, b, m[i + 6], 15, -1560198380);
+            b = II(b, c, d, a, m[i + 13], 21, 1309151649);
+            a = II(a, b, c, d, m[i + 4], 6, -145523070);
+            d = II(d, a, b, c, m[i + 11], 10, -1120210379);
+            c = II(c, d, a, b, m[i + 2], 15, 718787259);
+            b = II(b, c, d, a, m[i + 9], 21, -343485551);
+            a = a + aa >>> 0;
+            b = b + bb >>> 0;
+            c = c + cc >>> 0;
+            d = d + dd >>> 0;
+        }
+        return util.endian([ a, b, c, d ]);
+    };
+    MD5._ff = function(a, b, c, d, x, s, t) {
+        var n = a + (b & c | ~b & d) + (x >>> 0) + t;
+        return (n << s | n >>> 32 - s) + b;
+    };
+    MD5._gg = function(a, b, c, d, x, s, t) {
+        var n = a + (b & d | c & ~d) + (x >>> 0) + t;
+        return (n << s | n >>> 32 - s) + b;
+    };
+    MD5._hh = function(a, b, c, d, x, s, t) {
+        var n = a + (b ^ c ^ d) + (x >>> 0) + t;
+        return (n << s | n >>> 32 - s) + b;
+    };
+    MD5._ii = function(a, b, c, d, x, s, t) {
+        var n = a + (c ^ (b | ~d)) + (x >>> 0) + t;
+        return (n << s | n >>> 32 - s) + b;
+    };
+    MD5._blocksize = 16;
+    MD5._digestsize = 16;
+})();
+
+(function() {
+    var C = Crypto, util = C.util, charenc = C.charenc, UTF8 = charenc.UTF8;
+    var SBOX = [ 99, 124, 119, 123, 242, 107, 111, 197, 48, 1, 103, 43, 254, 215, 171, 118, 202, 130, 201, 125, 250, 89, 71, 240, 173, 212, 162, 175, 156, 164, 114, 192, 183, 253, 147, 38, 54, 63, 247, 204, 52, 165, 229, 241, 113, 216, 49, 21, 4, 199, 35, 195, 24, 150, 5, 154, 7, 18, 128, 226, 235, 39, 178, 117, 9, 131, 44, 26, 27, 110, 90, 160, 82, 59, 214, 179, 41, 227, 47, 132, 83, 209, 0, 237, 32, 252, 177, 91, 106, 203, 190, 57, 74, 76, 88, 207, 208, 239, 170, 251, 67, 77, 51, 133, 69, 249, 2, 127, 80, 60, 159, 168, 81, 163, 64, 143, 146, 157, 56, 245, 188, 182, 218, 33, 16, 255, 243, 210, 205, 12, 19, 236, 95, 151, 68, 23, 196, 167, 126, 61, 100, 93, 25, 115, 96, 129, 79, 220, 34, 42, 144, 136, 70, 238, 184, 20, 222, 94, 11, 219, 224, 50, 58, 10, 73, 6, 36, 92, 194, 211, 172, 98, 145, 149, 228, 121, 231, 200, 55, 109, 141, 213, 78, 169, 108, 86, 244, 234, 101, 122, 174, 8, 186, 120, 37, 46, 28, 166, 180, 198, 232, 221, 116, 31, 75, 189, 139, 138, 112, 62, 181, 102, 72, 3, 246, 14, 97, 53, 87, 185, 134, 193, 29, 158, 225, 248, 152, 17, 105, 217, 142, 148, 155, 30, 135, 233, 206, 85, 40, 223, 140, 161, 137, 13, 191, 230, 66, 104, 65, 153, 45, 15, 176, 84, 187, 22 ];
+    for (var INVSBOX = [], i = 0; i < 256; i++) INVSBOX[SBOX[i]] = i;
+    var MULT2 = [], MULT3 = [], MULT9 = [], MULTB = [], MULTD = [], MULTE = [];
+    function xtime(a, b) {
+        for (var result = 0, i = 0; i < 8; i++) {
+            if (b & 1) result ^= a;
+            var hiBitSet = a & 128;
+            a = a << 1 & 255;
+            if (hiBitSet) a ^= 27;
+            b >>>= 1;
+        }
+        return result;
+    }
+    for (var i = 0; i < 256; i++) {
+        MULT2[i] = xtime(i, 2);
+        MULT3[i] = xtime(i, 3);
+        MULT9[i] = xtime(i, 9);
+        MULTB[i] = xtime(i, 11);
+        MULTD[i] = xtime(i, 13);
+        MULTE[i] = xtime(i, 14);
+    }
+    var RCON = [ 0, 1, 2, 4, 8, 16, 32, 64, 128, 27, 54 ];
+    var state = [ [], [], [], [] ], keylength, nrounds, keyschedule;
+    var AES = C.AES = {
+        encrypt: function(message, password, options) {
+            options = options || {};
+            var mode = options.mode || new C.mode.OFB();
+            if (mode.fixOptions) mode.fixOptions(options);
+            var m = message.constructor == String ? UTF8.stringToBytes(message) : message, iv = options.iv || util.randomBytes(AES._blocksize * 4), k = password.constructor == String ? C.PBKDF2(password, iv, 32, {
+                asBytes: true
+            }) : password;
+            AES._init(k);
+            mode.encrypt(AES, m, iv);
+            m = options.iv ? m : iv.concat(m);
+            return options && options.asBytes ? m : util.bytesToBase64(m);
+        },
+        decrypt: function(ciphertext, password, options) {
+            options = options || {};
+            var mode = options.mode || new C.mode.OFB();
+            if (mode.fixOptions) mode.fixOptions(options);
+            var c = ciphertext.constructor == String ? util.base64ToBytes(ciphertext) : ciphertext, iv = options.iv || c.splice(0, AES._blocksize * 4), k = password.constructor == String ? C.PBKDF2(password, iv, 32, {
+                asBytes: true
+            }) : password;
+            AES._init(k);
+            mode.decrypt(AES, c, iv);
+            return options && options.asBytes ? c : UTF8.bytesToString(c);
+        },
+        _blocksize: 4,
+        _encryptblock: function(m, offset) {
+            for (var row = 0; row < AES._blocksize; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] = m[offset + col * 4 + row];
+            }
+            for (var row = 0; row < 4; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] ^= keyschedule[col][row];
+            }
+            for (var round = 1; round < nrounds; round++) {
+                for (var row = 0; row < 4; row++) {
+                    for (var col = 0; col < 4; col++) state[row][col] = SBOX[state[row][col]];
+                }
+                state[1].push(state[1].shift());
+                state[2].push(state[2].shift());
+                state[2].push(state[2].shift());
+                state[3].unshift(state[3].pop());
+                for (var col = 0; col < 4; col++) {
+                    var s0 = state[0][col], s1 = state[1][col], s2 = state[2][col], s3 = state[3][col];
+                    state[0][col] = MULT2[s0] ^ MULT3[s1] ^ s2 ^ s3;
+                    state[1][col] = s0 ^ MULT2[s1] ^ MULT3[s2] ^ s3;
+                    state[2][col] = s0 ^ s1 ^ MULT2[s2] ^ MULT3[s3];
+                    state[3][col] = MULT3[s0] ^ s1 ^ s2 ^ MULT2[s3];
+                }
+                for (var row = 0; row < 4; row++) {
+                    for (var col = 0; col < 4; col++) state[row][col] ^= keyschedule[round * 4 + col][row];
+                }
+            }
+            for (var row = 0; row < 4; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] = SBOX[state[row][col]];
+            }
+            state[1].push(state[1].shift());
+            state[2].push(state[2].shift());
+            state[2].push(state[2].shift());
+            state[3].unshift(state[3].pop());
+            for (var row = 0; row < 4; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] ^= keyschedule[nrounds * 4 + col][row];
+            }
+            for (var row = 0; row < AES._blocksize; row++) {
+                for (var col = 0; col < 4; col++) m[offset + col * 4 + row] = state[row][col];
+            }
+        },
+        _decryptblock: function(c, offset) {
+            for (var row = 0; row < AES._blocksize; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] = c[offset + col * 4 + row];
+            }
+            for (var row = 0; row < 4; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] ^= keyschedule[nrounds * 4 + col][row];
+            }
+            for (var round = 1; round < nrounds; round++) {
+                state[1].unshift(state[1].pop());
+                state[2].push(state[2].shift());
+                state[2].push(state[2].shift());
+                state[3].push(state[3].shift());
+                for (var row = 0; row < 4; row++) {
+                    for (var col = 0; col < 4; col++) state[row][col] = INVSBOX[state[row][col]];
+                }
+                for (var row = 0; row < 4; row++) {
+                    for (var col = 0; col < 4; col++) state[row][col] ^= keyschedule[(nrounds - round) * 4 + col][row];
+                }
+                for (var col = 0; col < 4; col++) {
+                    var s0 = state[0][col], s1 = state[1][col], s2 = state[2][col], s3 = state[3][col];
+                    state[0][col] = MULTE[s0] ^ MULTB[s1] ^ MULTD[s2] ^ MULT9[s3];
+                    state[1][col] = MULT9[s0] ^ MULTE[s1] ^ MULTB[s2] ^ MULTD[s3];
+                    state[2][col] = MULTD[s0] ^ MULT9[s1] ^ MULTE[s2] ^ MULTB[s3];
+                    state[3][col] = MULTB[s0] ^ MULTD[s1] ^ MULT9[s2] ^ MULTE[s3];
+                }
+            }
+            state[1].unshift(state[1].pop());
+            state[2].push(state[2].shift());
+            state[2].push(state[2].shift());
+            state[3].push(state[3].shift());
+            for (var row = 0; row < 4; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] = INVSBOX[state[row][col]];
+            }
+            for (var row = 0; row < 4; row++) {
+                for (var col = 0; col < 4; col++) state[row][col] ^= keyschedule[col][row];
+            }
+            for (var row = 0; row < AES._blocksize; row++) {
+                for (var col = 0; col < 4; col++) c[offset + col * 4 + row] = state[row][col];
+            }
+        },
+        _init: function(k) {
+            keylength = k.length / 4;
+            nrounds = keylength + 6;
+            AES._keyexpansion(k);
+        },
+        _keyexpansion: function(k) {
+            keyschedule = [];
+            for (var row = 0; row < keylength; row++) {
+                keyschedule[row] = [ k[row * 4], k[row * 4 + 1], k[row * 4 + 2], k[row * 4 + 3] ];
+            }
+            for (var row = keylength; row < AES._blocksize * (nrounds + 1); row++) {
+                var temp = [ keyschedule[row - 1][0], keyschedule[row - 1][1], keyschedule[row - 1][2], keyschedule[row - 1][3] ];
+                if (row % keylength == 0) {
+                    temp.push(temp.shift());
+                    temp[0] = SBOX[temp[0]];
+                    temp[1] = SBOX[temp[1]];
+                    temp[2] = SBOX[temp[2]];
+                    temp[3] = SBOX[temp[3]];
+                    temp[0] ^= RCON[row / keylength];
+                } else if (keylength > 6 && row % keylength == 4) {
+                    temp[0] = SBOX[temp[0]];
+                    temp[1] = SBOX[temp[1]];
+                    temp[2] = SBOX[temp[2]];
+                    temp[3] = SBOX[temp[3]];
+                }
+                keyschedule[row] = [ keyschedule[row - keylength][0] ^ temp[0], keyschedule[row - keylength][1] ^ temp[1], keyschedule[row - keylength][2] ^ temp[2], keyschedule[row - keylength][3] ^ temp[3] ];
+            }
+        }
+    };
+})();
+
+(function() {
+    var C = Crypto, util = C.util, charenc = C.charenc, UTF8 = charenc.UTF8, Binary = charenc.Binary;
+    C.PBKDF2 = function(password, salt, keylen, options) {
+        if (password.constructor == String) password = UTF8.stringToBytes(password);
+        if (salt.constructor == String) salt = UTF8.stringToBytes(salt);
+        var hasher = options && options.hasher || C.SHA1, iterations = options && options.iterations || 1;
+        function PRF(password, salt) {
+            return C.HMAC(hasher, salt, password, {
+                asBytes: true
+            });
+        }
+        var derivedKeyBytes = [], blockindex = 1;
+        while (derivedKeyBytes.length < keylen) {
+            var block = PRF(password, salt.concat(util.wordsToBytes([ blockindex ])));
+            for (var u = block, i = 1; i < iterations; i++) {
+                u = PRF(password, u);
+                for (var j = 0; j < block.length; j++) block[j] ^= u[j];
+            }
+            derivedKeyBytes = derivedKeyBytes.concat(block);
+            blockindex++;
+        }
+        derivedKeyBytes.length = keylen;
+        return options && options.asBytes ? derivedKeyBytes : options && options.asString ? Binary.bytesToString(derivedKeyBytes) : util.bytesToHex(derivedKeyBytes);
+    };
+})();
+
+(function() {
+    var C = Crypto, util = C.util, charenc = C.charenc, UTF8 = charenc.UTF8, Binary = charenc.Binary;
+    C.HMAC = function(hasher, message, key, options) {
+        if (message.constructor == String) message = UTF8.stringToBytes(message);
+        if (key.constructor == String) key = UTF8.stringToBytes(key);
+        if (key.length > hasher._blocksize * 4) key = hasher(key, {
+            asBytes: true
+        });
+        var okey = key.slice(0), ikey = key.slice(0);
+        for (var i = 0; i < hasher._blocksize * 4; i++) {
+            okey[i] ^= 92;
+            ikey[i] ^= 54;
+        }
+        var hmacbytes = hasher(okey.concat(hasher(ikey.concat(message), {
+            asBytes: true
+        })), {
+            asBytes: true
+        });
+        return options && options.asBytes ? hmacbytes : options && options.asString ? Binary.bytesToString(hmacbytes) : util.bytesToHex(hmacbytes);
+    };
+})();
+
+(function() {
+    var C = Crypto, util = C.util, charenc = C.charenc, UTF8 = charenc.UTF8, Binary = charenc.Binary;
+    util.bytesToLWords = function(bytes) {
+        var output = Array(bytes.length >> 2);
+        for (var i = 0; i < output.length; i++) output[i] = 0;
+        for (var i = 0; i < bytes.length * 8; i += 8) output[i >> 5] |= (bytes[i / 8] & 255) << i % 32;
+        return output;
+    };
+    util.lWordsToBytes = function(words) {
+        var output = [];
+        for (var i = 0; i < words.length * 32; i += 8) output.push(words[i >> 5] >>> i % 32 & 255);
+        return output;
+    };
+    var RIPEMD160 = C.RIPEMD160 = function(message, options) {
+        var digestbytes = util.lWordsToBytes(RIPEMD160._rmd160(message));
+        return options && options.asBytes ? digestbytes : options && options.asString ? Binary.bytesToString(digestbytes) : util.bytesToHex(digestbytes);
+    };
+    RIPEMD160._rmd160 = function(message) {
+        if (message.constructor == String) message = UTF8.stringToBytes(message);
+        var x = util.bytesToLWords(message), len = message.length * 8;
+        x[len >> 5] |= 128 << len % 32;
+        x[(len + 64 >>> 9 << 4) + 14] = len;
+        var h0 = 1732584193;
+        var h1 = 4023233417;
+        var h2 = 2562383102;
+        var h3 = 271733878;
+        var h4 = 3285377520;
+        for (var i = 0; i < x.length; i += 16) {
+            var T;
+            var A1 = h0, B1 = h1, C1 = h2, D1 = h3, E1 = h4;
+            var A2 = h0, B2 = h1, C2 = h2, D2 = h3, E2 = h4;
+            for (var j = 0; j <= 79; ++j) {
+                T = safe_add(A1, rmd160_f(j, B1, C1, D1));
+                T = safe_add(T, x[i + rmd160_r1[j]]);
+                T = safe_add(T, rmd160_K1(j));
+                T = safe_add(bit_rol(T, rmd160_s1[j]), E1);
+                A1 = E1;
+                E1 = D1;
+                D1 = bit_rol(C1, 10);
+                C1 = B1;
+                B1 = T;
+                T = safe_add(A2, rmd160_f(79 - j, B2, C2, D2));
+                T = safe_add(T, x[i + rmd160_r2[j]]);
+                T = safe_add(T, rmd160_K2(j));
+                T = safe_add(bit_rol(T, rmd160_s2[j]), E2);
+                A2 = E2;
+                E2 = D2;
+                D2 = bit_rol(C2, 10);
+                C2 = B2;
+                B2 = T;
+            }
+            T = safe_add(h1, safe_add(C1, D2));
+            h1 = safe_add(h2, safe_add(D1, E2));
+            h2 = safe_add(h3, safe_add(E1, A2));
+            h3 = safe_add(h4, safe_add(A1, B2));
+            h4 = safe_add(h0, safe_add(B1, C2));
+            h0 = T;
+        }
+        return [ h0, h1, h2, h3, h4 ];
+    };
+    function rmd160_f(j, x, y, z) {
+        return 0 <= j && j <= 15 ? x ^ y ^ z : 16 <= j && j <= 31 ? x & y | ~x & z : 32 <= j && j <= 47 ? (x | ~y) ^ z : 48 <= j && j <= 63 ? x & z | y & ~z : 64 <= j && j <= 79 ? x ^ (y | ~z) : "rmd160_f: j out of range";
+    }
+    function rmd160_K1(j) {
+        return 0 <= j && j <= 15 ? 0 : 16 <= j && j <= 31 ? 1518500249 : 32 <= j && j <= 47 ? 1859775393 : 48 <= j && j <= 63 ? 2400959708 : 64 <= j && j <= 79 ? 2840853838 : "rmd160_K1: j out of range";
+    }
+    function rmd160_K2(j) {
+        return 0 <= j && j <= 15 ? 1352829926 : 16 <= j && j <= 31 ? 1548603684 : 32 <= j && j <= 47 ? 1836072691 : 48 <= j && j <= 63 ? 2053994217 : 64 <= j && j <= 79 ? 0 : "rmd160_K2: j out of range";
+    }
+    var rmd160_r1 = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8, 3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12, 1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2, 4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13 ];
+    var rmd160_r2 = [ 5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12, 6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2, 15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13, 8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14, 12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11 ];
+    var rmd160_s1 = [ 11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8, 7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12, 11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5, 11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12, 9, 15, 5, 11, 6, 8, 13, 12, 5, 12, 13, 14, 11, 8, 5, 6 ];
+    var rmd160_s2 = [ 8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6, 9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11, 9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5, 15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8, 8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11 ];
+    function safe_add(x, y) {
+        var lsw = (x & 65535) + (y & 65535);
+        var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+        return msw << 16 | lsw & 65535;
+    }
+    function bit_rol(num, cnt) {
+        return num << cnt | num >>> 32 - cnt;
+    }
+})();
+
+var MAX_VALUE = 2147483647;
+
+function scrypt(passwd, salt, N, r, p, dkLen) {
+    if (N == 0 || (N & N - 1) != 0) throw Error("N must be > 0 and a power of 2");
+    if (N > MAX_VALUE / 128 / r) throw Error("Parameter N is too large");
+    if (r > MAX_VALUE / 128 / p) throw Error("Parameter r is too large");
+    var PBKDF2_opts = {
+        iterations: 1,
+        hasher: Crypto.SHA256,
+        asBytes: true
+    };
+    var DK = [];
+    var B = [];
+    var XY = [];
+    var V = [];
+    var i;
+    var B = Crypto.PBKDF2(passwd, salt, p * 128 * r, PBKDF2_opts);
+    for (i = 0; i < p; i++) {
+        smix(B, i * 128 * r, r, N, V, XY);
+    }
+    DK = Crypto.PBKDF2(passwd, B, dkLen, PBKDF2_opts);
+    return DK;
+}
+
+function smix(B, Bi, r, N, V, XY) {
+    var Xi = 0;
+    var Yi = 128 * r;
+    var i;
+    arraycopy32(B, Bi, XY, Xi, Yi);
+    for (i = 0; i < N; i++) {
+        arraycopy32(XY, Xi, V, i * Yi, Yi);
+        blockmix_salsa8(XY, Xi, Yi, r);
+    }
+    for (i = 0; i < N; i++) {
+        var j = integerify(XY, Xi, r) & N - 1;
+        blockxor(V, j * Yi, XY, Xi, Yi);
+        blockmix_salsa8(XY, Xi, Yi, r);
+    }
+    arraycopy32(XY, Xi, B, Bi, Yi);
+}
+
+function blockmix_salsa8(BY, Bi, Yi, r) {
+    var X = [];
+    var i;
+    arraycopy32(BY, Bi + (2 * r - 1) * 64, X, 0, 64);
+    for (i = 0; i < 2 * r; i++) {
+        blockxor(BY, i * 64, X, 0, 64);
+        salsa20_8(X);
+        arraycopy32(X, 0, BY, Yi + i * 64, 64);
+    }
+    for (i = 0; i < r; i++) {
+        arraycopy32(BY, Yi + i * 2 * 64, BY, Bi + i * 64, 64);
+    }
+    for (i = 0; i < r; i++) {
+        arraycopy32(BY, Yi + (i * 2 + 1) * 64, BY, Bi + (i + r) * 64, 64);
+    }
+}
+
+function R(a, b) {
+    return a << b | a >>> 32 - b;
+}
+
+function salsa20_8(B) {
+    var B32 = new Array(32);
+    var x = new Array(32);
+    var i;
+    for (i = 0; i < 16; i++) {
+        B32[i] = (B[i * 4 + 0] & 255) << 0;
+        B32[i] |= (B[i * 4 + 1] & 255) << 8;
+        B32[i] |= (B[i * 4 + 2] & 255) << 16;
+        B32[i] |= (B[i * 4 + 3] & 255) << 24;
+    }
+    arraycopy(B32, 0, x, 0, 16);
+    for (i = 8; i > 0; i -= 2) {
+        x[4] ^= R(x[0] + x[12], 7);
+        x[8] ^= R(x[4] + x[0], 9);
+        x[12] ^= R(x[8] + x[4], 13);
+        x[0] ^= R(x[12] + x[8], 18);
+        x[9] ^= R(x[5] + x[1], 7);
+        x[13] ^= R(x[9] + x[5], 9);
+        x[1] ^= R(x[13] + x[9], 13);
+        x[5] ^= R(x[1] + x[13], 18);
+        x[14] ^= R(x[10] + x[6], 7);
+        x[2] ^= R(x[14] + x[10], 9);
+        x[6] ^= R(x[2] + x[14], 13);
+        x[10] ^= R(x[6] + x[2], 18);
+        x[3] ^= R(x[15] + x[11], 7);
+        x[7] ^= R(x[3] + x[15], 9);
+        x[11] ^= R(x[7] + x[3], 13);
+        x[15] ^= R(x[11] + x[7], 18);
+        x[1] ^= R(x[0] + x[3], 7);
+        x[2] ^= R(x[1] + x[0], 9);
+        x[3] ^= R(x[2] + x[1], 13);
+        x[0] ^= R(x[3] + x[2], 18);
+        x[6] ^= R(x[5] + x[4], 7);
+        x[7] ^= R(x[6] + x[5], 9);
+        x[4] ^= R(x[7] + x[6], 13);
+        x[5] ^= R(x[4] + x[7], 18);
+        x[11] ^= R(x[10] + x[9], 7);
+        x[8] ^= R(x[11] + x[10], 9);
+        x[9] ^= R(x[8] + x[11], 13);
+        x[10] ^= R(x[9] + x[8], 18);
+        x[12] ^= R(x[15] + x[14], 7);
+        x[13] ^= R(x[12] + x[15], 9);
+        x[14] ^= R(x[13] + x[12], 13);
+        x[15] ^= R(x[14] + x[13], 18);
+    }
+    for (i = 0; i < 16; ++i) B32[i] = x[i] + B32[i];
+    for (i = 0; i < 16; i++) {
+        var bi = i * 4;
+        B[bi + 0] = B32[i] >> 0 & 255;
+        B[bi + 1] = B32[i] >> 8 & 255;
+        B[bi + 2] = B32[i] >> 16 & 255;
+        B[bi + 3] = B32[i] >> 24 & 255;
+    }
+}
+
+function blockxor(S, Si, D, Di, len) {
+    var i = len >> 6;
+    while (i--) {
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+        D[Di++] ^= S[Si++];
+    }
+}
+
+function integerify(B, bi, r) {
+    var n;
+    bi += (2 * r - 1) * 64;
+    n = (B[bi + 0] & 255) << 0;
+    n |= (B[bi + 1] & 255) << 8;
+    n |= (B[bi + 2] & 255) << 16;
+    n |= (B[bi + 3] & 255) << 24;
+    return n;
+}
+
+function arraycopy(src, srcPos, dest, destPos, length) {
+    while (length--) {
+        dest[destPos++] = src[srcPos++];
+    }
+}
+
+function arraycopy16(src, srcPos, dest, destPos, length) {
+    var i = length >> 4;
+    while (i--) {
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+    }
+}
+
+function arraycopy32(src, srcPos, dest, destPos, length) {
+    var i = length >> 5;
+    while (i--) {
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+        dest[destPos++] = src[srcPos++];
+    }
+}
+
+function Arcfour() {
+    this.i = 0;
+    this.j = 0;
+    this.S = new Array();
+}
+
+function ARC4init(key) {
+    var i, j, t;
+    for (i = 0; i < 256; ++i) this.S[i] = i;
+    j = 0;
+    for (i = 0; i < 256; ++i) {
+        j = j + this.S[i] + key[i % key.length] & 255;
+        t = this.S[i];
+        this.S[i] = this.S[j];
+        this.S[j] = t;
+    }
+    this.i = 0;
+    this.j = 0;
+}
+
+function ARC4next() {
+    var t;
+    this.i = this.i + 1 & 255;
+    this.j = this.j + this.S[this.i] & 255;
+    t = this.S[this.i];
+    this.S[this.i] = this.S[this.j];
+    this.S[this.j] = t;
+    return this.S[t + this.S[this.i] & 255];
+}
+
+Arcfour.prototype.init = ARC4init;
+
+Arcfour.prototype.next = ARC4next;
+
+function prng_newstate() {
+    return new Arcfour();
+}
+
+var rng_psize = 256;
+
+var rng_state;
+
+var rng_pool;
+
+var rng_pptr;
+
+function rng_seed_int(x) {
+    rng_pool[rng_pptr++] ^= x & 255;
+    rng_pool[rng_pptr++] ^= x >> 8 & 255;
+    rng_pool[rng_pptr++] ^= x >> 16 & 255;
+    rng_pool[rng_pptr++] ^= x >> 24 & 255;
+    if (rng_pptr >= rng_psize) rng_pptr -= rng_psize;
+}
+
+function rng_seed_time() {
+    rng_seed_int(new Date().getTime());
+}
+
+if (rng_pool == null) {
+    rng_pool = new Array();
+    rng_pptr = 0;
+    var t;
+    if (navigator.appName == "Netscape" && navigator.appVersion < "5" && window.crypto) {
+        var z = window.crypto.random(32);
+        for (t = 0; t < z.length; ++t) rng_pool[rng_pptr++] = z.charCodeAt(t) & 255;
+    }
+    while (rng_pptr < rng_psize) {
+        t = Math.floor(65536 * Math.random());
+        rng_pool[rng_pptr++] = t >>> 8;
+        rng_pool[rng_pptr++] = t & 255;
+    }
+    rng_pptr = 0;
+    rng_seed_time();
+}
+
+function rng_get_byte() {
+    if (rng_state == null) {
+        rng_seed_time();
+        rng_state = prng_newstate();
+        rng_state.init(rng_pool);
+        for (rng_pptr = 0; rng_pptr < rng_pool.length; ++rng_pptr) rng_pool[rng_pptr] = 0;
+        rng_pptr = 0;
+    }
+    return rng_state.next();
+}
+
+function rng_get_bytes(ba) {
+    var i;
+    for (i = 0; i < ba.length; ++i) ba[i] = rng_get_byte();
+}
+
+function SecureRandom() {}
+
+SecureRandom.prototype.nextBytes = rng_get_bytes;
+
+var dbits;
+
+var canary = 0xdeadbeefcafe;
+
+var j_lm = (canary & 16777215) == 15715070;
+
+function BigInteger(a, b, c) {
+    if (a != null) if ("number" == typeof a) this.fromNumber(a, b, c); else if (b == null && "string" != typeof a) this.fromString(a, 256); else this.fromString(a, b);
+}
+
+function nbi() {
+    return new BigInteger(null);
+}
+
+function am1(i, x, w, j, c, n) {
+    while (--n >= 0) {
+        var v = x * this[i++] + w[j] + c;
+        c = Math.floor(v / 67108864);
+        w[j++] = v & 67108863;
+    }
+    return c;
+}
+
+function am2(i, x, w, j, c, n) {
+    var xl = x & 32767, xh = x >> 15;
+    while (--n >= 0) {
+        var l = this[i] & 32767;
+        var h = this[i++] >> 15;
+        var m = xh * l + h * xl;
+        l = xl * l + ((m & 32767) << 15) + w[j] + (c & 1073741823);
+        c = (l >>> 30) + (m >>> 15) + xh * h + (c >>> 30);
+        w[j++] = l & 1073741823;
+    }
+    return c;
+}
+
+function am3(i, x, w, j, c, n) {
+    var xl = x & 16383, xh = x >> 14;
+    while (--n >= 0) {
+        var l = this[i] & 16383;
+        var h = this[i++] >> 14;
+        var m = xh * l + h * xl;
+        l = xl * l + ((m & 16383) << 14) + w[j] + c;
+        c = (l >> 28) + (m >> 14) + xh * h;
+        w[j++] = l & 268435455;
+    }
+    return c;
+}
+
+if (j_lm && navigator.appName == "Microsoft Internet Explorer") {
+    BigInteger.prototype.am = am2;
+    dbits = 30;
+} else if (j_lm && navigator.appName != "Netscape") {
+    BigInteger.prototype.am = am1;
+    dbits = 26;
+} else {
+    BigInteger.prototype.am = am3;
+    dbits = 28;
+}
+
+BigInteger.prototype.DB = dbits;
+
+BigInteger.prototype.DM = (1 << dbits) - 1;
+
+BigInteger.prototype.DV = 1 << dbits;
+
+var BI_FP = 52;
+
+BigInteger.prototype.FV = Math.pow(2, BI_FP);
+
+BigInteger.prototype.F1 = BI_FP - dbits;
+
+BigInteger.prototype.F2 = 2 * dbits - BI_FP;
+
+var BI_RM = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+var BI_RC = new Array();
+
+var rr, vv;
+
+rr = "0".charCodeAt(0);
+
+for (vv = 0; vv <= 9; ++vv) BI_RC[rr++] = vv;
+
+rr = "a".charCodeAt(0);
+
+for (vv = 10; vv < 36; ++vv) BI_RC[rr++] = vv;
+
+rr = "A".charCodeAt(0);
+
+for (vv = 10; vv < 36; ++vv) BI_RC[rr++] = vv;
+
+function int2char(n) {
+    return BI_RM.charAt(n);
+}
+
+function intAt(s, i) {
+    var c = BI_RC[s.charCodeAt(i)];
+    return c == null ? -1 : c;
+}
+
+function bnpCopyTo(r) {
+    for (var i = this.t - 1; i >= 0; --i) r[i] = this[i];
+    r.t = this.t;
+    r.s = this.s;
+}
+
+function bnpFromInt(x) {
+    this.t = 1;
+    this.s = x < 0 ? -1 : 0;
+    if (x > 0) this[0] = x; else if (x < -1) this[0] = x + DV; else this.t = 0;
+}
+
+function nbv(i) {
+    var r = nbi();
+    r.fromInt(i);
+    return r;
+}
+
+function bnpFromString(s, b) {
+    var k;
+    if (b == 16) k = 4; else if (b == 8) k = 3; else if (b == 256) k = 8; else if (b == 2) k = 1; else if (b == 32) k = 5; else if (b == 4) k = 2; else {
+        this.fromRadix(s, b);
+        return;
+    }
+    this.t = 0;
+    this.s = 0;
+    var i = s.length, mi = false, sh = 0;
+    while (--i >= 0) {
+        var x = k == 8 ? s[i] & 255 : intAt(s, i);
+        if (x < 0) {
+            if (s.charAt(i) == "-") mi = true;
+            continue;
+        }
+        mi = false;
+        if (sh == 0) this[this.t++] = x; else if (sh + k > this.DB) {
+            this[this.t - 1] |= (x & (1 << this.DB - sh) - 1) << sh;
+            this[this.t++] = x >> this.DB - sh;
+        } else this[this.t - 1] |= x << sh;
+        sh += k;
+        if (sh >= this.DB) sh -= this.DB;
+    }
+    if (k == 8 && (s[0] & 128) != 0) {
+        this.s = -1;
+        if (sh > 0) this[this.t - 1] |= (1 << this.DB - sh) - 1 << sh;
+    }
+    this.clamp();
+    if (mi) BigInteger.ZERO.subTo(this, this);
+}
+
+function bnpClamp() {
+    var c = this.s & this.DM;
+    while (this.t > 0 && this[this.t - 1] == c) --this.t;
+}
+
+function bnToString(b) {
+    if (this.s < 0) return "-" + this.negate().toString(b);
+    var k;
+    if (b == 16) k = 4; else if (b == 8) k = 3; else if (b == 2) k = 1; else if (b == 32) k = 5; else if (b == 4) k = 2; else return this.toRadix(b);
+    var km = (1 << k) - 1, d, m = false, r = "", i = this.t;
+    var p = this.DB - i * this.DB % k;
+    if (i-- > 0) {
+        if (p < this.DB && (d = this[i] >> p) > 0) {
+            m = true;
+            r = int2char(d);
+        }
+        while (i >= 0) {
+            if (p < k) {
+                d = (this[i] & (1 << p) - 1) << k - p;
+                d |= this[--i] >> (p += this.DB - k);
+            } else {
+                d = this[i] >> (p -= k) & km;
+                if (p <= 0) {
+                    p += this.DB;
+                    --i;
+                }
+            }
+            if (d > 0) m = true;
+            if (m) r += int2char(d);
+        }
+    }
+    return m ? r : "0";
+}
+
+function bnNegate() {
+    var r = nbi();
+    BigInteger.ZERO.subTo(this, r);
+    return r;
+}
+
+function bnAbs() {
+    return this.s < 0 ? this.negate() : this;
+}
+
+function bnCompareTo(a) {
+    var r = this.s - a.s;
+    if (r != 0) return r;
+    var i = this.t;
+    r = i - a.t;
+    if (r != 0) return this.s < 0 ? -r : r;
+    while (--i >= 0) if ((r = this[i] - a[i]) != 0) return r;
+    return 0;
+}
+
+function nbits(x) {
+    var r = 1, t;
+    if ((t = x >>> 16) != 0) {
+        x = t;
+        r += 16;
+    }
+    if ((t = x >> 8) != 0) {
+        x = t;
+        r += 8;
+    }
+    if ((t = x >> 4) != 0) {
+        x = t;
+        r += 4;
+    }
+    if ((t = x >> 2) != 0) {
+        x = t;
+        r += 2;
+    }
+    if ((t = x >> 1) != 0) {
+        x = t;
+        r += 1;
+    }
+    return r;
+}
+
+function bnBitLength() {
+    if (this.t <= 0) return 0;
+    return this.DB * (this.t - 1) + nbits(this[this.t - 1] ^ this.s & this.DM);
+}
+
+function bnpDLShiftTo(n, r) {
+    var i;
+    for (i = this.t - 1; i >= 0; --i) r[i + n] = this[i];
+    for (i = n - 1; i >= 0; --i) r[i] = 0;
+    r.t = this.t + n;
+    r.s = this.s;
+}
+
+function bnpDRShiftTo(n, r) {
+    for (var i = n; i < this.t; ++i) r[i - n] = this[i];
+    r.t = Math.max(this.t - n, 0);
+    r.s = this.s;
+}
+
+function bnpLShiftTo(n, r) {
+    var bs = n % this.DB;
+    var cbs = this.DB - bs;
+    var bm = (1 << cbs) - 1;
+    var ds = Math.floor(n / this.DB), c = this.s << bs & this.DM, i;
+    for (i = this.t - 1; i >= 0; --i) {
+        r[i + ds + 1] = this[i] >> cbs | c;
+        c = (this[i] & bm) << bs;
+    }
+    for (i = ds - 1; i >= 0; --i) r[i] = 0;
+    r[ds] = c;
+    r.t = this.t + ds + 1;
+    r.s = this.s;
+    r.clamp();
+}
+
+function bnpRShiftTo(n, r) {
+    r.s = this.s;
+    var ds = Math.floor(n / this.DB);
+    if (ds >= this.t) {
+        r.t = 0;
+        return;
+    }
+    var bs = n % this.DB;
+    var cbs = this.DB - bs;
+    var bm = (1 << bs) - 1;
+    r[0] = this[ds] >> bs;
+    for (var i = ds + 1; i < this.t; ++i) {
+        r[i - ds - 1] |= (this[i] & bm) << cbs;
+        r[i - ds] = this[i] >> bs;
+    }
+    if (bs > 0) r[this.t - ds - 1] |= (this.s & bm) << cbs;
+    r.t = this.t - ds;
+    r.clamp();
+}
+
+function bnpSubTo(a, r) {
+    var i = 0, c = 0, m = Math.min(a.t, this.t);
+    while (i < m) {
+        c += this[i] - a[i];
+        r[i++] = c & this.DM;
+        c >>= this.DB;
+    }
+    if (a.t < this.t) {
+        c -= a.s;
+        while (i < this.t) {
+            c += this[i];
+            r[i++] = c & this.DM;
+            c >>= this.DB;
+        }
+        c += this.s;
+    } else {
+        c += this.s;
+        while (i < a.t) {
+            c -= a[i];
+            r[i++] = c & this.DM;
+            c >>= this.DB;
+        }
+        c -= a.s;
+    }
+    r.s = c < 0 ? -1 : 0;
+    if (c < -1) r[i++] = this.DV + c; else if (c > 0) r[i++] = c;
+    r.t = i;
+    r.clamp();
+}
+
+function bnpMultiplyTo(a, r) {
+    var x = this.abs(), y = a.abs();
+    var i = x.t;
+    r.t = i + y.t;
+    while (--i >= 0) r[i] = 0;
+    for (i = 0; i < y.t; ++i) r[i + x.t] = x.am(0, y[i], r, i, 0, x.t);
+    r.s = 0;
+    r.clamp();
+    if (this.s != a.s) BigInteger.ZERO.subTo(r, r);
+}
+
+function bnpSquareTo(r) {
+    var x = this.abs();
+    var i = r.t = 2 * x.t;
+    while (--i >= 0) r[i] = 0;
+    for (i = 0; i < x.t - 1; ++i) {
+        var c = x.am(i, x[i], r, 2 * i, 0, 1);
+        if ((r[i + x.t] += x.am(i + 1, 2 * x[i], r, 2 * i + 1, c, x.t - i - 1)) >= x.DV) {
+            r[i + x.t] -= x.DV;
+            r[i + x.t + 1] = 1;
+        }
+    }
+    if (r.t > 0) r[r.t - 1] += x.am(i, x[i], r, 2 * i, 0, 1);
+    r.s = 0;
+    r.clamp();
+}
+
+function bnpDivRemTo(m, q, r) {
+    var pm = m.abs();
+    if (pm.t <= 0) return;
+    var pt = this.abs();
+    if (pt.t < pm.t) {
+        if (q != null) q.fromInt(0);
+        if (r != null) this.copyTo(r);
+        return;
+    }
+    if (r == null) r = nbi();
+    var y = nbi(), ts = this.s, ms = m.s;
+    var nsh = this.DB - nbits(pm[pm.t - 1]);
+    if (nsh > 0) {
+        pm.lShiftTo(nsh, y);
+        pt.lShiftTo(nsh, r);
+    } else {
+        pm.copyTo(y);
+        pt.copyTo(r);
+    }
+    var ys = y.t;
+    var y0 = y[ys - 1];
+    if (y0 == 0) return;
+    var yt = y0 * (1 << this.F1) + (ys > 1 ? y[ys - 2] >> this.F2 : 0);
+    var d1 = this.FV / yt, d2 = (1 << this.F1) / yt, e = 1 << this.F2;
+    var i = r.t, j = i - ys, t = q == null ? nbi() : q;
+    y.dlShiftTo(j, t);
+    if (r.compareTo(t) >= 0) {
+        r[r.t++] = 1;
+        r.subTo(t, r);
+    }
+    BigInteger.ONE.dlShiftTo(ys, t);
+    t.subTo(y, y);
+    while (y.t < ys) y[y.t++] = 0;
+    while (--j >= 0) {
+        var qd = r[--i] == y0 ? this.DM : Math.floor(r[i] * d1 + (r[i - 1] + e) * d2);
+        if ((r[i] += y.am(0, qd, r, j, 0, ys)) < qd) {
+            y.dlShiftTo(j, t);
+            r.subTo(t, r);
+            while (r[i] < --qd) r.subTo(t, r);
+        }
+    }
+    if (q != null) {
+        r.drShiftTo(ys, q);
+        if (ts != ms) BigInteger.ZERO.subTo(q, q);
+    }
+    r.t = ys;
+    r.clamp();
+    if (nsh > 0) r.rShiftTo(nsh, r);
+    if (ts < 0) BigInteger.ZERO.subTo(r, r);
+}
+
+function bnMod(a) {
+    var r = nbi();
+    this.abs().divRemTo(a, null, r);
+    if (this.s < 0 && r.compareTo(BigInteger.ZERO) > 0) a.subTo(r, r);
+    return r;
+}
+
+function Classic(m) {
+    this.m = m;
+}
+
+function cConvert(x) {
+    if (x.s < 0 || x.compareTo(this.m) >= 0) return x.mod(this.m); else return x;
+}
+
+function cRevert(x) {
+    return x;
+}
+
+function cReduce(x) {
+    x.divRemTo(this.m, null, x);
+}
+
+function cMulTo(x, y, r) {
+    x.multiplyTo(y, r);
+    this.reduce(r);
+}
+
+function cSqrTo(x, r) {
+    x.squareTo(r);
+    this.reduce(r);
+}
+
+Classic.prototype.convert = cConvert;
+
+Classic.prototype.revert = cRevert;
+
+Classic.prototype.reduce = cReduce;
+
+Classic.prototype.mulTo = cMulTo;
+
+Classic.prototype.sqrTo = cSqrTo;
+
+function bnpInvDigit() {
+    if (this.t < 1) return 0;
+    var x = this[0];
+    if ((x & 1) == 0) return 0;
+    var y = x & 3;
+    y = y * (2 - (x & 15) * y) & 15;
+    y = y * (2 - (x & 255) * y) & 255;
+    y = y * (2 - ((x & 65535) * y & 65535)) & 65535;
+    y = y * (2 - x * y % this.DV) % this.DV;
+    return y > 0 ? this.DV - y : -y;
+}
+
+function Montgomery(m) {
+    this.m = m;
+    this.mp = m.invDigit();
+    this.mpl = this.mp & 32767;
+    this.mph = this.mp >> 15;
+    this.um = (1 << m.DB - 15) - 1;
+    this.mt2 = 2 * m.t;
+}
+
+function montConvert(x) {
+    var r = nbi();
+    x.abs().dlShiftTo(this.m.t, r);
+    r.divRemTo(this.m, null, r);
+    if (x.s < 0 && r.compareTo(BigInteger.ZERO) > 0) this.m.subTo(r, r);
+    return r;
+}
+
+function montRevert(x) {
+    var r = nbi();
+    x.copyTo(r);
+    this.reduce(r);
+    return r;
+}
+
+function montReduce(x) {
+    while (x.t <= this.mt2) x[x.t++] = 0;
+    for (var i = 0; i < this.m.t; ++i) {
+        var j = x[i] & 32767;
+        var u0 = j * this.mpl + ((j * this.mph + (x[i] >> 15) * this.mpl & this.um) << 15) & x.DM;
+        j = i + this.m.t;
+        x[j] += this.m.am(0, u0, x, i, 0, this.m.t);
+        while (x[j] >= x.DV) {
+            x[j] -= x.DV;
+            x[++j]++;
+        }
+    }
+    x.clamp();
+    x.drShiftTo(this.m.t, x);
+    if (x.compareTo(this.m) >= 0) x.subTo(this.m, x);
+}
+
+function montSqrTo(x, r) {
+    x.squareTo(r);
+    this.reduce(r);
+}
+
+function montMulTo(x, y, r) {
+    x.multiplyTo(y, r);
+    this.reduce(r);
+}
+
+Montgomery.prototype.convert = montConvert;
+
+Montgomery.prototype.revert = montRevert;
+
+Montgomery.prototype.reduce = montReduce;
+
+Montgomery.prototype.mulTo = montMulTo;
+
+Montgomery.prototype.sqrTo = montSqrTo;
+
+function bnpIsEven() {
+    return (this.t > 0 ? this[0] & 1 : this.s) == 0;
+}
+
+function bnpExp(e, z) {
+    if (e > 4294967295 || e < 1) return BigInteger.ONE;
+    var r = nbi(), r2 = nbi(), g = z.convert(this), i = nbits(e) - 1;
+    g.copyTo(r);
+    while (--i >= 0) {
+        z.sqrTo(r, r2);
+        if ((e & 1 << i) > 0) z.mulTo(r2, g, r); else {
+            var t = r;
+            r = r2;
+            r2 = t;
+        }
+    }
+    return z.revert(r);
+}
+
+function bnModPowInt(e, m) {
+    var z;
+    if (e < 256 || m.isEven()) z = new Classic(m); else z = new Montgomery(m);
+    return this.exp(e, z);
+}
+
+BigInteger.prototype.copyTo = bnpCopyTo;
+
+BigInteger.prototype.fromInt = bnpFromInt;
+
+BigInteger.prototype.fromString = bnpFromString;
+
+BigInteger.prototype.clamp = bnpClamp;
+
+BigInteger.prototype.dlShiftTo = bnpDLShiftTo;
+
+BigInteger.prototype.drShiftTo = bnpDRShiftTo;
+
+BigInteger.prototype.lShiftTo = bnpLShiftTo;
+
+BigInteger.prototype.rShiftTo = bnpRShiftTo;
+
+BigInteger.prototype.subTo = bnpSubTo;
+
+BigInteger.prototype.multiplyTo = bnpMultiplyTo;
+
+BigInteger.prototype.squareTo = bnpSquareTo;
+
+BigInteger.prototype.divRemTo = bnpDivRemTo;
+
+BigInteger.prototype.invDigit = bnpInvDigit;
+
+BigInteger.prototype.isEven = bnpIsEven;
+
+BigInteger.prototype.exp = bnpExp;
+
+BigInteger.prototype.toString = bnToString;
+
+BigInteger.prototype.negate = bnNegate;
+
+BigInteger.prototype.abs = bnAbs;
+
+BigInteger.prototype.compareTo = bnCompareTo;
+
+BigInteger.prototype.bitLength = bnBitLength;
+
+BigInteger.prototype.mod = bnMod;
+
+BigInteger.prototype.modPowInt = bnModPowInt;
+
+BigInteger.ZERO = nbv(0);
+
+BigInteger.ONE = nbv(1);
+
+function bnClone() {
+    var r = nbi();
+    this.copyTo(r);
+    return r;
+}
+
+function bnIntValue() {
+    if (this.s < 0) {
+        if (this.t == 1) return this[0] - this.DV; else if (this.t == 0) return -1;
+    } else if (this.t == 1) return this[0]; else if (this.t == 0) return 0;
+    return (this[1] & (1 << 32 - this.DB) - 1) << this.DB | this[0];
+}
+
+function bnByteValue() {
+    return this.t == 0 ? this.s : this[0] << 24 >> 24;
+}
+
+function bnShortValue() {
+    return this.t == 0 ? this.s : this[0] << 16 >> 16;
+}
+
+function bnpChunkSize(r) {
+    return Math.floor(Math.LN2 * this.DB / Math.log(r));
+}
+
+function bnSigNum() {
+    if (this.s < 0) return -1; else if (this.t <= 0 || this.t == 1 && this[0] <= 0) return 0; else return 1;
+}
+
+function bnpToRadix(b) {
+    if (b == null) b = 10;
+    if (this.signum() == 0 || b < 2 || b > 36) return "0";
+    var cs = this.chunkSize(b);
+    var a = Math.pow(b, cs);
+    var d = nbv(a), y = nbi(), z = nbi(), r = "";
+    this.divRemTo(d, y, z);
+    while (y.signum() > 0) {
+        r = (a + z.intValue()).toString(b).substr(1) + r;
+        y.divRemTo(d, y, z);
+    }
+    return z.intValue().toString(b) + r;
+}
+
+function bnpFromRadix(s, b) {
+    this.fromInt(0);
+    if (b == null) b = 10;
+    var cs = this.chunkSize(b);
+    var d = Math.pow(b, cs), mi = false, j = 0, w = 0;
+    for (var i = 0; i < s.length; ++i) {
+        var x = intAt(s, i);
+        if (x < 0) {
+            if (s.charAt(i) == "-" && this.signum() == 0) mi = true;
+            continue;
+        }
+        w = b * w + x;
+        if (++j >= cs) {
+            this.dMultiply(d);
+            this.dAddOffset(w, 0);
+            j = 0;
+            w = 0;
+        }
+    }
+    if (j > 0) {
+        this.dMultiply(Math.pow(b, j));
+        this.dAddOffset(w, 0);
+    }
+    if (mi) BigInteger.ZERO.subTo(this, this);
+}
+
+function bnpFromNumber(a, b, c) {
+    if ("number" == typeof b) {
+        if (a < 2) this.fromInt(1); else {
+            this.fromNumber(a, c);
+            if (!this.testBit(a - 1)) this.bitwiseTo(BigInteger.ONE.shiftLeft(a - 1), op_or, this);
+            if (this.isEven()) this.dAddOffset(1, 0);
+            while (!this.isProbablePrime(b)) {
+                this.dAddOffset(2, 0);
+                if (this.bitLength() > a) this.subTo(BigInteger.ONE.shiftLeft(a - 1), this);
+            }
+        }
+    } else {
+        var x = new Array(), t = a & 7;
+        x.length = (a >> 3) + 1;
+        b.nextBytes(x);
+        if (t > 0) x[0] &= (1 << t) - 1; else x[0] = 0;
+        this.fromString(x, 256);
+    }
+}
+
+function bnToByteArray() {
+    var i = this.t, r = new Array();
+    r[0] = this.s;
+    var p = this.DB - i * this.DB % 8, d, k = 0;
+    if (i-- > 0) {
+        if (p < this.DB && (d = this[i] >> p) != (this.s & this.DM) >> p) r[k++] = d | this.s << this.DB - p;
+        while (i >= 0) {
+            if (p < 8) {
+                d = (this[i] & (1 << p) - 1) << 8 - p;
+                d |= this[--i] >> (p += this.DB - 8);
+            } else {
+                d = this[i] >> (p -= 8) & 255;
+                if (p <= 0) {
+                    p += this.DB;
+                    --i;
+                }
+            }
+            if ((d & 128) != 0) d |= -256;
+            if (k == 0 && (this.s & 128) != (d & 128)) ++k;
+            if (k > 0 || d != this.s) r[k++] = d;
+        }
+    }
+    return r;
+}
+
+function bnEquals(a) {
+    return this.compareTo(a) == 0;
+}
+
+function bnMin(a) {
+    return this.compareTo(a) < 0 ? this : a;
+}
+
+function bnMax(a) {
+    return this.compareTo(a) > 0 ? this : a;
+}
+
+function bnpBitwiseTo(a, op, r) {
+    var i, f, m = Math.min(a.t, this.t);
+    for (i = 0; i < m; ++i) r[i] = op(this[i], a[i]);
+    if (a.t < this.t) {
+        f = a.s & this.DM;
+        for (i = m; i < this.t; ++i) r[i] = op(this[i], f);
+        r.t = this.t;
+    } else {
+        f = this.s & this.DM;
+        for (i = m; i < a.t; ++i) r[i] = op(f, a[i]);
+        r.t = a.t;
+    }
+    r.s = op(this.s, a.s);
+    r.clamp();
+}
+
+function op_and(x, y) {
+    return x & y;
+}
+
+function bnAnd(a) {
+    var r = nbi();
+    this.bitwiseTo(a, op_and, r);
+    return r;
+}
+
+function op_or(x, y) {
+    return x | y;
+}
+
+function bnOr(a) {
+    var r = nbi();
+    this.bitwiseTo(a, op_or, r);
+    return r;
+}
+
+function op_xor(x, y) {
+    return x ^ y;
+}
+
+function bnXor(a) {
+    var r = nbi();
+    this.bitwiseTo(a, op_xor, r);
+    return r;
+}
+
+function op_andnot(x, y) {
+    return x & ~y;
+}
+
+function bnAndNot(a) {
+    var r = nbi();
+    this.bitwiseTo(a, op_andnot, r);
+    return r;
+}
+
+function bnNot() {
+    var r = nbi();
+    for (var i = 0; i < this.t; ++i) r[i] = this.DM & ~this[i];
+    r.t = this.t;
+    r.s = ~this.s;
+    return r;
+}
+
+function bnShiftLeft(n) {
+    var r = nbi();
+    if (n < 0) this.rShiftTo(-n, r); else this.lShiftTo(n, r);
+    return r;
+}
+
+function bnShiftRight(n) {
+    var r = nbi();
+    if (n < 0) this.lShiftTo(-n, r); else this.rShiftTo(n, r);
+    return r;
+}
+
+function lbit(x) {
+    if (x == 0) return -1;
+    var r = 0;
+    if ((x & 65535) == 0) {
+        x >>= 16;
+        r += 16;
+    }
+    if ((x & 255) == 0) {
+        x >>= 8;
+        r += 8;
+    }
+    if ((x & 15) == 0) {
+        x >>= 4;
+        r += 4;
+    }
+    if ((x & 3) == 0) {
+        x >>= 2;
+        r += 2;
+    }
+    if ((x & 1) == 0) ++r;
+    return r;
+}
+
+function bnGetLowestSetBit() {
+    for (var i = 0; i < this.t; ++i) if (this[i] != 0) return i * this.DB + lbit(this[i]);
+    if (this.s < 0) return this.t * this.DB;
+    return -1;
+}
+
+function cbit(x) {
+    var r = 0;
+    while (x != 0) {
+        x &= x - 1;
+        ++r;
+    }
+    return r;
+}
+
+function bnBitCount() {
+    var r = 0, x = this.s & this.DM;
+    for (var i = 0; i < this.t; ++i) r += cbit(this[i] ^ x);
+    return r;
+}
+
+function bnTestBit(n) {
+    var j = Math.floor(n / this.DB);
+    if (j >= this.t) return this.s != 0;
+    return (this[j] & 1 << n % this.DB) != 0;
+}
+
+function bnpChangeBit(n, op) {
+    var r = BigInteger.ONE.shiftLeft(n);
+    this.bitwiseTo(r, op, r);
+    return r;
+}
+
+function bnSetBit(n) {
+    return this.changeBit(n, op_or);
+}
+
+function bnClearBit(n) {
+    return this.changeBit(n, op_andnot);
+}
+
+function bnFlipBit(n) {
+    return this.changeBit(n, op_xor);
+}
+
+function bnpAddTo(a, r) {
+    var i = 0, c = 0, m = Math.min(a.t, this.t);
+    while (i < m) {
+        c += this[i] + a[i];
+        r[i++] = c & this.DM;
+        c >>= this.DB;
+    }
+    if (a.t < this.t) {
+        c += a.s;
+        while (i < this.t) {
+            c += this[i];
+            r[i++] = c & this.DM;
+            c >>= this.DB;
+        }
+        c += this.s;
+    } else {
+        c += this.s;
+        while (i < a.t) {
+            c += a[i];
+            r[i++] = c & this.DM;
+            c >>= this.DB;
+        }
+        c += a.s;
+    }
+    r.s = c < 0 ? -1 : 0;
+    if (c > 0) r[i++] = c; else if (c < -1) r[i++] = this.DV + c;
+    r.t = i;
+    r.clamp();
+}
+
+function bnAdd(a) {
+    var r = nbi();
+    this.addTo(a, r);
+    return r;
+}
+
+function bnSubtract(a) {
+    var r = nbi();
+    this.subTo(a, r);
+    return r;
+}
+
+function bnMultiply(a) {
+    var r = nbi();
+    this.multiplyTo(a, r);
+    return r;
+}
+
+function bnSquare() {
+    var r = nbi();
+    this.squareTo(r);
+    return r;
+}
+
+function bnDivide(a) {
+    var r = nbi();
+    this.divRemTo(a, r, null);
+    return r;
+}
+
+function bnRemainder(a) {
+    var r = nbi();
+    this.divRemTo(a, null, r);
+    return r;
+}
+
+function bnDivideAndRemainder(a) {
+    var q = nbi(), r = nbi();
+    this.divRemTo(a, q, r);
+    return new Array(q, r);
+}
+
+function bnpDMultiply(n) {
+    this[this.t] = this.am(0, n - 1, this, 0, 0, this.t);
+    ++this.t;
+    this.clamp();
+}
+
+function bnpDAddOffset(n, w) {
+    if (n == 0) return;
+    while (this.t <= w) this[this.t++] = 0;
+    this[w] += n;
+    while (this[w] >= this.DV) {
+        this[w] -= this.DV;
+        if (++w >= this.t) this[this.t++] = 0;
+        ++this[w];
+    }
+}
+
+function NullExp() {}
+
+function nNop(x) {
+    return x;
+}
+
+function nMulTo(x, y, r) {
+    x.multiplyTo(y, r);
+}
+
+function nSqrTo(x, r) {
+    x.squareTo(r);
+}
+
+NullExp.prototype.convert = nNop;
+
+NullExp.prototype.revert = nNop;
+
+NullExp.prototype.mulTo = nMulTo;
+
+NullExp.prototype.sqrTo = nSqrTo;
+
+function bnPow(e) {
+    return this.exp(e, new NullExp());
+}
+
+function bnpMultiplyLowerTo(a, n, r) {
+    var i = Math.min(this.t + a.t, n);
+    r.s = 0;
+    r.t = i;
+    while (i > 0) r[--i] = 0;
+    var j;
+    for (j = r.t - this.t; i < j; ++i) r[i + this.t] = this.am(0, a[i], r, i, 0, this.t);
+    for (j = Math.min(a.t, n); i < j; ++i) this.am(0, a[i], r, i, 0, n - i);
+    r.clamp();
+}
+
+function bnpMultiplyUpperTo(a, n, r) {
+    --n;
+    var i = r.t = this.t + a.t - n;
+    r.s = 0;
+    while (--i >= 0) r[i] = 0;
+    for (i = Math.max(n - this.t, 0); i < a.t; ++i) r[this.t + i - n] = this.am(n - i, a[i], r, 0, 0, this.t + i - n);
+    r.clamp();
+    r.drShiftTo(1, r);
+}
+
+function Barrett(m) {
+    this.r2 = nbi();
+    this.q3 = nbi();
+    BigInteger.ONE.dlShiftTo(2 * m.t, this.r2);
+    this.mu = this.r2.divide(m);
+    this.m = m;
+}
+
+function barrettConvert(x) {
+    if (x.s < 0 || x.t > 2 * this.m.t) return x.mod(this.m); else if (x.compareTo(this.m) < 0) return x; else {
+        var r = nbi();
+        x.copyTo(r);
+        this.reduce(r);
+        return r;
+    }
+}
+
+function barrettRevert(x) {
+    return x;
+}
+
+function barrettReduce(x) {
+    x.drShiftTo(this.m.t - 1, this.r2);
+    if (x.t > this.m.t + 1) {
+        x.t = this.m.t + 1;
+        x.clamp();
+    }
+    this.mu.multiplyUpperTo(this.r2, this.m.t + 1, this.q3);
+    this.m.multiplyLowerTo(this.q3, this.m.t + 1, this.r2);
+    while (x.compareTo(this.r2) < 0) x.dAddOffset(1, this.m.t + 1);
+    x.subTo(this.r2, x);
+    while (x.compareTo(this.m) >= 0) x.subTo(this.m, x);
+}
+
+function barrettSqrTo(x, r) {
+    x.squareTo(r);
+    this.reduce(r);
+}
+
+function barrettMulTo(x, y, r) {
+    x.multiplyTo(y, r);
+    this.reduce(r);
+}
+
+Barrett.prototype.convert = barrettConvert;
+
+Barrett.prototype.revert = barrettRevert;
+
+Barrett.prototype.reduce = barrettReduce;
+
+Barrett.prototype.mulTo = barrettMulTo;
+
+Barrett.prototype.sqrTo = barrettSqrTo;
+
+function bnModPow(e, m) {
+    var i = e.bitLength(), k, r = nbv(1), z;
+    if (i <= 0) return r; else if (i < 18) k = 1; else if (i < 48) k = 3; else if (i < 144) k = 4; else if (i < 768) k = 5; else k = 6;
+    if (i < 8) z = new Classic(m); else if (m.isEven()) z = new Barrett(m); else z = new Montgomery(m);
+    var g = new Array(), n = 3, k1 = k - 1, km = (1 << k) - 1;
+    g[1] = z.convert(this);
+    if (k > 1) {
+        var g2 = nbi();
+        z.sqrTo(g[1], g2);
+        while (n <= km) {
+            g[n] = nbi();
+            z.mulTo(g2, g[n - 2], g[n]);
+            n += 2;
+        }
+    }
+    var j = e.t - 1, w, is1 = true, r2 = nbi(), t;
+    i = nbits(e[j]) - 1;
+    while (j >= 0) {
+        if (i >= k1) w = e[j] >> i - k1 & km; else {
+            w = (e[j] & (1 << i + 1) - 1) << k1 - i;
+            if (j > 0) w |= e[j - 1] >> this.DB + i - k1;
+        }
+        n = k;
+        while ((w & 1) == 0) {
+            w >>= 1;
+            --n;
+        }
+        if ((i -= n) < 0) {
+            i += this.DB;
+            --j;
+        }
+        if (is1) {
+            g[w].copyTo(r);
+            is1 = false;
+        } else {
+            while (n > 1) {
+                z.sqrTo(r, r2);
+                z.sqrTo(r2, r);
+                n -= 2;
+            }
+            if (n > 0) z.sqrTo(r, r2); else {
+                t = r;
+                r = r2;
+                r2 = t;
+            }
+            z.mulTo(r2, g[w], r);
+        }
+        while (j >= 0 && (e[j] & 1 << i) == 0) {
+            z.sqrTo(r, r2);
+            t = r;
+            r = r2;
+            r2 = t;
+            if (--i < 0) {
+                i = this.DB - 1;
+                --j;
+            }
+        }
+    }
+    return z.revert(r);
+}
+
+function bnGCD(a) {
+    var x = this.s < 0 ? this.negate() : this.clone();
+    var y = a.s < 0 ? a.negate() : a.clone();
+    if (x.compareTo(y) < 0) {
+        var t = x;
+        x = y;
+        y = t;
+    }
+    var i = x.getLowestSetBit(), g = y.getLowestSetBit();
+    if (g < 0) return x;
+    if (i < g) g = i;
+    if (g > 0) {
+        x.rShiftTo(g, x);
+        y.rShiftTo(g, y);
+    }
+    while (x.signum() > 0) {
+        if ((i = x.getLowestSetBit()) > 0) x.rShiftTo(i, x);
+        if ((i = y.getLowestSetBit()) > 0) y.rShiftTo(i, y);
+        if (x.compareTo(y) >= 0) {
+            x.subTo(y, x);
+            x.rShiftTo(1, x);
+        } else {
+            y.subTo(x, y);
+            y.rShiftTo(1, y);
+        }
+    }
+    if (g > 0) y.lShiftTo(g, y);
+    return y;
+}
+
+function bnpModInt(n) {
+    if (n <= 0) return 0;
+    var d = this.DV % n, r = this.s < 0 ? n - 1 : 0;
+    if (this.t > 0) if (d == 0) r = this[0] % n; else for (var i = this.t - 1; i >= 0; --i) r = (d * r + this[i]) % n;
+    return r;
+}
+
+function bnModInverse(m) {
+    var ac = m.isEven();
+    if (this.isEven() && ac || m.signum() == 0) return BigInteger.ZERO;
+    var u = m.clone(), v = this.clone();
+    var a = nbv(1), b = nbv(0), c = nbv(0), d = nbv(1);
+    while (u.signum() != 0) {
+        while (u.isEven()) {
+            u.rShiftTo(1, u);
+            if (ac) {
+                if (!a.isEven() || !b.isEven()) {
+                    a.addTo(this, a);
+                    b.subTo(m, b);
+                }
+                a.rShiftTo(1, a);
+            } else if (!b.isEven()) b.subTo(m, b);
+            b.rShiftTo(1, b);
+        }
+        while (v.isEven()) {
+            v.rShiftTo(1, v);
+            if (ac) {
+                if (!c.isEven() || !d.isEven()) {
+                    c.addTo(this, c);
+                    d.subTo(m, d);
+                }
+                c.rShiftTo(1, c);
+            } else if (!d.isEven()) d.subTo(m, d);
+            d.rShiftTo(1, d);
+        }
+        if (u.compareTo(v) >= 0) {
+            u.subTo(v, u);
+            if (ac) a.subTo(c, a);
+            b.subTo(d, b);
+        } else {
+            v.subTo(u, v);
+            if (ac) c.subTo(a, c);
+            d.subTo(b, d);
+        }
+    }
+    if (v.compareTo(BigInteger.ONE) != 0) return BigInteger.ZERO;
+    if (d.compareTo(m) >= 0) return d.subtract(m);
+    if (d.signum() < 0) d.addTo(m, d); else return d;
+    if (d.signum() < 0) return d.add(m); else return d;
+}
+
+var lowprimes = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503, 509, 521, 523, 541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701, 709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797, 809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883, 887, 907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997 ];
+
+var lplim = (1 << 26) / lowprimes[lowprimes.length - 1];
+
+function bnIsProbablePrime(t) {
+    var i, x = this.abs();
+    if (x.t == 1 && x[0] <= lowprimes[lowprimes.length - 1]) {
+        for (i = 0; i < lowprimes.length; ++i) if (x[0] == lowprimes[i]) return true;
+        return false;
+    }
+    if (x.isEven()) return false;
+    i = 1;
+    while (i < lowprimes.length) {
+        var m = lowprimes[i], j = i + 1;
+        while (j < lowprimes.length && m < lplim) m *= lowprimes[j++];
+        m = x.modInt(m);
+        while (i < j) if (m % lowprimes[i++] == 0) return false;
+    }
+    return x.millerRabin(t);
+}
+
+function bnpMillerRabin(t) {
+    var n1 = this.subtract(BigInteger.ONE);
+    var k = n1.getLowestSetBit();
+    if (k <= 0) return false;
+    var r = n1.shiftRight(k);
+    t = t + 1 >> 1;
+    if (t > lowprimes.length) t = lowprimes.length;
+    var a = nbi();
+    for (var i = 0; i < t; ++i) {
+        a.fromInt(lowprimes[Math.floor(Math.random() * lowprimes.length)]);
+        var y = a.modPow(r, this);
+        if (y.compareTo(BigInteger.ONE) != 0 && y.compareTo(n1) != 0) {
+            var j = 1;
+            while (j++ < k && y.compareTo(n1) != 0) {
+                y = y.modPowInt(2, this);
+                if (y.compareTo(BigInteger.ONE) == 0) return false;
+            }
+            if (y.compareTo(n1) != 0) return false;
+        }
+    }
+    return true;
+}
+
+BigInteger.prototype.chunkSize = bnpChunkSize;
+
+BigInteger.prototype.toRadix = bnpToRadix;
+
+BigInteger.prototype.fromRadix = bnpFromRadix;
+
+BigInteger.prototype.fromNumber = bnpFromNumber;
+
+BigInteger.prototype.bitwiseTo = bnpBitwiseTo;
+
+BigInteger.prototype.changeBit = bnpChangeBit;
+
+BigInteger.prototype.addTo = bnpAddTo;
+
+BigInteger.prototype.dMultiply = bnpDMultiply;
+
+BigInteger.prototype.dAddOffset = bnpDAddOffset;
+
+BigInteger.prototype.multiplyLowerTo = bnpMultiplyLowerTo;
+
+BigInteger.prototype.multiplyUpperTo = bnpMultiplyUpperTo;
+
+BigInteger.prototype.modInt = bnpModInt;
+
+BigInteger.prototype.millerRabin = bnpMillerRabin;
+
+BigInteger.prototype.clone = bnClone;
+
+BigInteger.prototype.intValue = bnIntValue;
+
+BigInteger.prototype.byteValue = bnByteValue;
+
+BigInteger.prototype.shortValue = bnShortValue;
+
+BigInteger.prototype.signum = bnSigNum;
+
+BigInteger.prototype.toByteArray = bnToByteArray;
+
+BigInteger.prototype.equals = bnEquals;
+
+BigInteger.prototype.min = bnMin;
+
+BigInteger.prototype.max = bnMax;
+
+BigInteger.prototype.and = bnAnd;
+
+BigInteger.prototype.or = bnOr;
+
+BigInteger.prototype.xor = bnXor;
+
+BigInteger.prototype.andNot = bnAndNot;
+
+BigInteger.prototype.not = bnNot;
+
+BigInteger.prototype.shiftLeft = bnShiftLeft;
+
+BigInteger.prototype.shiftRight = bnShiftRight;
+
+BigInteger.prototype.getLowestSetBit = bnGetLowestSetBit;
+
+BigInteger.prototype.bitCount = bnBitCount;
+
+BigInteger.prototype.testBit = bnTestBit;
+
+BigInteger.prototype.setBit = bnSetBit;
+
+BigInteger.prototype.clearBit = bnClearBit;
+
+BigInteger.prototype.flipBit = bnFlipBit;
+
+BigInteger.prototype.add = bnAdd;
+
+BigInteger.prototype.subtract = bnSubtract;
+
+BigInteger.prototype.multiply = bnMultiply;
+
+BigInteger.prototype.divide = bnDivide;
+
+BigInteger.prototype.remainder = bnRemainder;
+
+BigInteger.prototype.divideAndRemainder = bnDivideAndRemainder;
+
+BigInteger.prototype.modPow = bnModPow;
+
+BigInteger.prototype.modInverse = bnModInverse;
+
+BigInteger.prototype.pow = bnPow;
+
+BigInteger.prototype.gcd = bnGCD;
+
+BigInteger.prototype.isProbablePrime = bnIsProbablePrime;
+
+BigInteger.prototype.square = bnSquare;
+
+function ECFieldElementFp(q, x) {
+    this.x = x;
+    this.q = q;
+}
+
+function feFpEquals(other) {
+    if (other == this) return true;
+    return this.q.equals(other.q) && this.x.equals(other.x);
+}
+
+function feFpToBigInteger() {
+    return this.x;
+}
+
+function feFpNegate() {
+    return new ECFieldElementFp(this.q, this.x.negate().mod(this.q));
+}
+
+function feFpAdd(b) {
+    return new ECFieldElementFp(this.q, this.x.add(b.toBigInteger()).mod(this.q));
+}
+
+function feFpSubtract(b) {
+    return new ECFieldElementFp(this.q, this.x.subtract(b.toBigInteger()).mod(this.q));
+}
+
+function feFpMultiply(b) {
+    return new ECFieldElementFp(this.q, this.x.multiply(b.toBigInteger()).mod(this.q));
+}
+
+function feFpSquare() {
+    return new ECFieldElementFp(this.q, this.x.square().mod(this.q));
+}
+
+function feFpDivide(b) {
+    return new ECFieldElementFp(this.q, this.x.multiply(b.toBigInteger().modInverse(this.q)).mod(this.q));
+}
+
+ECFieldElementFp.prototype.equals = feFpEquals;
+
+ECFieldElementFp.prototype.toBigInteger = feFpToBigInteger;
+
+ECFieldElementFp.prototype.negate = feFpNegate;
+
+ECFieldElementFp.prototype.add = feFpAdd;
+
+ECFieldElementFp.prototype.subtract = feFpSubtract;
+
+ECFieldElementFp.prototype.multiply = feFpMultiply;
+
+ECFieldElementFp.prototype.square = feFpSquare;
+
+ECFieldElementFp.prototype.divide = feFpDivide;
+
+function ECPointFp(curve, x, y, z) {
+    this.curve = curve;
+    this.x = x;
+    this.y = y;
+    if (z == null) {
+        this.z = BigInteger.ONE;
+    } else {
+        this.z = z;
+    }
+    this.zinv = null;
+}
+
+function pointFpGetX() {
+    if (this.zinv == null) {
+        this.zinv = this.z.modInverse(this.curve.q);
+    }
+    return this.curve.fromBigInteger(this.x.toBigInteger().multiply(this.zinv).mod(this.curve.q));
+}
+
+function pointFpGetY() {
+    if (this.zinv == null) {
+        this.zinv = this.z.modInverse(this.curve.q);
+    }
+    return this.curve.fromBigInteger(this.y.toBigInteger().multiply(this.zinv).mod(this.curve.q));
+}
+
+function pointFpEquals(other) {
+    if (other == this) return true;
+    if (this.isInfinity()) return other.isInfinity();
+    if (other.isInfinity()) return this.isInfinity();
+    var u, v;
+    u = other.y.toBigInteger().multiply(this.z).subtract(this.y.toBigInteger().multiply(other.z)).mod(this.curve.q);
+    if (!u.equals(BigInteger.ZERO)) return false;
+    v = other.x.toBigInteger().multiply(this.z).subtract(this.x.toBigInteger().multiply(other.z)).mod(this.curve.q);
+    return v.equals(BigInteger.ZERO);
+}
+
+function pointFpIsInfinity() {
+    if (this.x == null && this.y == null) return true;
+    return this.z.equals(BigInteger.ZERO) && !this.y.toBigInteger().equals(BigInteger.ZERO);
+}
+
+function pointFpNegate() {
+    return new ECPointFp(this.curve, this.x, this.y.negate(), this.z);
+}
+
+function pointFpAdd(b) {
+    if (this.isInfinity()) return b;
+    if (b.isInfinity()) return this;
+    var u = b.y.toBigInteger().multiply(this.z).subtract(this.y.toBigInteger().multiply(b.z)).mod(this.curve.q);
+    var v = b.x.toBigInteger().multiply(this.z).subtract(this.x.toBigInteger().multiply(b.z)).mod(this.curve.q);
+    if (BigInteger.ZERO.equals(v)) {
+        if (BigInteger.ZERO.equals(u)) {
+            return this.twice();
+        }
+        return this.curve.getInfinity();
+    }
+    var THREE = new BigInteger("3");
+    var x1 = this.x.toBigInteger();
+    var y1 = this.y.toBigInteger();
+    var x2 = b.x.toBigInteger();
+    var y2 = b.y.toBigInteger();
+    var v2 = v.square();
+    var v3 = v2.multiply(v);
+    var x1v2 = x1.multiply(v2);
+    var zu2 = u.square().multiply(this.z);
+    var x3 = zu2.subtract(x1v2.shiftLeft(1)).multiply(b.z).subtract(v3).multiply(v).mod(this.curve.q);
+    var y3 = x1v2.multiply(THREE).multiply(u).subtract(y1.multiply(v3)).subtract(zu2.multiply(u)).multiply(b.z).add(u.multiply(v3)).mod(this.curve.q);
+    var z3 = v3.multiply(this.z).multiply(b.z).mod(this.curve.q);
+    return new ECPointFp(this.curve, this.curve.fromBigInteger(x3), this.curve.fromBigInteger(y3), z3);
+}
+
+function pointFpTwice() {
+    if (this.isInfinity()) return this;
+    if (this.y.toBigInteger().signum() == 0) return this.curve.getInfinity();
+    var THREE = new BigInteger("3");
+    var x1 = this.x.toBigInteger();
+    var y1 = this.y.toBigInteger();
+    var y1z1 = y1.multiply(this.z);
+    var y1sqz1 = y1z1.multiply(y1).mod(this.curve.q);
+    var a = this.curve.a.toBigInteger();
+    var w = x1.square().multiply(THREE);
+    if (!BigInteger.ZERO.equals(a)) {
+        w = w.add(this.z.square().multiply(a));
+    }
+    w = w.mod(this.curve.q);
+    var x3 = w.square().subtract(x1.shiftLeft(3).multiply(y1sqz1)).shiftLeft(1).multiply(y1z1).mod(this.curve.q);
+    var y3 = w.multiply(THREE).multiply(x1).subtract(y1sqz1.shiftLeft(1)).shiftLeft(2).multiply(y1sqz1).subtract(w.square().multiply(w)).mod(this.curve.q);
+    var z3 = y1z1.square().multiply(y1z1).shiftLeft(3).mod(this.curve.q);
+    return new ECPointFp(this.curve, this.curve.fromBigInteger(x3), this.curve.fromBigInteger(y3), z3);
+}
+
+function pointFpMultiply(k) {
+    if (this.isInfinity()) return this;
+    if (k.signum() == 0) return this.curve.getInfinity();
+    var e = k;
+    var h = e.multiply(new BigInteger("3"));
+    var neg = this.negate();
+    var R = this;
+    var i;
+    for (i = h.bitLength() - 2; i > 0; --i) {
+        R = R.twice();
+        var hBit = h.testBit(i);
+        var eBit = e.testBit(i);
+        if (hBit != eBit) {
+            R = R.add(hBit ? this : neg);
+        }
+    }
+    return R;
+}
+
+function pointFpMultiplyTwo(j, x, k) {
+    var i;
+    if (j.bitLength() > k.bitLength()) i = j.bitLength() - 1; else i = k.bitLength() - 1;
+    var R = this.curve.getInfinity();
+    var both = this.add(x);
+    while (i >= 0) {
+        R = R.twice();
+        if (j.testBit(i)) {
+            if (k.testBit(i)) {
+                R = R.add(both);
+            } else {
+                R = R.add(this);
+            }
+        } else {
+            if (k.testBit(i)) {
+                R = R.add(x);
+            }
+        }
+        --i;
+    }
+    return R;
+}
+
+ECPointFp.prototype.getX = pointFpGetX;
+
+ECPointFp.prototype.getY = pointFpGetY;
+
+ECPointFp.prototype.equals = pointFpEquals;
+
+ECPointFp.prototype.isInfinity = pointFpIsInfinity;
+
+ECPointFp.prototype.negate = pointFpNegate;
+
+ECPointFp.prototype.add = pointFpAdd;
+
+ECPointFp.prototype.twice = pointFpTwice;
+
+ECPointFp.prototype.multiply = pointFpMultiply;
+
+ECPointFp.prototype.multiplyTwo = pointFpMultiplyTwo;
+
+function ECCurveFp(q, a, b) {
+    this.q = q;
+    this.a = this.fromBigInteger(a);
+    this.b = this.fromBigInteger(b);
+    this.infinity = new ECPointFp(this, null, null);
+}
+
+function curveFpGetQ() {
+    return this.q;
+}
+
+function curveFpGetA() {
+    return this.a;
+}
+
+function curveFpGetB() {
+    return this.b;
+}
+
+function curveFpEquals(other) {
+    if (other == this) return true;
+    return this.q.equals(other.q) && this.a.equals(other.a) && this.b.equals(other.b);
+}
+
+function curveFpGetInfinity() {
+    return this.infinity;
+}
+
+function curveFpFromBigInteger(x) {
+    return new ECFieldElementFp(this.q, x);
+}
+
+function curveFpDecodePointHex(s) {
+    switch (parseInt(s.substr(0, 2), 16)) {
+      case 0:
+        return this.infinity;
+
+      case 2:
+      case 3:
+        return null;
+
+      case 4:
+      case 6:
+      case 7:
+        var len = (s.length - 2) / 2;
+        var xHex = s.substr(2, len);
+        var yHex = s.substr(len + 2, len);
+        return new ECPointFp(this, this.fromBigInteger(new BigInteger(xHex, 16)), this.fromBigInteger(new BigInteger(yHex, 16)));
+
+      default:
+        return null;
+    }
+}
+
+ECCurveFp.prototype.getQ = curveFpGetQ;
+
+ECCurveFp.prototype.getA = curveFpGetA;
+
+ECCurveFp.prototype.getB = curveFpGetB;
+
+ECCurveFp.prototype.equals = curveFpEquals;
+
+ECCurveFp.prototype.getInfinity = curveFpGetInfinity;
+
+ECCurveFp.prototype.fromBigInteger = curveFpFromBigInteger;
+
+ECCurveFp.prototype.decodePointHex = curveFpDecodePointHex;
+
+function X9ECParameters(curve, g, n, h) {
+    this.curve = curve;
+    this.g = g;
+    this.n = n;
+    this.h = h;
+}
+
+function x9getCurve() {
+    return this.curve;
+}
+
+function x9getG() {
+    return this.g;
+}
+
+function x9getN() {
+    return this.n;
+}
+
+function x9getH() {
+    return this.h;
+}
+
+X9ECParameters.prototype.getCurve = x9getCurve;
+
+X9ECParameters.prototype.getG = x9getG;
+
+X9ECParameters.prototype.getN = x9getN;
+
+X9ECParameters.prototype.getH = x9getH;
+
+function fromHex(s) {
+    return new BigInteger(s, 16);
+}
+
+function secp128r1() {
+    var p = fromHex("FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFF");
+    var a = fromHex("FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFC");
+    var b = fromHex("E87579C11079F43DD824993C2CEE5ED3");
+    var n = fromHex("FFFFFFFE0000000075A30D1B9038A115");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "161FF7528B899B2D0C28607CA52C5B86" + "CF5AC8395BAFEB13C02DA292DDED7A83");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function secp160k1() {
+    var p = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73");
+    var a = BigInteger.ZERO;
+    var b = fromHex("7");
+    var n = fromHex("0100000000000000000001B8FA16DFAB9ACA16B6B3");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "3B4C382CE37AA192A4019E763036F4F5DD4D7EBB" + "938CF935318FDCED6BC28286531733C3F03C4FEE");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function secp160r1() {
+    var p = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF");
+    var a = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC");
+    var b = fromHex("1C97BEFC54BD7A8B65ACF89F81D4D4ADC565FA45");
+    var n = fromHex("0100000000000000000001F4C8F927AED3CA752257");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "4A96B5688EF573284664698968C38BB913CBFC82" + "23A628553168947D59DCC912042351377AC5FB32");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function secp192k1() {
+    var p = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37");
+    var a = BigInteger.ZERO;
+    var b = fromHex("3");
+    var n = fromHex("FFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "DB4FF10EC057E9AE26B07D0280B7F4341DA5D1B1EAE06C7D" + "9B2F2F6D9C5628A7844163D015BE86344082AA88D95E2F9D");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function secp192r1() {
+    var p = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF");
+    var a = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC");
+    var b = fromHex("64210519E59C80E70FA7E9AB72243049FEB8DEECC146B9B1");
+    var n = fromHex("FFFFFFFFFFFFFFFFFFFFFFFF99DEF836146BC9B1B4D22831");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "188DA80EB03090F67CBF20EB43A18800F4FF0AFD82FF1012" + "07192B95FFC8DA78631011ED6B24CDD573F977A11E794811");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function secp224r1() {
+    var p = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001");
+    var a = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFE");
+    var b = fromHex("B4050A850C04B3ABF54132565044B0B7D7BFD8BA270B39432355FFB4");
+    var n = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2E0B8F03E13DD29455C5C2A3D");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "B70E0CBD6BB4BF7F321390B94A03C1D356C21122343280D6115C1D21" + "BD376388B5F723FB4C22DFE6CD4375A05A07476444D5819985007E34");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function secp256k1() {
+    var p = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F");
+    var a = BigInteger.ZERO;
+    var b = fromHex("7");
+    var n = fromHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798" + "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function secp256r1() {
+    var p = fromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF");
+    var a = fromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC");
+    var b = fromHex("5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B");
+    var n = fromHex("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551");
+    var h = BigInteger.ONE;
+    var curve = new ECCurveFp(p, a, b);
+    var G = curve.decodePointHex("04" + "6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296" + "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5");
+    return new X9ECParameters(curve, G, n, h);
+}
+
+function getSECCurveByName(name) {
+    if (name == "secp128r1") return secp128r1();
+    if (name == "secp160k1") return secp160k1();
+    if (name == "secp160r1") return secp160r1();
+    if (name == "secp192k1") return secp192k1();
+    if (name == "secp192r1") return secp192r1();
+    if (name == "secp224r1") return secp224r1();
+    if (name == "secp256k1") return secp256k1();
+    if (name == "secp256r1") return secp256r1();
+    return null;
+}
+
+var EventEmitter = function() {};
+
+EventEmitter.prototype.on = function(name, callback, context) {
+    if (!context) context = this;
+    if (!this._listeners) this._listeners = {};
+    if (!this._listeners[name]) this._listeners[name] = [];
+    if (!this._unbinders) this._unbinders = {};
+    if (!this._unbinders[name]) this._unbinders[name] = [];
+    var f = function(e) {
+        callback.apply(context, [ e ]);
+    };
+    this._unbinders[name].push(callback);
+    this._listeners[name].push(f);
+};
+
+EventEmitter.prototype.trigger = function(name, event) {
+    if (event === undefined) event = {};
+    if (!this._listeners) this._listeners = {};
+    if (!this._listeners[name]) return;
+    var i = this._listeners[name].length;
+    while (i--) this._listeners[name][i](event);
+};
+
+EventEmitter.prototype.removeListener = function(name, callback) {
+    if (!this._unbinders) this._unbinders = {};
+    if (!this._unbinders[name]) return;
+    var i = this._unbinders[name].length;
+    while (i--) {
+        if (this._unbinders[name][i] === callback) {
+            this._unbinders[name].splice(i, 1);
+            this._listeners[name].splice(i, 1);
+        }
+    }
+};
+
+EventEmitter.augment = function(obj) {
+    for (var method in EventEmitter.prototype) {
+        if (!obj[method]) obj[method] = EventEmitter.prototype[method];
+    }
+};
+
+(function(exports) {
+    var Bitcoin = exports;
+    if ("object" !== typeof module) {
+        Bitcoin.EventEmitter = EventEmitter;
+    }
+})("object" === typeof module ? module.exports : window.Bitcoin = {});
+
+BigInteger.valueOf = nbv;
+
+BigInteger.prototype.toByteArrayUnsigned = function() {
+    var ba = this.abs().toByteArray();
+    if (ba.length) {
+        if (ba[0] == 0) {
+            ba = ba.slice(1);
+        }
+        return ba.map(function(v) {
+            return v < 0 ? v + 256 : v;
+        });
+    } else {
+        return ba;
+    }
+};
+
+BigInteger.fromByteArrayUnsigned = function(ba) {
+    if (!ba.length) {
+        return ba.valueOf(0);
+    } else if (ba[0] & 128) {
+        return new BigInteger([ 0 ].concat(ba));
+    } else {
+        return new BigInteger(ba);
+    }
+};
+
+BigInteger.prototype.toByteArraySigned = function() {
+    var val = this.abs().toByteArrayUnsigned();
+    var neg = this.compareTo(BigInteger.ZERO) < 0;
+    if (neg) {
+        if (val[0] & 128) {
+            val.unshift(128);
+        } else {
+            val[0] |= 128;
+        }
+    } else {
+        if (val[0] & 128) {
+            val.unshift(0);
+        }
+    }
+    return val;
+};
+
+BigInteger.fromByteArraySigned = function(ba) {
+    if (ba[0] & 128) {
+        ba[0] &= 127;
+        return BigInteger.fromByteArrayUnsigned(ba).negate();
+    } else {
+        return BigInteger.fromByteArrayUnsigned(ba);
+    }
+};
+
+var names = [ "log", "debug", "info", "warn", "error", "assert", "dir", "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace", "profile", "profileEnd" ];
+
+if ("undefined" == typeof window.console) window.console = {};
+
+for (var i = 0; i < names.length; ++i) if ("undefined" == typeof window.console[names[i]]) window.console[names[i]] = function() {};
+
+Bitcoin.Util = {
+    isArray: Array.isArray || function(o) {
+        return Object.prototype.toString.call(o) === "[object Array]";
+    },
+    makeFilledArray: function(len, val) {
+        var array = [];
+        var i = 0;
+        while (i < len) {
+            array[i++] = val;
+        }
+        return array;
+    },
+    numToVarInt: function(i) {
+        if (i < 253) {
+            return [ i ];
+        } else if (i <= 1 << 16) {
+            return [ 253, i >>> 8, i & 255 ];
+        } else if (i <= 1 << 32) {
+            return [ 254 ].concat(Crypto.util.wordsToBytes([ i ]));
+        } else {
+            return [ 255 ].concat(Crypto.util.wordsToBytes([ i >>> 32, i ]));
+        }
+    },
+    valueToBigInt: function(valueBuffer) {
+        if (valueBuffer instanceof BigInteger) return valueBuffer;
+        return BigInteger.fromByteArrayUnsigned(valueBuffer);
+    },
+    formatValue: function(valueBuffer) {
+        var value = this.valueToBigInt(valueBuffer).toString();
+        var integerPart = value.length > 8 ? value.substr(0, value.length - 8) : "0";
+        var decimalPart = value.length > 8 ? value.substr(value.length - 8) : value;
+        while (decimalPart.length < 8) decimalPart = "0" + decimalPart;
+        decimalPart = decimalPart.replace(/0*$/, "");
+        while (decimalPart.length < 2) decimalPart += "0";
+        return integerPart + "." + decimalPart;
+    },
+    parseValue: function(valueString) {
+        var valueComp = valueString.split(".");
+        var integralPart = valueComp[0];
+        var fractionalPart = valueComp[1] || "0";
+        while (fractionalPart.length < 8) fractionalPart += "0";
+        fractionalPart = fractionalPart.replace(/^0+/g, "");
+        var value = BigInteger.valueOf(parseInt(integralPart));
+        value = value.multiply(BigInteger.valueOf(1e8));
+        value = value.add(BigInteger.valueOf(parseInt(fractionalPart)));
+        return value;
+    },
+    sha256ripe160: function(data) {
+        return Crypto.RIPEMD160(Crypto.SHA256(data, {
+            asBytes: true
+        }), {
+            asBytes: true
+        });
+    },
+    dsha256: function(data) {
+        return Crypto.SHA256(Crypto.SHA256(data, {
+            asBytes: true
+        }), {
+            asBytes: true
+        });
+    }
+};
+
+for (var i in Crypto.util) {
+    if (Crypto.util.hasOwnProperty(i)) {
+        Bitcoin.Util[i] = Crypto.util[i];
+    }
+}
+
+(function(Bitcoin) {
+    Bitcoin.Base58 = {
+        alphabet: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
+        validRegex: /^[1-9A-HJ-NP-Za-km-z]+$/,
+        base: BigInteger.valueOf(58),
+        encode: function(input) {
+            var bi = BigInteger.fromByteArrayUnsigned(input);
+            var chars = [];
+            while (bi.compareTo(B58.base) >= 0) {
+                var mod = bi.mod(B58.base);
+                chars.unshift(B58.alphabet[mod.intValue()]);
+                bi = bi.subtract(mod).divide(B58.base);
+            }
+            chars.unshift(B58.alphabet[bi.intValue()]);
+            for (var i = 0; i < input.length; i++) {
+                if (input[i] == 0) {
+                    chars.unshift(B58.alphabet[0]);
+                } else break;
+            }
+            return chars.join("");
+        },
+        decode: function(input) {
+            var bi = BigInteger.valueOf(0);
+            var leadingZerosNum = 0;
+            for (var i = input.length - 1; i >= 0; i--) {
+                var alphaIndex = B58.alphabet.indexOf(input[i]);
+                if (alphaIndex < 0) {
+                    throw "Invalid character";
+                }
+                bi = bi.add(BigInteger.valueOf(alphaIndex).multiply(B58.base.pow(input.length - 1 - i)));
+                if (input[i] == "1") leadingZerosNum++; else leadingZerosNum = 0;
+            }
+            var bytes = bi.toByteArrayUnsigned();
+            while (leadingZerosNum-- > 0) bytes.unshift(0);
+            return bytes;
+        }
+    };
+    var B58 = Bitcoin.Base58;
+})("undefined" != typeof Bitcoin ? Bitcoin : module.exports);
+
+Bitcoin.Address = function(bytes) {
+    if ("string" == typeof bytes) {
+        bytes = Bitcoin.Address.decodeString(bytes);
+    }
+    this.hash = bytes;
+    this.version = Bitcoin.Address.networkVersion;
+};
+
+Bitcoin.Address.networkVersion = 0;
+
+Bitcoin.Address.prototype.toString = function() {
+    var hash = this.hash.slice(0);
+    hash.unshift(this.version);
+    var checksum = Bitcoin.Util.dsha256(hash);
+    var bytes = hash.concat(checksum.slice(0, 4));
+    return Bitcoin.Base58.encode(bytes);
+};
+
+Bitcoin.Address.prototype.getHashBase64 = function() {
+    return Crypto.util.bytesToBase64(this.hash);
+};
+
+Bitcoin.Address.decodeString = function(string) {
+    var bytes = Bitcoin.Base58.decode(string);
+    var hash = bytes.slice(0, 21);
+    var checksum = Bitcoin.Util.dsha256(hash);
+    if (checksum[0] != bytes[21] || checksum[1] != bytes[22] || checksum[2] != bytes[23] || checksum[3] != bytes[24]) {
+        throw "Checksum validation failed!";
+    }
+    var version = hash.shift();
+    if (version != 0) {
+        throw "Version " + version + " not supported!";
+    }
+    return hash;
+};
+
+function integerToBytes(i, len) {
+    var bytes = i.toByteArrayUnsigned();
+    if (len < bytes.length) {
+        bytes = bytes.slice(bytes.length - len);
+    } else while (len > bytes.length) {
+        bytes.unshift(0);
+    }
+    return bytes;
+}
+
+ECFieldElementFp.prototype.getByteLength = function() {
+    return Math.floor((this.toBigInteger().bitLength() + 7) / 8);
+};
+
+ECPointFp.prototype.getEncoded = function(compressed) {
+    var x = this.getX().toBigInteger();
+    var y = this.getY().toBigInteger();
+    var enc = integerToBytes(x, 32);
+    if (compressed) {
+        if (y.isEven()) {
+            enc.unshift(2);
+        } else {
+            enc.unshift(3);
+        }
+    } else {
+        enc.unshift(4);
+        enc = enc.concat(integerToBytes(y, 32));
+    }
+    return enc;
+};
+
+ECPointFp.decodeFrom = function(curve, enc) {
+    var type = enc[0];
+    var dataLen = enc.length - 1;
+    var xBa = enc.slice(1, 1 + dataLen / 2);
+    var yBa = enc.slice(1 + dataLen / 2, 1 + dataLen);
+    xBa.unshift(0);
+    yBa.unshift(0);
+    var x = new BigInteger(xBa);
+    var y = new BigInteger(yBa);
+    return new ECPointFp(curve, curve.fromBigInteger(x), curve.fromBigInteger(y));
+};
+
+ECPointFp.prototype.add2D = function(b) {
+    if (this.isInfinity()) return b;
+    if (b.isInfinity()) return this;
+    if (this.x.equals(b.x)) {
+        if (this.y.equals(b.y)) {
+            return this.twice();
+        }
+        return this.curve.getInfinity();
+    }
+    var x_x = b.x.subtract(this.x);
+    var y_y = b.y.subtract(this.y);
+    var gamma = y_y.divide(x_x);
+    var x3 = gamma.square().subtract(this.x).subtract(b.x);
+    var y3 = gamma.multiply(this.x.subtract(x3)).subtract(this.y);
+    return new ECPointFp(this.curve, x3, y3);
+};
+
+ECPointFp.prototype.twice2D = function() {
+    if (this.isInfinity()) return this;
+    if (this.y.toBigInteger().signum() == 0) {
+        return this.curve.getInfinity();
+    }
+    var TWO = this.curve.fromBigInteger(BigInteger.valueOf(2));
+    var THREE = this.curve.fromBigInteger(BigInteger.valueOf(3));
+    var gamma = this.x.square().multiply(THREE).add(this.curve.a).divide(this.y.multiply(TWO));
+    var x3 = gamma.square().subtract(this.x.multiply(TWO));
+    var y3 = gamma.multiply(this.x.subtract(x3)).subtract(this.y);
+    return new ECPointFp(this.curve, x3, y3);
+};
+
+ECPointFp.prototype.multiply2D = function(k) {
+    if (this.isInfinity()) return this;
+    if (k.signum() == 0) return this.curve.getInfinity();
+    var e = k;
+    var h = e.multiply(new BigInteger("3"));
+    var neg = this.negate();
+    var R = this;
+    var i;
+    for (i = h.bitLength() - 2; i > 0; --i) {
+        R = R.twice();
+        var hBit = h.testBit(i);
+        var eBit = e.testBit(i);
+        if (hBit != eBit) {
+            R = R.add2D(hBit ? this : neg);
+        }
+    }
+    return R;
+};
+
+ECPointFp.prototype.isOnCurve = function() {
+    var x = this.getX().toBigInteger();
+    var y = this.getY().toBigInteger();
+    var a = this.curve.getA().toBigInteger();
+    var b = this.curve.getB().toBigInteger();
+    var n = this.curve.getQ();
+    var lhs = y.multiply(y).mod(n);
+    var rhs = x.multiply(x).multiply(x).add(a.multiply(x)).add(b).mod(n);
+    return lhs.equals(rhs);
+};
+
+ECPointFp.prototype.toString = function() {
+    return "(" + this.getX().toBigInteger().toString() + "," + this.getY().toBigInteger().toString() + ")";
+};
+
+ECPointFp.prototype.validate = function() {
+    var n = this.curve.getQ();
+    if (this.isInfinity()) {
+        throw new Error("Point is at infinity.");
+    }
+    var x = this.getX().toBigInteger();
+    var y = this.getY().toBigInteger();
+    if (x.compareTo(BigInteger.ONE) < 0 || x.compareTo(n.subtract(BigInteger.ONE)) > 0) {
+        throw new Error("x coordinate out of bounds");
+    }
+    if (y.compareTo(BigInteger.ONE) < 0 || y.compareTo(n.subtract(BigInteger.ONE)) > 0) {
+        throw new Error("y coordinate out of bounds");
+    }
+    if (!this.isOnCurve()) {
+        throw new Error("Point is not on the curve.");
+    }
+    if (this.multiply(n).isInfinity()) {
+        throw new Error("Point is not a scalar multiple of G.");
+    }
+    return true;
+};
+
+function dmp(v) {
+    if (!(v instanceof BigInteger)) v = v.toBigInteger();
+    return Crypto.util.bytesToHex(v.toByteArrayUnsigned());
+}
+
+Bitcoin.ECDSA = function() {
+    var ecparams = getSECCurveByName("secp256k1");
+    var rng = new SecureRandom();
+    var P_OVER_FOUR = null;
+    function implShamirsTrick(P, k, Q, l) {
+        var m = Math.max(k.bitLength(), l.bitLength());
+        var Z = P.add2D(Q);
+        var R = P.curve.getInfinity();
+        for (var i = m - 1; i >= 0; --i) {
+            R = R.twice2D();
+            R.z = BigInteger.ONE;
+            if (k.testBit(i)) {
+                if (l.testBit(i)) {
+                    R = R.add2D(Z);
+                } else {
+                    R = R.add2D(P);
+                }
+            } else {
+                if (l.testBit(i)) {
+                    R = R.add2D(Q);
+                }
+            }
+        }
+        return R;
+    }
+    var ECDSA = {
+        getBigRandom: function(limit) {
+            return new BigInteger(limit.bitLength(), rng).mod(limit.subtract(BigInteger.ONE)).add(BigInteger.ONE);
+        },
+        sign: function(hash, priv) {
+            var d = priv;
+            var n = ecparams.getN();
+            var e = BigInteger.fromByteArrayUnsigned(hash);
+            do {
+                var k = ECDSA.getBigRandom(n);
+                var G = ecparams.getG();
+                var Q = G.multiply(k);
+                var r = Q.getX().toBigInteger().mod(n);
+            } while (r.compareTo(BigInteger.ZERO) <= 0);
+            var s = k.modInverse(n).multiply(e.add(d.multiply(r))).mod(n);
+            return ECDSA.serializeSig(r, s);
+        },
+        verify: function(hash, sig, pubkey) {
+            var r, s;
+            if (Bitcoin.Util.isArray(sig)) {
+                var obj = ECDSA.parseSig(sig);
+                r = obj.r;
+                s = obj.s;
+            } else if ("object" === typeof sig && sig.r && sig.s) {
+                r = sig.r;
+                s = sig.s;
+            } else {
+                throw "Invalid value for signature";
+            }
+            var Q;
+            if (pubkey instanceof ECPointFp) {
+                Q = pubkey;
+            } else if (Bitcoin.Util.isArray(pubkey)) {
+                Q = ECPointFp.decodeFrom(ecparams.getCurve(), pubkey);
+            } else {
+                throw "Invalid format for pubkey value, must be byte array or ECPointFp";
+            }
+            var e = BigInteger.fromByteArrayUnsigned(hash);
+            return ECDSA.verifyRaw(e, r, s, Q);
+        },
+        verifyRaw: function(e, r, s, Q) {
+            var n = ecparams.getN();
+            var G = ecparams.getG();
+            if (r.compareTo(BigInteger.ONE) < 0 || r.compareTo(n) >= 0) return false;
+            if (s.compareTo(BigInteger.ONE) < 0 || s.compareTo(n) >= 0) return false;
+            var c = s.modInverse(n);
+            var u1 = e.multiply(c).mod(n);
+            var u2 = r.multiply(c).mod(n);
+            var point = G.multiply(u1).add(Q.multiply(u2));
+            var v = point.getX().toBigInteger().mod(n);
+            return v.equals(r);
+        },
+        serializeSig: function(r, s) {
+            var rBa = r.toByteArraySigned();
+            var sBa = s.toByteArraySigned();
+            var sequence = [];
+            sequence.push(2);
+            sequence.push(rBa.length);
+            sequence = sequence.concat(rBa);
+            sequence.push(2);
+            sequence.push(sBa.length);
+            sequence = sequence.concat(sBa);
+            sequence.unshift(sequence.length);
+            sequence.unshift(48);
+            return sequence;
+        },
+        parseSig: function(sig) {
+            var cursor;
+            if (sig[0] != 48) throw new Error("Signature not a valid DERSequence");
+            cursor = 2;
+            if (sig[cursor] != 2) throw new Error("First element in signature must be a DERInteger");
+            var rBa = sig.slice(cursor + 2, cursor + 2 + sig[cursor + 1]);
+            cursor += 2 + sig[cursor + 1];
+            if (sig[cursor] != 2) throw new Error("Second element in signature must be a DERInteger");
+            var sBa = sig.slice(cursor + 2, cursor + 2 + sig[cursor + 1]);
+            cursor += 2 + sig[cursor + 1];
+            var r = BigInteger.fromByteArrayUnsigned(rBa);
+            var s = BigInteger.fromByteArrayUnsigned(sBa);
+            return {
+                r: r,
+                s: s
+            };
+        },
+        parseSigCompact: function(sig) {
+            if (sig.length !== 65) {
+                throw "Signature has the wrong length";
+            }
+            var i = sig[0] - 27;
+            if (i < 0 || i > 7) {
+                throw "Invalid signature type";
+            }
+            var n = ecparams.getN();
+            var r = BigInteger.fromByteArrayUnsigned(sig.slice(1, 33)).mod(n);
+            var s = BigInteger.fromByteArrayUnsigned(sig.slice(33, 65)).mod(n);
+            return {
+                r: r,
+                s: s,
+                i: i
+            };
+        },
+        recoverPubKey: function(r, s, hash, i) {
+            i = i & 3;
+            var isYEven = i & 1;
+            var isSecondKey = i >> 1;
+            var n = ecparams.getN();
+            var G = ecparams.getG();
+            var curve = ecparams.getCurve();
+            var p = curve.getQ();
+            var a = curve.getA().toBigInteger();
+            var b = curve.getB().toBigInteger();
+            if (!P_OVER_FOUR) {
+                P_OVER_FOUR = p.add(BigInteger.ONE).divide(BigInteger.valueOf(4));
+            }
+            var x = isSecondKey ? r.add(n) : r;
+            var alpha = x.multiply(x).multiply(x).add(a.multiply(x)).add(b).mod(p);
+            var beta = alpha.modPow(P_OVER_FOUR, p);
+            var xorOdd = beta.isEven() ? i % 2 : (i + 1) % 2;
+            var y = (beta.isEven() ? !isYEven : isYEven) ? beta : p.subtract(beta);
+            var R = new ECPointFp(curve, curve.fromBigInteger(x), curve.fromBigInteger(y));
+            R.validate();
+            var e = BigInteger.fromByteArrayUnsigned(hash);
+            var eNeg = BigInteger.ZERO.subtract(e).mod(n);
+            var rInv = r.modInverse(n);
+            var Q = implShamirsTrick(R, s, G, eNeg).multiply(rInv);
+            Q.validate();
+            if (!ECDSA.verifyRaw(e, r, s, Q)) {
+                throw "Pubkey recovery unsuccessful";
+            }
+            var pubKey = new Bitcoin.ECKey();
+            pubKey.pub = Q;
+            return pubKey;
+        },
+        calcPubkeyRecoveryParam: function(address, r, s, hash) {
+            for (var i = 0; i < 4; i++) {
+                try {
+                    var pubkey = Bitcoin.ECDSA.recoverPubKey(r, s, hash, i);
+                    if (pubkey.getAddress().toString() == address) {
+                        return i;
+                    }
+                } catch (e) {}
+            }
+            throw "Unable to find valid recovery factor";
+        }
+    };
+    return ECDSA;
+}();
+
+Bitcoin.ECKey = function() {
+    var ECDSA = Bitcoin.ECDSA;
+    var ecparams = getSECCurveByName("secp256k1");
+    var rng = new SecureRandom();
+    var ECKey = function(input) {
+        if (!input) {
+            var n = ecparams.getN();
+            this.priv = ECDSA.getBigRandom(n);
+        } else if (input instanceof BigInteger) {
+            this.priv = input;
+        } else if (Bitcoin.Util.isArray(input)) {
+            this.priv = BigInteger.fromByteArrayUnsigned(input);
+        } else if ("string" == typeof input) {
+            var bytes = null;
+            if (ECKey.isWalletImportFormat(input)) {
+                bytes = ECKey.decodeWalletImportFormat(input);
+            } else if (ECKey.isCompressedWalletImportFormat(input)) {
+                bytes = ECKey.decodeCompressedWalletImportFormat(input);
+                this.compressed = true;
+            } else if (ECKey.isMiniFormat(input)) {
+                bytes = Crypto.SHA256(input, {
+                    asBytes: true
+                });
+            } else if (ECKey.isHexFormat(input)) {
+                bytes = Crypto.util.hexToBytes(input);
+            } else if (ECKey.isBase64Format(input)) {
+                bytes = Crypto.util.base64ToBytes(input);
+            }
+            if (bytes == null || bytes.length != 32) {
+                this.priv = null;
+            } else {
+                this.priv = BigInteger.fromByteArrayUnsigned(bytes);
+            }
+        }
+        this.compressed = this.compressed == undefined ? !!ECKey.compressByDefault : this.compressed;
+    };
+    ECKey.privateKeyPrefix = 128;
+    ECKey.compressByDefault = false;
+    ECKey.prototype.setCompressed = function(v) {
+        this.compressed = !!v;
+        if (this.pubPoint) this.pubPoint.compressed = this.compressed;
+        return this;
+    };
+    ECKey.prototype.getPub = function() {
+        if (this.compressed) {
+            if (this.pubComp) return this.pubComp;
+            return this.pubComp = this.getPubPoint().getEncoded(1);
+        } else {
+            if (this.pubUncomp) return this.pubUncomp;
+            return this.pubUncomp = this.getPubPoint().getEncoded(0);
+        }
+    };
+    ECKey.prototype.getPubPoint = function() {
+        if (!this.pubPoint) {
+            this.pubPoint = ecparams.getG().multiply(this.priv);
+            this.pubPoint.compressed = this.compressed;
+        }
+        return this.pubPoint;
+    };
+    ECKey.prototype.getPubKeyHex = function() {
+        if (this.compressed) {
+            if (this.pubKeyHexComp) return this.pubKeyHexComp;
+            return this.pubKeyHexComp = Crypto.util.bytesToHex(this.getPub()).toString().toUpperCase();
+        } else {
+            if (this.pubKeyHexUncomp) return this.pubKeyHexUncomp;
+            return this.pubKeyHexUncomp = Crypto.util.bytesToHex(this.getPub()).toString().toUpperCase();
+        }
+    };
+    ECKey.prototype.getPubKeyHash = function() {
+        if (this.compressed) {
+            if (this.pubKeyHashComp) return this.pubKeyHashComp;
+            return this.pubKeyHashComp = Bitcoin.Util.sha256ripe160(this.getPub());
+        } else {
+            if (this.pubKeyHashUncomp) return this.pubKeyHashUncomp;
+            return this.pubKeyHashUncomp = Bitcoin.Util.sha256ripe160(this.getPub());
+        }
+    };
+    ECKey.prototype.getAddress = function() {
+        var hash = this.getPubKeyHash();
+        var addr = new Bitcoin.Address(hash);
+        return addr;
+    };
+    ECKey.prototype.setPub = function(pub) {
+        if (Bitcoin.Util.isArray(pub)) {
+            pub = Crypto.util.bytesToHex(pub).toString().toUpperCase();
+        }
+        var ecPoint = ecparams.getCurve().decodePointHex(pub);
+        this.setCompressed(ecPoint.compressed);
+        this.pubPoint = ecPoint;
+        return this;
+    };
+    ECKey.prototype.getWalletImportFormat = function() {
+        var bytes = this.getPrivateKeyByteArray();
+        bytes.unshift(ECKey.privateKeyPrefix);
+        if (this.compressed) bytes.push(1);
+        var checksum = Bitcoin.Util.dsha256(bytes);
+        bytes = bytes.concat(checksum.slice(0, 4));
+        var privWif = Bitcoin.Base58.encode(bytes);
+        return privWif;
+    };
+    ECKey.prototype.getEncryptedFormat = function(passphrase) {
+        return Bitcoin.BIP38.encode(this, passphrase);
+    };
+    ECKey.prototype.getHexFormat = function() {
+        return Crypto.util.bytesToHex(this.getPrivateKeyByteArray()).toString().toUpperCase();
+    };
+    ECKey.prototype.getBase64Format = function() {
+        return Crypto.util.bytesToBase64(this.getPrivateKeyByteArray());
+    };
+    ECKey.prototype.getPrivateKeyByteArray = function() {
+        var bytes = this.priv.toByteArrayUnsigned();
+        while (bytes.length < 32) bytes.unshift(0);
+        return bytes;
+    };
+    ECKey.prototype.toString = function(format) {
+        format = format || "";
+        if (format.toString().toLowerCase() == "base64" || format.toString().toLowerCase() == "b64") {
+            return this.getBase64Format();
+        } else if (format.toString().toLowerCase() == "wif") {
+            return this.getWalletImportFormat();
+        } else {
+            return this.getHexFormat();
+        }
+    };
+    ECKey.prototype.sign = function(hash) {
+        return ECDSA.sign(hash, this.priv);
+    };
+    ECKey.prototype.verify = function(hash, sig) {
+        return ECDSA.verify(hash, sig, this.getPub());
+    };
+    ECKey.decodeWalletImportFormat = function(privStr) {
+        var bytes = Bitcoin.Base58.decode(privStr);
+        var hash = bytes.slice(0, 33);
+        var checksum = Bitcoin.Util.dsha256(hash);
+        if (checksum[0] != bytes[33] || checksum[1] != bytes[34] || checksum[2] != bytes[35] || checksum[3] != bytes[36]) {
+            throw "Checksum validation failed!";
+        }
+        var version = hash.shift();
+        if (version != ECKey.privateKeyPrefix) {
+            throw "Version " + version + " not supported!";
+        }
+        return hash;
+    };
+    ECKey.decodeCompressedWalletImportFormat = function(privStr) {
+        var bytes = Bitcoin.Base58.decode(privStr);
+        var hash = bytes.slice(0, 34);
+        var checksum = Bitcoin.Util.dsha256(hash);
+        if (checksum[0] != bytes[34] || checksum[1] != bytes[35] || checksum[2] != bytes[36] || checksum[3] != bytes[37]) {
+            throw "Checksum validation failed!";
+        }
+        var version = hash.shift();
+        if (version != ECKey.privateKeyPrefix) {
+            throw "Version " + version + " not supported!";
+        }
+        hash.pop();
+        return hash;
+    };
+    ECKey.decodeEncryptedFormat = function(base58Encrypted, passphrase) {
+        return Bitcoin.BIP38.decode(base58Encrypted, passphrase);
+    };
+    ECKey.isHexFormat = function(key) {
+        key = key.toString();
+        return /^[A-Fa-f0-9]{64}$/.test(key);
+    };
+    ECKey.isWalletImportFormat = function(key) {
+        key = key.toString();
+        return ECKey.privateKeyPrefix == ECKey.privateKeyPrefix ? /^5[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{50}$/.test(key) : /^9[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{50}$/.test(key);
+    };
+    ECKey.isCompressedWalletImportFormat = function(key) {
+        key = key.toString();
+        return ECKey.privateKeyPrefix == ECKey.privateKeyPrefix ? /^[LK][123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{51}$/.test(key) : /^c[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{51}$/.test(key);
+    };
+    ECKey.isBase64Format = function(key) {
+        key = key.toString();
+        return /^[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=+\/]{44}$/.test(key);
+    };
+    ECKey.isMiniFormat = function(key) {
+        key = key.toString();
+        var validChars22 = /^S[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{21}$/.test(key);
+        var validChars26 = /^S[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{25}$/.test(key);
+        var validChars30 = /^S[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{29}$/.test(key);
+        var testBytes = Crypto.SHA256(key + "?", {
+            asBytes: true
+        });
+        return (testBytes[0] === 0 || testBytes[0] === 1) && (validChars22 || validChars26 || validChars30);
+    };
+    ECKey.isBIP38Format = function(string) {
+        return Bitcoin.BIP38.isBIP38Format(string);
+    };
+    return ECKey;
+}();
+
+(function() {
+    var Opcode = Bitcoin.Opcode = function(num) {
+        this.code = num;
+    };
+    Opcode.prototype.toString = function() {
+        return Opcode.reverseMap[this.code];
+    };
+    Opcode.map = {
+        OP_0: 0,
+        OP_FALSE: 0,
+        OP_PUSHDATA1: 76,
+        OP_PUSHDATA2: 77,
+        OP_PUSHDATA4: 78,
+        OP_1NEGATE: 79,
+        OP_RESERVED: 80,
+        OP_1: 81,
+        OP_TRUE: 81,
+        OP_2: 82,
+        OP_3: 83,
+        OP_4: 84,
+        OP_5: 85,
+        OP_6: 86,
+        OP_7: 87,
+        OP_8: 88,
+        OP_9: 89,
+        OP_10: 90,
+        OP_11: 91,
+        OP_12: 92,
+        OP_13: 93,
+        OP_14: 94,
+        OP_15: 95,
+        OP_16: 96,
+        OP_NOP: 97,
+        OP_VER: 98,
+        OP_IF: 99,
+        OP_NOTIF: 100,
+        OP_VERIF: 101,
+        OP_VERNOTIF: 102,
+        OP_ELSE: 103,
+        OP_ENDIF: 104,
+        OP_VERIFY: 105,
+        OP_RETURN: 106,
+        OP_TOALTSTACK: 107,
+        OP_FROMALTSTACK: 108,
+        OP_2DROP: 109,
+        OP_2DUP: 110,
+        OP_3DUP: 111,
+        OP_2OVER: 112,
+        OP_2ROT: 113,
+        OP_2SWAP: 114,
+        OP_IFDUP: 115,
+        OP_DEPTH: 116,
+        OP_DROP: 117,
+        OP_DUP: 118,
+        OP_NIP: 119,
+        OP_OVER: 120,
+        OP_PICK: 121,
+        OP_ROLL: 122,
+        OP_ROT: 123,
+        OP_SWAP: 124,
+        OP_TUCK: 125,
+        OP_CAT: 126,
+        OP_SUBSTR: 127,
+        OP_LEFT: 128,
+        OP_RIGHT: 129,
+        OP_SIZE: 130,
+        OP_INVERT: 131,
+        OP_AND: 132,
+        OP_OR: 133,
+        OP_XOR: 134,
+        OP_EQUAL: 135,
+        OP_EQUALVERIFY: 136,
+        OP_RESERVED1: 137,
+        OP_RESERVED2: 138,
+        OP_1ADD: 139,
+        OP_1SUB: 140,
+        OP_2MUL: 141,
+        OP_2DIV: 142,
+        OP_NEGATE: 143,
+        OP_ABS: 144,
+        OP_NOT: 145,
+        OP_0NOTEQUAL: 146,
+        OP_ADD: 147,
+        OP_SUB: 148,
+        OP_MUL: 149,
+        OP_DIV: 150,
+        OP_MOD: 151,
+        OP_LSHIFT: 152,
+        OP_RSHIFT: 153,
+        OP_BOOLAND: 154,
+        OP_BOOLOR: 155,
+        OP_NUMEQUAL: 156,
+        OP_NUMEQUALVERIFY: 157,
+        OP_NUMNOTEQUAL: 158,
+        OP_LESSTHAN: 159,
+        OP_GREATERTHAN: 160,
+        OP_LESSTHANOREQUAL: 161,
+        OP_GREATERTHANOREQUAL: 162,
+        OP_MIN: 163,
+        OP_MAX: 164,
+        OP_WITHIN: 165,
+        OP_RIPEMD160: 166,
+        OP_SHA1: 167,
+        OP_SHA256: 168,
+        OP_HASH160: 169,
+        OP_HASH256: 170,
+        OP_CODESEPARATOR: 171,
+        OP_CHECKSIG: 172,
+        OP_CHECKSIGVERIFY: 173,
+        OP_CHECKMULTISIG: 174,
+        OP_CHECKMULTISIGVERIFY: 175,
+        OP_NOP1: 176,
+        OP_NOP2: 177,
+        OP_NOP3: 178,
+        OP_NOP4: 179,
+        OP_NOP5: 180,
+        OP_NOP6: 181,
+        OP_NOP7: 182,
+        OP_NOP8: 183,
+        OP_NOP9: 184,
+        OP_NOP10: 185,
+        OP_PUBKEYHASH: 253,
+        OP_PUBKEY: 254,
+        OP_INVALIDOPCODE: 255
+    };
+    Opcode.reverseMap = [];
+    for (var i in Opcode.map) {
+        Opcode.reverseMap[Opcode.map[i]] = i;
+    }
+})();
+
+(function() {
+    var Opcode = Bitcoin.Opcode;
+    for (var i in Opcode.map) {
+        eval("var " + i + " = " + Opcode.map[i] + ";");
+    }
+    var Script = Bitcoin.Script = function(data) {
+        if (!data) {
+            this.buffer = [];
+        } else if ("string" == typeof data) {
+            this.buffer = Crypto.util.base64ToBytes(data);
+        } else if (Bitcoin.Util.isArray(data)) {
+            this.buffer = data;
+        } else if (data instanceof Script) {
+            this.buffer = data.buffer;
+        } else {
+            throw new Error("Invalid script");
+        }
+        this.parse();
+    };
+    Script.prototype.parse = function() {
+        var self = this;
+        this.chunks = [];
+        var i = 0;
+        function readChunk(n) {
+            self.chunks.push(self.buffer.slice(i, i + n));
+            i += n;
+        }
+        while (i < this.buffer.length) {
+            var opcode = this.buffer[i++];
+            if (opcode >= 240) {
+                opcode = opcode << 8 | this.buffer[i++];
+            }
+            var len;
+            if (opcode > 0 && opcode < OP_PUSHDATA1) {
+                readChunk(opcode);
+            } else if (opcode == OP_PUSHDATA1) {
+                len = this.buffer[i++];
+                readChunk(len);
+            } else if (opcode == OP_PUSHDATA2) {
+                len = this.buffer[i++] << 8 | this.buffer[i++];
+                readChunk(len);
+            } else if (opcode == OP_PUSHDATA4) {
+                len = this.buffer[i++] << 24 | this.buffer[i++] << 16 | this.buffer[i++] << 8 | this.buffer[i++];
+                readChunk(len);
+            } else {
+                this.chunks.push(opcode);
+            }
+        }
+    };
+    Script.prototype.getOutType = function() {
+        if (this.chunks[this.chunks.length - 1] == OP_CHECKMULTISIG && this.chunks[this.chunks.length - 2] <= 3) {
+            return "Multisig";
+        } else if (this.chunks.length == 5 && this.chunks[0] == OP_DUP && this.chunks[1] == OP_HASH160 && this.chunks[3] == OP_EQUALVERIFY && this.chunks[4] == OP_CHECKSIG) {
+            return "Address";
+        } else if (this.chunks.length == 2 && this.chunks[1] == OP_CHECKSIG) {
+            return "Pubkey";
+        } else {
+            return "Strange";
+        }
+    };
+    Script.prototype.simpleOutHash = function() {
+        switch (this.getOutType()) {
+          case "Address":
+            return this.chunks[2];
+
+          case "Pubkey":
+            return Bitcoin.Util.sha256ripe160(this.chunks[0]);
+
+          default:
+            throw new Error("Encountered non-standard scriptPubKey");
+        }
+    };
+    Script.prototype.simpleOutPubKeyHash = Script.prototype.simpleOutHash;
+    Script.prototype.getInType = function() {
+        if (this.chunks.length == 1 && Bitcoin.Util.isArray(this.chunks[0])) {
+            return "Pubkey";
+        } else if (this.chunks.length == 2 && Bitcoin.Util.isArray(this.chunks[0]) && Bitcoin.Util.isArray(this.chunks[1])) {
+            return "Address";
+        } else {
+            return "Strange";
+        }
+    };
+    Script.prototype.simpleInPubKey = function() {
+        switch (this.getInType()) {
+          case "Address":
+            return this.chunks[1];
+
+          case "Pubkey":
+            throw new Error("Script does not contain pubkey.");
+
+          default:
+            throw new Error("Encountered non-standard scriptSig");
+        }
+    };
+    Script.prototype.simpleInHash = function() {
+        return Bitcoin.Util.sha256ripe160(this.simpleInPubKey());
+    };
+    Script.prototype.simpleInPubKeyHash = Script.prototype.simpleInHash;
+    Script.prototype.writeOp = function(opcode) {
+        this.buffer.push(opcode);
+        this.chunks.push(opcode);
+    };
+    Script.prototype.writeBytes = function(data) {
+        if (data.length < OP_PUSHDATA1) {
+            this.buffer.push(data.length);
+        } else if (data.length <= 255) {
+            this.buffer.push(OP_PUSHDATA1);
+            this.buffer.push(data.length);
+        } else if (data.length <= 65535) {
+            this.buffer.push(OP_PUSHDATA2);
+            this.buffer.push(data.length & 255);
+            this.buffer.push(data.length >>> 8 & 255);
+        } else {
+            this.buffer.push(OP_PUSHDATA4);
+            this.buffer.push(data.length & 255);
+            this.buffer.push(data.length >>> 8 & 255);
+            this.buffer.push(data.length >>> 16 & 255);
+            this.buffer.push(data.length >>> 24 & 255);
+        }
+        this.buffer = this.buffer.concat(data);
+        this.chunks.push(data);
+    };
+    Script.createOutputScript = function(address) {
+        var script = new Script();
+        script.writeOp(OP_DUP);
+        script.writeOp(OP_HASH160);
+        script.writeBytes(address.hash);
+        script.writeOp(OP_EQUALVERIFY);
+        script.writeOp(OP_CHECKSIG);
+        return script;
+    };
+    Script.prototype.extractAddresses = function(addresses) {
+        switch (this.getOutType()) {
+          case "Address":
+            addresses.push(new Address(this.chunks[2]));
+            return 1;
+
+          case "Pubkey":
+            addresses.push(new Address(Util.sha256ripe160(this.chunks[0])));
+            return 1;
+
+          case "Multisig":
+            for (var i = 1; i < this.chunks.length - 2; ++i) {
+                addresses.push(new Address(Util.sha256ripe160(this.chunks[i])));
+            }
+            return this.chunks[0] - OP_1 + 1;
+
+          default:
+            throw new Error("Encountered non-standard scriptPubKey");
+        }
+    };
+    Script.createMultiSigOutputScript = function(m, pubkeys) {
+        var script = new Bitcoin.Script();
+        script.writeOp(OP_1 + m - 1);
+        for (var i = 0; i < pubkeys.length; ++i) {
+            script.writeBytes(pubkeys[i]);
+        }
+        script.writeOp(OP_1 + pubkeys.length - 1);
+        script.writeOp(OP_CHECKMULTISIG);
+        return script;
+    };
+    Script.createInputScript = function(signature, pubKey) {
+        var script = new Script();
+        script.writeBytes(signature);
+        script.writeBytes(pubKey);
+        return script;
+    };
+    Script.prototype.clone = function() {
+        return new Script(this.buffer);
+    };
+})();
+
+(function() {
+    var Script = Bitcoin.Script;
+    var Transaction = Bitcoin.Transaction = function(doc) {
+        this.version = 1;
+        this.lock_time = 0;
+        this.ins = [];
+        this.outs = [];
+        this.timestamp = null;
+        this.block = null;
+        if (doc) {
+            if (doc.hash) this.hash = doc.hash;
+            if (doc.version) this.version = doc.version;
+            if (doc.lock_time) this.lock_time = doc.lock_time;
+            if (doc.ins && doc.ins.length) {
+                for (var i = 0; i < doc.ins.length; i++) {
+                    this.addInput(new TransactionIn(doc.ins[i]));
+                }
+            }
+            if (doc.outs && doc.outs.length) {
+                for (var i = 0; i < doc.outs.length; i++) {
+                    this.addOutput(new TransactionOut(doc.outs[i]));
+                }
+            }
+            if (doc.timestamp) this.timestamp = doc.timestamp;
+            if (doc.block) this.block = doc.block;
+        }
+    };
+    Transaction.objectify = function(txs) {
+        var objs = [];
+        for (var i = 0; i < txs.length; i++) {
+            objs.push(new Transaction(txs[i]));
+        }
+        return objs;
+    };
+    Transaction.prototype.addInput = function(tx, outIndex) {
+        if (arguments[0] instanceof TransactionIn) {
+            this.ins.push(arguments[0]);
+        } else {
+            this.ins.push(new TransactionIn({
+                outpoint: {
+                    hash: tx.hash,
+                    index: outIndex
+                },
+                script: new Bitcoin.Script(),
+                sequence: 4294967295
+            }));
+        }
+    };
+    Transaction.prototype.addOutput = function(address, value) {
+        if (arguments[0] instanceof TransactionOut) {
+            this.outs.push(arguments[0]);
+        } else {
+            if (value instanceof BigInteger) {
+                value = value.toByteArrayUnsigned().reverse();
+                while (value.length < 8) value.push(0);
+            } else if (Bitcoin.Util.isArray(value)) {}
+            this.outs.push(new TransactionOut({
+                value: value,
+                script: Script.createOutputScript(address)
+            }));
+        }
+    };
+    Transaction.prototype.serialize = function() {
+        var buffer = [];
+        buffer = buffer.concat(Crypto.util.wordsToBytes([ parseInt(this.version) ]).reverse());
+        buffer = buffer.concat(Bitcoin.Util.numToVarInt(this.ins.length));
+        for (var i = 0; i < this.ins.length; i++) {
+            var txin = this.ins[i];
+            buffer = buffer.concat(Crypto.util.base64ToBytes(txin.outpoint.hash));
+            buffer = buffer.concat(Crypto.util.wordsToBytes([ parseInt(txin.outpoint.index) ]).reverse());
+            var scriptBytes = txin.script.buffer;
+            buffer = buffer.concat(Bitcoin.Util.numToVarInt(scriptBytes.length));
+            buffer = buffer.concat(scriptBytes);
+            buffer = buffer.concat(Crypto.util.wordsToBytes([ parseInt(txin.sequence) ]).reverse());
+        }
+        buffer = buffer.concat(Bitcoin.Util.numToVarInt(this.outs.length));
+        for (var i = 0; i < this.outs.length; i++) {
+            var txout = this.outs[i];
+            buffer = buffer.concat(txout.value);
+            var scriptBytes = txout.script.buffer;
+            buffer = buffer.concat(Bitcoin.Util.numToVarInt(scriptBytes.length));
+            buffer = buffer.concat(scriptBytes);
+        }
+        buffer = buffer.concat(Crypto.util.wordsToBytes([ parseInt(this.lock_time) ]).reverse());
+        return buffer;
+    };
+    var OP_CODESEPARATOR = 171;
+    var SIGHASH_ALL = 1;
+    var SIGHASH_NONE = 2;
+    var SIGHASH_SINGLE = 3;
+    var SIGHASH_ANYONECANPAY = 80;
+    Transaction.prototype.hashTransactionForSignature = function(connectedScript, inIndex, hashType) {
+        var txTmp = this.clone();
+        for (var i = 0; i < txTmp.ins.length; i++) {
+            txTmp.ins[i].script = new Script();
+        }
+        txTmp.ins[inIndex].script = connectedScript;
+        if ((hashType & 31) == SIGHASH_NONE) {
+            txTmp.outs = [];
+            for (var i = 0; i < txTmp.ins.length; i++) if (i != inIndex) txTmp.ins[i].sequence = 0;
+        } else if ((hashType & 31) == SIGHASH_SINGLE) {}
+        if (hashType & SIGHASH_ANYONECANPAY) {
+            txTmp.ins = [ txTmp.ins[inIndex] ];
+        }
+        var buffer = txTmp.serialize();
+        buffer = buffer.concat(Crypto.util.wordsToBytes([ parseInt(hashType) ]).reverse());
+        var hash1 = Crypto.SHA256(buffer, {
+            asBytes: true
+        });
+        return Crypto.SHA256(hash1, {
+            asBytes: true
+        });
+    };
+    Transaction.prototype.getHash = function() {
+        var buffer = this.serialize();
+        return Crypto.SHA256(Crypto.SHA256(buffer, {
+            asBytes: true
+        }), {
+            asBytes: true
+        });
+    };
+    Transaction.prototype.clone = function() {
+        var newTx = new Transaction();
+        newTx.version = this.version;
+        newTx.lock_time = this.lock_time;
+        for (var i = 0; i < this.ins.length; i++) {
+            var txin = this.ins[i].clone();
+            newTx.addInput(txin);
+        }
+        for (var i = 0; i < this.outs.length; i++) {
+            var txout = this.outs[i].clone();
+            newTx.addOutput(txout);
+        }
+        return newTx;
+    };
+    Transaction.prototype.analyze = function(wallet) {
+        if (!(wallet instanceof Bitcoin.Wallet)) return null;
+        var allFromMe = true, allToMe = true, firstRecvHash = null, firstMeRecvHash = null, firstSendHash = null;
+        for (var i = this.outs.length - 1; i >= 0; i--) {
+            var txout = this.outs[i];
+            var hash = txout.script.simpleOutPubKeyHash();
+            if (!wallet.hasHash(hash)) {
+                allToMe = false;
+            } else {
+                firstMeRecvHash = hash;
+            }
+            firstRecvHash = hash;
+        }
+        for (var i = this.ins.length - 1; i >= 0; i--) {
+            var txin = this.ins[i];
+            firstSendHash = txin.script.simpleInPubKeyHash();
+            if (!wallet.hasHash(firstSendHash)) {
+                allFromMe = false;
+                break;
+            }
+        }
+        var impact = this.calcImpact(wallet);
+        var analysis = {};
+        analysis.impact = impact;
+        if (impact.sign > 0 && impact.value.compareTo(BigInteger.ZERO) > 0) {
+            analysis.type = "recv";
+            analysis.addr = new Bitcoin.Address(firstMeRecvHash);
+        } else if (allFromMe && allToMe) {
+            analysis.type = "self";
+        } else if (allFromMe) {
+            analysis.type = "sent";
+            analysis.addr = new Bitcoin.Address(firstRecvHash);
+        } else {
+            analysis.type = "other";
+        }
+        return analysis;
+    };
+    Transaction.prototype.getDescription = function(wallet) {
+        var analysis = this.analyze(wallet);
+        if (!analysis) return "";
+        switch (analysis.type) {
+          case "recv":
+            return "Received with " + analysis.addr;
+            break;
+
+          case "sent":
+            return "Payment to " + analysis.addr;
+            break;
+
+          case "self":
+            return "Payment to yourself";
+            break;
+
+          case "other":
+          default:
+            return "";
+        }
+    };
+    Transaction.prototype.getTotalOutValue = function() {
+        var totalValue = BigInteger.ZERO;
+        for (var j = 0; j < this.outs.length; j++) {
+            var txout = this.outs[j];
+            totalValue = totalValue.add(Bitcoin.Util.valueToBigInt(txout.value));
+        }
+        return totalValue;
+    };
+    Transaction.prototype.getTotalValue = Transaction.prototype.getTotalOutValue;
+    Transaction.prototype.calcImpact = function(wallet) {
+        if (!(wallet instanceof Bitcoin.Wallet)) return BigInteger.ZERO;
+        var valueOut = BigInteger.ZERO;
+        for (var j = 0; j < this.outs.length; j++) {
+            var txout = this.outs[j];
+            var hash = Crypto.util.bytesToBase64(txout.script.simpleOutPubKeyHash());
+            if (wallet.hasHash(hash)) {
+                valueOut = valueOut.add(Bitcoin.Util.valueToBigInt(txout.value));
+            }
+        }
+        var valueIn = BigInteger.ZERO;
+        for (var j = 0; j < this.ins.length; j++) {
+            var txin = this.ins[j];
+            var hash = Crypto.util.bytesToBase64(txin.script.simpleInPubKeyHash());
+            if (wallet.hasHash(hash)) {
+                var fromTx = wallet.txIndex[txin.outpoint.hash];
+                if (fromTx) {
+                    valueIn = valueIn.add(Bitcoin.Util.valueToBigInt(fromTx.outs[txin.outpoint.index].value));
+                }
+            }
+        }
+        if (valueOut.compareTo(valueIn) >= 0) {
+            return {
+                sign: 1,
+                value: valueOut.subtract(valueIn)
+            };
+        } else {
+            return {
+                sign: -1,
+                value: valueIn.subtract(valueOut)
+            };
+        }
+    };
+    var TransactionIn = Bitcoin.TransactionIn = function(data) {
+        this.outpoint = data.outpoint;
+        if (data.script instanceof Script) {
+            this.script = data.script;
+        } else {
+            this.script = new Script(data.script);
+        }
+        this.sequence = data.sequence;
+    };
+    TransactionIn.prototype.clone = function() {
+        var newTxin = new TransactionIn({
+            outpoint: {
+                hash: this.outpoint.hash,
+                index: this.outpoint.index
+            },
+            script: this.script.clone(),
+            sequence: this.sequence
+        });
+        return newTxin;
+    };
+    var TransactionOut = Bitcoin.TransactionOut = function(data) {
+        if (data.script instanceof Script) {
+            this.script = data.script;
+        } else {
+            this.script = new Script(data.script);
+        }
+        if (Bitcoin.Util.isArray(data.value)) {
+            this.value = data.value;
+        } else if ("string" == typeof data.value) {
+            var valueHex = new BigInteger(data.value, 10).toString(16);
+            while (valueHex.length < 16) valueHex = "0" + valueHex;
+            this.value = Crypto.util.hexToBytes(valueHex);
+        }
+    };
+    TransactionOut.prototype.clone = function() {
+        var newTxout = new TransactionOut({
+            script: this.script.clone(),
+            value: this.value.slice(0)
+        });
+        return newTxout;
+    };
+})();
+
+Bitcoin.BIP38 = function() {
+    var BIP38 = function() {};
+    BIP38.scryptParams = {
+        N: 16384,
+        r: 8,
+        p: 8
+    };
+    BIP38.encode = function(eckey, passphrase) {
+        var privKeyBytes = eckey.getPrivateKeyByteArray();
+        var address = eckey.getAddress().toString();
+        var salt = Bitcoin.Util.dsha256(address).slice(0, 4);
+        var AES_opts = {
+            mode: new Crypto.mode.ECB(Crypto.pad.NoPadding),
+            asBytes: true
+        };
+        var derivedBytes = scrypt(passphrase, salt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 64);
+        for (var i = 0; i < 32; ++i) {
+            privKeyBytes[i] ^= derivedBytes[i];
+        }
+        var flagByte = eckey.compressed ? 224 : 192;
+        var encryptedKey = [ 1, 66, flagByte ].concat(salt);
+        var encryptedKey = encryptedKey.concat(Crypto.AES.encrypt(privKeyBytes, derivedBytes.slice(32), AES_opts));
+        encryptedKey = encryptedKey.concat(Bitcoin.Util.dsha256(encryptedKey).slice(0, 4));
+        return Bitcoin.Base58.encode(encryptedKey);
+    };
+    BIP38.decode = function(base58Encrypted, passphrase) {
+        var hex;
+        try {
+            hex = Bitcoin.Base58.decode(base58Encrypted);
+        } catch (e) {
+            throw new Error("Invalid BIP38-encrypted private key. Unable to decode base58.");
+        }
+        if (hex.length != 43) {
+            throw new Error("Invalid BIP38-encrypted private key. Length of key in hex format is not 43 characters in length.");
+        } else if (hex[0] != 1) {
+            throw new Error("Invalid BIP38-encrypted private key. First byte is not 0x01.");
+        }
+        var expChecksum = hex.slice(-4);
+        hex = hex.slice(0, -4);
+        var checksum = Bitcoin.Util.dsha256(hex);
+        if (checksum[0] != expChecksum[0] || checksum[1] != expChecksum[1] || checksum[2] != expChecksum[2] || checksum[3] != expChecksum[3]) {
+            throw new Error("Invalid BIP38-encrypted private key. Checksum failed.");
+        }
+        var isCompPoint = false;
+        var isECMult = false;
+        var hasLotSeq = false;
+        if (hex[1] == 66) {
+            if (hex[2] == 224) {
+                isCompPoint = true;
+            } else if (hex[2] != 192) {
+                throw new Error("Invalid BIP38-encrypted private key. Second byte should be 0xc0.");
+            }
+        } else if (hex[1] == 67) {
+            isECMult = true;
+            isCompPoint = (hex[2] & 32) != 0;
+            hasLotSeq = (hex[2] & 4) != 0;
+            if ((hex[2] & 36) != hex[2]) {
+                throw new Error("Invalid BIP38-encrypted private key. Unknown validation error.");
+            }
+        } else {
+            throw new Error("Invalid BIP38-encrypted private key. Unknown validation error.");
+        }
+        var decrypted;
+        var AES_opts = {
+            mode: new Crypto.mode.ECB(Crypto.pad.NoPadding),
+            asBytes: true
+        };
+        var verifyHashAndReturn = function() {
+            var tmpkey = new Bitcoin.ECKey(decrypted);
+            tmpkey.setCompressed(isCompPoint);
+            var address = tmpkey.getAddress();
+            checksum = Bitcoin.Util.dsha256(address.toString());
+            if (checksum[0] != hex[3] || checksum[1] != hex[4] || checksum[2] != hex[5] || checksum[3] != hex[6]) {
+                throw new Error("Invalid BIP38-encrypted private key. Hash could not be verified.");
+            }
+            return tmpkey;
+        };
+        if (!isECMult) {
+            var addresshash = hex.slice(3, 7);
+            var derivedBytes = scrypt(passphrase, addresshash, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 64);
+            var k = derivedBytes.slice(32, 32 + 32);
+            decrypted = Crypto.AES.decrypt(hex.slice(7, 7 + 32), k, AES_opts);
+            for (var x = 0; x < 32; x++) decrypted[x] ^= derivedBytes[x];
+            return verifyHashAndReturn();
+        } else {
+            var ownerentropy = hex.slice(7, 7 + 8);
+            var ownersalt = !hasLotSeq ? ownerentropy : ownerentropy.slice(0, 4);
+            var prefactorA = scrypt(passphrase, ownersalt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 32);
+            var passfactor;
+            if (!hasLotSeq) {
+                passfactor = prefactorA;
+            } else {
+                var prefactorB = prefactorA.concat(ownerentropy);
+                passfactor = Bitcoin.Util.dsha256(prefactorB);
+            }
+            var kp = new Bitcoin.ECKey(passfactor);
+            var passpoint = kp.getPubCompressed();
+            var encryptedpart2 = hex.slice(23, 23 + 16);
+            var addresshashplusownerentropy = hex.slice(3, 3 + 12);
+            var derived = scrypt(passpoint, addresshashplusownerentropy, 1024, 1, 1, 64);
+            var k = derived.slice(32);
+            var unencryptedpart2 = Crypto.AES.decrypt(encryptedpart2, k, AES_opts);
+            for (var i = 0; i < 16; i++) {
+                unencryptedpart2[i] ^= derived[i + 16];
+            }
+            var encryptedpart1 = hex.slice(15, 15 + 8).concat(unencryptedpart2.slice(0, 0 + 8));
+            var unencryptedpart1 = Crypto.AES.decrypt(encryptedpart1, k, AES_opts);
+            for (var i = 0; i < 16; i++) {
+                unencryptedpart1[i] ^= derived[i];
+            }
+            var seedb = unencryptedpart1.slice(0, 0 + 16).concat(unencryptedpart2.slice(8, 8 + 8));
+            var factorb = Bitcoin.Util.dsha256(seedb);
+            var ps = EllipticCurve.getSECCurveByName("secp256k1");
+            var privateKey = BigInteger.fromByteArrayUnsigned(passfactor).multiply(BigInteger.fromByteArrayUnsigned(factorb)).remainder(ps.getN());
+            decrypted = privateKey.toByteArrayUnsigned();
+            return verifyHashAndReturn();
+        }
+    };
+    BIP38.isBIP38Format = function(string) {
+        return /^6P[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{56}$/.test(string);
+    };
+    return BIP38;
+}();
+
+Bitcoin.Wallet = function() {
+    var Script = Bitcoin.Script, TransactionIn = Bitcoin.TransactionIn, TransactionOut = Bitcoin.TransactionOut;
+    var Wallet = function() {
+        var keys = [];
+        this.addressHashes = [];
+        this.txIndex = {};
+        this.unspentOuts = [];
+        this.addressPointer = 0;
+        this.addKey = function(key, pub) {
+            if (!(key instanceof Bitcoin.ECKey)) {
+                key = new Bitcoin.ECKey(key);
+            }
+            keys.push(key);
+            if (pub) {
+                if ("string" === typeof pub) {
+                    pub = Crypto.util.base64ToBytes(pub);
+                }
+                key.setPub(pub);
+            }
+            this.addressHashes.push(key.getAddress().getHashBase64());
+        };
+        this.addKeys = function(keys, pubs) {
+            if ("string" === typeof keys) {
+                keys = keys.split(",");
+            }
+            if ("string" === typeof pubs) {
+                pubs = pubs.split(",");
+            }
+            var i;
+            if (Array.isArray(pubs) && keys.length == pubs.length) {
+                for (i = 0; i < keys.length; i++) {
+                    this.addKey(keys[i], pubs[i]);
+                }
+            } else {
+                for (i = 0; i < keys.length; i++) {
+                    this.addKey(keys[i]);
+                }
+            }
+        };
+        this.getKeys = function() {
+            var serializedWallet = [];
+            for (var i = 0; i < keys.length; i++) {
+                serializedWallet.push(keys[i].toString("base64"));
+            }
+            return serializedWallet;
+        };
+        this.getPubKeys = function() {
+            var pubs = [];
+            for (var i = 0; i < keys.length; i++) {
+                pubs.push(Crypto.util.bytesToBase64(keys[i].getPub()));
+            }
+            return pubs;
+        };
+        this.clear = function() {
+            keys = [];
+        };
+        this.getLength = function() {
+            return keys.length;
+        };
+        this.getAllAddresses = function() {
+            var addresses = [];
+            for (var i = 0; i < keys.length; i++) {
+                addresses.push(keys[i].getAddress());
+            }
+            return addresses;
+        };
+        this.getCurAddress = function() {
+            if (keys[this.addressPointer]) {
+                return keys[this.addressPointer].getAddress();
+            } else {
+                return null;
+            }
+        };
+        this.getNextAddress = function() {
+            this.addressPointer++;
+            if (!keys[this.addressPointer]) {
+                this.generateAddress();
+            }
+            return keys[this.addressPointer].getAddress();
+        };
+        this.signWithKey = function(pubKeyHash, hash) {
+            pubKeyHash = Crypto.util.bytesToBase64(pubKeyHash);
+            for (var i = 0; i < this.addressHashes.length; i++) {
+                if (this.addressHashes[i] == pubKeyHash) {
+                    return keys[i].sign(hash);
+                }
+            }
+            throw new Error("Missing key for signature");
+        };
+        this.getPubKeyFromHash = function(pubKeyHash) {
+            pubKeyHash = Crypto.util.bytesToBase64(pubKeyHash);
+            for (var i = 0; i < this.addressHashes.length; i++) {
+                if (this.addressHashes[i] == pubKeyHash) {
+                    return keys[i].getPub();
+                }
+            }
+            throw new Error("Hash unknown");
+        };
+    };
+    Wallet.prototype.generateAddress = function() {
+        this.addKey(new Bitcoin.ECKey());
+    };
+    Wallet.prototype.process = function(tx) {
+        if (this.txIndex[tx.hash]) return;
+        var j;
+        var k;
+        var hash;
+        for (j = 0; j < tx.outs.length; j++) {
+            var txout = new TransactionOut(tx.outs[j]);
+            hash = Crypto.util.bytesToBase64(txout.script.simpleOutPubKeyHash());
+            for (k = 0; k < this.addressHashes.length; k++) {
+                if (this.addressHashes[k] === hash) {
+                    this.unspentOuts.push({
+                        tx: tx,
+                        index: j,
+                        out: txout
+                    });
+                    break;
+                }
+            }
+        }
+        for (j = 0; j < tx.ins.length; j++) {
+            var txin = new TransactionIn(tx.ins[j]);
+            var pubkey = txin.script.simpleInPubKey();
+            hash = Crypto.util.bytesToBase64(Bitcoin.Util.sha256ripe160(pubkey));
+            for (k = 0; k < this.addressHashes.length; k++) {
+                if (this.addressHashes[k] === hash) {
+                    for (var l = 0; l < this.unspentOuts.length; l++) {
+                        if (txin.outpoint.hash == this.unspentOuts[l].tx.hash && txin.outpoint.index == this.unspentOuts[l].index) {
+                            this.unspentOuts.splice(l, 1);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        this.txIndex[tx.hash] = tx;
+    };
+    Wallet.prototype.getBalance = function() {
+        var balance = BigInteger.valueOf(0);
+        for (var i = 0; i < this.unspentOuts.length; i++) {
+            var txout = this.unspentOuts[i].out;
+            balance = balance.add(Bitcoin.Util.valueToBigInt(txout.value));
+        }
+        return balance;
+    };
+    Wallet.prototype.createSend = function(address, sendValue, feeValue) {
+        var selectedOuts = [];
+        var txValue = sendValue.add(feeValue);
+        var availableValue = BigInteger.ZERO;
+        var i;
+        for (i = 0; i < this.unspentOuts.length; i++) {
+            selectedOuts.push(this.unspentOuts[i]);
+            availableValue = availableValue.add(Bitcoin.Util.valueToBigInt(this.unspentOuts[i].out.value));
+            if (availableValue.compareTo(txValue) >= 0) break;
+        }
+        if (availableValue.compareTo(txValue) < 0) {
+            throw new Error("Insufficient funds.");
+        }
+        var changeValue = availableValue.subtract(txValue);
+        var sendTx = new Bitcoin.Transaction();
+        for (i = 0; i < selectedOuts.length; i++) {
+            sendTx.addInput(selectedOuts[i].tx, selectedOuts[i].index);
+        }
+        sendTx.addOutput(address, sendValue);
+        if (changeValue.compareTo(BigInteger.ZERO) > 0) {
+            sendTx.addOutput(this.getNextAddress(), changeValue);
+        }
+        var hashType = 1;
+        for (i = 0; i < sendTx.ins.length; i++) {
+            var hash = sendTx.hashTransactionForSignature(selectedOuts[i].out.script, i, hashType);
+            var pubKeyHash = selectedOuts[i].out.script.simpleOutPubKeyHash();
+            var signature = this.signWithKey(pubKeyHash, hash);
+            signature.push(parseInt(hashType, 10));
+            sendTx.ins[i].script = Script.createInputScript(signature, this.getPubKeyFromHash(pubKeyHash));
+        }
+        return sendTx;
+    };
+    Wallet.prototype.clearTransactions = function() {
+        this.txIndex = {};
+        this.unspentOuts = [];
+    };
+    Wallet.prototype.hasHash = function(hash) {
+        if (Bitcoin.Util.isArray(hash)) hash = Crypto.util.bytesToBase64(hash);
+        for (var k = 0; k < this.addressHashes.length; k++) {
+            if (this.addressHashes[k] === hash) return true;
+        }
+        return false;
+    };
+    return Wallet;
+}();
+
+var TransactionDatabase = function() {
+    this.txs = [];
+    this.txIndex = {};
+};
+
+EventEmitter.augment(TransactionDatabase.prototype);
+
+TransactionDatabase.prototype.addTransaction = function(tx) {
+    this.addTransactionNoUpdate(tx);
+    $(this).trigger("update");
+};
+
+TransactionDatabase.prototype.addTransactionNoUpdate = function(tx) {
+    if (this.txIndex[tx.hash]) {
+        return;
+    }
+    this.txs.push(new Bitcoin.Transaction(tx));
+    this.txIndex[tx.hash] = tx;
+};
+
+TransactionDatabase.prototype.removeTransaction = function(hash) {
+    this.removeTransactionNoUpdate(hash);
+    $(this).trigger("update");
+};
+
+TransactionDatabase.prototype.removeTransactionNoUpdate = function(hash) {
+    var tx = this.txIndex[hash];
+    if (!tx) {
+        return;
+    }
+    for (var i = 0, l = this.txs.length; i < l; i++) {
+        if (this.txs[i].hash == hash) {
+            this.txs.splice(i, 1);
+            break;
+        }
+    }
+    delete this.txIndex[hash];
+};
+
+TransactionDatabase.prototype.loadTransactions = function(txs) {
+    for (var i = 0; i < txs.length; i++) {
+        this.addTransactionNoUpdate(txs[i]);
+    }
+    $(this).trigger("update");
+};
+
+TransactionDatabase.prototype.getTransactions = function() {
+    return this.txs;
+};
+
+TransactionDatabase.prototype.clear = function() {
+    this.txs = [];
+    this.txIndex = {};
+    $(this).trigger("update");
+};

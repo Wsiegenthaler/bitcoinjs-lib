@@ -1,8 +1,109 @@
 /**
- * BitcoinJS-lib v0.1.0-default
+ * BitcoinJS-lib v0.1.3-default
  * Copyright (c) 2011 BitcoinJS Project
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license.
  */
-(function(a,b,c,d,e){function f(a,b,c){this.setUri(a,b,c),this.unique=1,this.connected=!1,this.callbacks=[]}a.ExitNode=f,b.EventEmitter.augment(f),f.prototype.setUri=function(a,b,c){this.uri=(c?"https://":"http://")+a+":"+b},f.prototype.connect=function(a){this.wallet=a,delete c.sockets[this.uri],c.j=[],this.socket=c.connect(this.uri),this.socket.on("connect",d.proxy(this.handleConnect,this)),this.socket.on("error",function(){console.log("error, test")}),this.socket.on("message",d.proxy(this.handleMessage,this)),this.socket.on("disconnect",d.proxy(this.handleDisconnect,this))},f.prototype.disconnect=function(){this.socket&&(this.socket.disconnect(),this.socket=null,this.connected=!1),this.trigger("connectStatus",{status:"unknown"})},f.prototype.call=function(a,b,c){this.socket.send(d.toJSON({method:a,params:[b],id:this.unique})),c&&(this.callbacks[this.unique]=c),this.unique++},f.prototype.handleConnect=function(){var a=this;this.connected=!0},f.prototype.listen=function(a){self.call("pubkeysRegister",{keys:a.join(",")},function(a,b){if(a){console.error("Could not register public keys");return}self.call("pubkeysListen",{handle:b.handle},function(a,b){self.trigger("blockInit",{height:b.height}),self.trigger("txData",{confirmed:!0,txs:b.txs}),self.trigger("connectStatus",{status:"ok"})}),self.call("pubkeysUnconfirmed",{handle:b.handle},function(a,b){self.trigger("txData",{confirmed:!1,txs:b.txs})})})},f.prototype.handleMessage=function(a){"undefined"!=typeof a.result&&"function"==typeof this.callbacks[a.id]?this.callbacks[a.id](a.error,a.result):"undefined"!=typeof a.method&&this.trigger(a.method,a.params[0])},f.prototype.handleDisconnect=function(){},f.prototype.query=function(a,b,c,e){"function"==typeof c&&(e=c,c=!1),b=b||{},e="function"==typeof e?e:function(){};var f=this.uri+"/"+a;c&&(f+="?callback=?"),d.getJSON(f,b,e)}})("undefined"!=typeof Bitcoin?Bitcoin:module.exports,"undefined"!=typeof Bitcoin?Bitcoin:require("bitcoinjs-lib"),"undefined"!=typeof io?io:require("io"),jQuery,this)
+
+(function(exports, Bitcoin, io, $, global) {
+    exports.ExitNode = ExitNode;
+    function ExitNode(host, port, secure) {
+        this.setUri(host, port, secure);
+        this.unique = 1;
+        this.connected = false;
+        this.callbacks = [];
+    }
+    Bitcoin.EventEmitter.augment(ExitNode);
+    ExitNode.prototype.setUri = function(host, port, secure) {
+        this.uri = (secure ? "https://" : "http://") + host + ":" + port;
+    };
+    ExitNode.prototype.connect = function(wallet) {
+        this.wallet = wallet;
+        delete io.sockets[this.uri];
+        io.j = [];
+        this.socket = io.connect(this.uri);
+        this.socket.on("connect", $.proxy(this.handleConnect, this));
+        this.socket.on("error", function() {
+            console.log("error, test");
+        });
+        this.socket.on("message", $.proxy(this.handleMessage, this));
+        this.socket.on("disconnect", $.proxy(this.handleDisconnect, this));
+    };
+    ExitNode.prototype.disconnect = function() {
+        if (this.socket) {
+            this.socket.disconnect();
+            this.socket = null;
+            this.connected = false;
+        }
+        this.trigger("connectStatus", {
+            status: "unknown"
+        });
+    };
+    ExitNode.prototype.call = function(method, argObj, callback) {
+        this.socket.send($.toJSON({
+            method: method,
+            params: [ argObj ],
+            id: this.unique
+        }));
+        if (callback) this.callbacks[this.unique] = callback;
+        this.unique++;
+    };
+    ExitNode.prototype.handleConnect = function() {
+        var self = this;
+        this.connected = true;
+    };
+    ExitNode.prototype.listen = function(addrs) {
+        self.call("pubkeysRegister", {
+            keys: addrs.join(",")
+        }, function(err, result) {
+            if (err) {
+                console.error("Could not register public keys");
+                return;
+            }
+            self.call("pubkeysListen", {
+                handle: result.handle
+            }, function(err, result) {
+                self.trigger("blockInit", {
+                    height: result.height
+                });
+                self.trigger("txData", {
+                    confirmed: true,
+                    txs: result.txs
+                });
+                self.trigger("connectStatus", {
+                    status: "ok"
+                });
+            });
+            self.call("pubkeysUnconfirmed", {
+                handle: result.handle
+            }, function(err, result) {
+                self.trigger("txData", {
+                    confirmed: false,
+                    txs: result.txs
+                });
+            });
+        });
+    };
+    ExitNode.prototype.handleMessage = function(data) {
+        if ("undefined" !== typeof data.result && "function" == typeof this.callbacks[data.id]) {
+            this.callbacks[data.id](data.error, data.result);
+        } else if ("undefined" !== typeof data.method) {
+            this.trigger(data.method, data.params[0]);
+        }
+    };
+    ExitNode.prototype.handleDisconnect = function() {};
+    ExitNode.prototype.query = function(api, params, jsonp, callback) {
+        if ("function" === typeof jsonp) {
+            callback = jsonp;
+            jsonp = false;
+        }
+        params = params || {};
+        callback = "function" === typeof callback ? callback : function() {};
+        var url = this.uri + "/" + api;
+        if (jsonp) {
+            url += "?callback=?";
+        }
+        $.getJSON(url, params, callback);
+    };
+})("undefined" != typeof Bitcoin ? Bitcoin : module.exports, "undefined" != typeof Bitcoin ? Bitcoin : require("bitcoinjs-lib"), "undefined" != typeof io ? io : require("io"), jQuery, this);
