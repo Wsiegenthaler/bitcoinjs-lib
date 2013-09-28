@@ -110,3 +110,59 @@ test("Classes", function () {
   ok(Bitcoin.Paillier.PublicKey, "Bitcoin.Paillier.PublicKey");
   ok(Bitcoin.Paillier.PrivateKey, "Bitcoin.Paillier.PrivateKey");
 });
+
+//
+// Testing BIP38 Key Encryption/Decryption
+// -----------------------------------------------------------------------------
+module("bip38");
+
+test("Classes", function () {
+  expect(1);
+  ok(Bitcoin.BIP38, "Bitcoin.BIP38");
+});
+
+test("No compression, no EC multiply #1", function () {
+  expect(2);
+
+  var wif = "5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR";
+  var pw = "TestingOneTwoThree";
+  var encrypted = "6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg";
+
+  equal(new Bitcoin.ECKey(wif).getEncryptedFormat(pw), encrypted, "Key encrypted successfully.");
+  equal(Bitcoin.ECKey.decodeEncryptedFormat(encrypted, pw).getWalletImportFormat(), wif, "Key decrypted successfully.");
+});
+
+test("No compression, no EC multiply #2", function () {
+  expect(2);
+
+  var wif = "5HtasZ6ofTHP6HCwTqTkLDuLQisYPah7aUnSKfC7h4hMUVw2gi5";
+  var pw = "Satoshi";
+  var encrypted = "6PRNFFkZc2NZ6dJqFfhRoFNMR9Lnyj7dYGrzdgXXVMXcxoKTePPX1dWByq";
+
+  equal(new Bitcoin.ECKey(wif).getEncryptedFormat(pw), encrypted, "Key encrypted successfully.");
+  equal(Bitcoin.ECKey.decodeEncryptedFormat(encrypted, pw).getWalletImportFormat(), wif, "Key decrypted successfully.");
+});
+
+
+test("Compression, no EC multiply #1", function () {
+  expect(2);
+
+  var wif = "L44B5gGEpqEDRS9vVPz7QT35jcBG2r3CZwSwQ4fCewXAhAhqGVpP";
+  var pw = "TestingOneTwoThree";
+  var encrypted = "6PYNKZ1EAgYgmQfmNVamxyXVWHzK5s6DGhwP4J5o44cvXdoY7sRzhtpUeo";
+
+  equal(new Bitcoin.ECKey(wif).getEncryptedFormat(pw), encrypted, "Key encrypted successfully.");
+  equal(Bitcoin.ECKey.decodeEncryptedFormat(encrypted, pw).getWalletImportFormat(), wif, "Key decrypted successfully.");
+});
+
+test("Compression, no EC multiply #2", function () {
+  expect(2);
+
+  var wif = "KwYgW8gcxj1JWJXhPSu4Fqwzfhp5Yfi42mdYmMa4XqK7NJxXUSK7";
+  var pw = "Satoshi";
+  var encrypted = "6PYLtMnXvfG3oJde97zRyLYFZCYizPU5T3LwgdYJz1fRhh16bU7u6PPmY7";
+
+  equal(new Bitcoin.ECKey(wif).getEncryptedFormat(pw), encrypted, "Key encrypted successfully.");
+  equal(Bitcoin.ECKey.decodeEncryptedFormat(encrypted, pw).getWalletImportFormat(), wif, "Key decrypted successfully.");
+});
+
