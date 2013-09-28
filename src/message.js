@@ -31,7 +31,7 @@ Bitcoin.Message = (function () {
 
     var obj = Bitcoin.ECDSA.parseSig(sig);
 
-    var address = key.getBitcoinAddress().toString();
+    var address = key.getAddress().toString();
     var i = Bitcoin.ECDSA.calcPubkeyRecoveryParam(address, obj.r, obj.s, hash);
 
     i += 27;
@@ -60,7 +60,7 @@ Bitcoin.Message = (function () {
 
     pubKey.setCompressed(isCompressed);
 
-    var expectedAddress = pubKey.getBitcoinAddress().toString();
+    var expectedAddress = pubKey.getAddress().toString();
 
     return (address === expectedAddress);
   };

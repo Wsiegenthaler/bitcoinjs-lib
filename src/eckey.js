@@ -109,7 +109,7 @@ Bitcoin.ECKey = (function () {
     }
   };
 
-  ECKey.prototype.getBitcoinAddress = function () {
+  ECKey.prototype.getAddress = function () {
     var hash = this.getPubKeyHash();
     var addr = new Bitcoin.Address(hash);
     return addr;
@@ -132,8 +132,8 @@ Bitcoin.ECKey = (function () {
   /**
    * Private key encoded as standard Wallet Import Format (WIF)
    */
-  ECKey.prototype.getBitcoinWalletImportFormat = function () {
-    var bytes = this.getBitcoinPrivateKeyByteArray();
+  ECKey.prototype.getWalletImportFormat = function () {
+    var bytes = this.getPrivateKeyByteArray();
     bytes.unshift(ECKey.privateKeyPrefix); // prepend 0x80 byte
     if (this.compressed) bytes.push(0x01); // append 0x01 byte for compressed format
     var checksum = Crypto.SHA256(Crypto.SHA256(bytes, { asBytes: true }), { asBytes: true });
@@ -145,21 +145,21 @@ Bitcoin.ECKey = (function () {
   /**
    * Private key encoded as hexadecimal string.
    */
-  ECKey.prototype.getBitcoinHexFormat = function () {
-    return Crypto.util.bytesToHex(this.getBitcoinPrivateKeyByteArray()).toString().toUpperCase();
+  ECKey.prototype.getHexFormat = function () {
+    return Crypto.util.bytesToHex(this.getPrivateKeyByteArray()).toString().toUpperCase();
   };
 
   /**
    * Private key encoded as Base64 string.
    */
-  ECKey.prototype.getBitcoinBase64Format = function () {
-    return Crypto.util.bytesToBase64(this.getBitcoinPrivateKeyByteArray());
+  ECKey.prototype.getBase64Format = function () {
+    return Crypto.util.bytesToBase64(this.getPrivateKeyByteArray());
   };
 
   /**
    * Private key encoded as raw byte array.
    */
-  ECKey.prototype.getBitcoinPrivateKeyByteArray = function () {
+  ECKey.prototype.getPrivateKeyByteArray = function () {
     // Get a copy of private key as a byte array
     var bytes = this.priv.toByteArrayUnsigned();
     // zero pad if private key is less than 32 bytes 
@@ -170,11 +170,11 @@ Bitcoin.ECKey = (function () {
   ECKey.prototype.toString = function (format) {
     format = format || "";
     if (format.toString().toLowerCase() == "base64" || format.toString().toLowerCase() == "b64") {
-      return this.getBitcoinBase64Format(); // Base 64
+      return this.getBase64Format(); // Base 64
     } else if (format.toString().toLowerCase() == "wif") {
-      return this.getBitcoinWalletImportFormat(); // Wallet Import Format
+      return this.getWalletImportFormat(); // Wallet Import Format
     } else {
-      return this.getBitcoinHexFormat(); // Hex
+      return this.getHexFormat(); // Hex
     }
   };
 

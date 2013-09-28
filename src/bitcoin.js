@@ -157,7 +157,7 @@
    $(function () {
    var key = new Bitcoin.ECKey(Crypto.util.hexToBytes("5c0b98e524ad188ddef35dc6abba13c34a351a05409e5d285403718b93336a4a"));
    key = new Bitcoin.ECKey(Crypto.util.hexToBytes("180cb41c7c600be951b5d3d0a7334acc7506173875834f7a6c4c786a28fcbb19"));
-   //console.log(key.getBitcoinAddress().toString());
+   //console.log(key.getAddress().toString());
    //var message = Crypto.util.hexToBytes("2aec28d323ee7b06a799d540d224b351161fe48967174ca5e43164e86137da11");
    //message = [0];
    //var out = key.sign(message);

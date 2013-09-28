@@ -462,7 +462,7 @@ Bitcoin.ECDSA = (function () {
       for (var i = 0; i < 4; i++) {
         try {
           var pubkey = Bitcoin.ECDSA.recoverPubKey(r, s, hash, i);
-          if (pubkey.getBitcoinAddress().toString() == address) {
+          if (pubkey.getAddress().toString() == address) {
             return i;
           }
         } catch (e) {}

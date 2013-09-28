@@ -43,7 +43,7 @@ Bitcoin.Wallet = (function () {
         key.setPub(pub);
       }
 
-      this.addressHashes.push(key.getBitcoinAddress().getHashBase64());
+      this.addressHashes.push(key.getAddress().getHashBase64());
     };
 
     /**
@@ -120,14 +120,14 @@ Bitcoin.Wallet = (function () {
     this.getAllAddresses = function () {
       var addresses = [];
       for (var i = 0; i < keys.length; i++) {
-        addresses.push(keys[i].getBitcoinAddress());
+        addresses.push(keys[i].getAddress());
       }
       return addresses;
     };
 
     this.getCurAddress = function () {
       if (keys[this.addressPointer]) {
-        return keys[this.addressPointer].getBitcoinAddress();
+        return keys[this.addressPointer].getAddress();
       } else {
         return null;
       }
@@ -144,7 +144,7 @@ Bitcoin.Wallet = (function () {
       if (!keys[this.addressPointer]) {
         this.generateAddress();
       }
-      return keys[this.addressPointer].getBitcoinAddress();
+      return keys[this.addressPointer].getAddress();
     };
 
     /**
