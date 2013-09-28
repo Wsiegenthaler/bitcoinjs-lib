@@ -100,8 +100,8 @@
     buffer.concat(Crypto.util.wordsToBytes([parseInt(hashType)]));
 
     console.log(buffer);
-    
-    return Crypto.SHA256(Crypto.SHA256(buffer, {asBytes: true}), {asBytes: true});
+   
+    return Bitcoin.Util.dsha256(buffer); 
   };
 
   function verifyTransactionSignature(tx) {

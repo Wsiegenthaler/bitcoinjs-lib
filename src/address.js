@@ -21,7 +21,7 @@ Bitcoin.Address.prototype.toString = function () {
   // Version
   hash.unshift(this.version);
 
-  var checksum = Crypto.SHA256(Crypto.SHA256(hash, {asBytes: true}), {asBytes: true});
+  var checksum = Bitcoin.Util.dsha256(hash);
 
   var bytes = hash.concat(checksum.slice(0,4));
 
@@ -40,7 +40,7 @@ Bitcoin.Address.decodeString = function (string) {
 
   var hash = bytes.slice(0, 21);
 
-  var checksum = Crypto.SHA256(Crypto.SHA256(hash, {asBytes: true}), {asBytes: true});
+  var checksum = Bitcoin.Util.dsha256(hash);
 
   if (checksum[0] != bytes[21] ||
       checksum[1] != bytes[22] ||

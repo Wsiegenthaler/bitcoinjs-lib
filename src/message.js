@@ -21,7 +21,7 @@ Bitcoin.Message = (function () {
 
   Message.getHash = function (message) {
     var buffer = Message.makeMagicMessage(message);
-    return Crypto.SHA256(Crypto.SHA256(buffer, {asBytes: true}), {asBytes: true});
+    return Bitcoin.Util.dsha256(buffer);
   };
 
   Message.signMessage = function (key, message, compressed) {

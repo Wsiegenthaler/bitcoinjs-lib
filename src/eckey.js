@@ -136,7 +136,7 @@ Bitcoin.ECKey = (function () {
     var bytes = this.getPrivateKeyByteArray();
     bytes.unshift(ECKey.privateKeyPrefix); // prepend 0x80 byte
     if (this.compressed) bytes.push(0x01); // append 0x01 byte for compressed format
-    var checksum = Crypto.SHA256(Crypto.SHA256(bytes, { asBytes: true }), { asBytes: true });
+    var checksum = Bitcoin.Util.dsha256(bytes);
     bytes = bytes.concat(checksum.slice(0, 4));
     var privWif = Bitcoin.Base58.encode(bytes);
     return privWif;
@@ -194,7 +194,7 @@ Bitcoin.ECKey = (function () {
 
     var hash = bytes.slice(0, 33);
 
-    var checksum = Crypto.SHA256(Crypto.SHA256(hash, {asBytes: true}), {asBytes: true});
+    var checksum = Bitcoin.Util.dsha256(hash);
 
     if (checksum[0] != bytes[33] ||
         checksum[1] != bytes[34] ||
@@ -218,7 +218,7 @@ Bitcoin.ECKey = (function () {
   ECKey.decodeCompressedWalletImportFormat = function (privStr) {
     var bytes = Bitcoin.Base58.decode(privStr);
     var hash = bytes.slice(0, 34);
-    var checksum = Crypto.SHA256(Crypto.SHA256(hash, { asBytes: true }), { asBytes: true });
+    var checksum = Bitcoin.Util.dsha256(hash);
     if (checksum[0] != bytes[34] ||
       checksum[1] != bytes[35] ||
       checksum[2] != bytes[36] ||
