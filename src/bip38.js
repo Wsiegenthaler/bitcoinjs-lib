@@ -2,6 +2,11 @@ Bitcoin.BIP38 = (function () {
 
   var BIP38 = function() {};
 
+  var ecparams = getSECCurveByName("secp256k1");
+  var rng = new SecureRandom();
+  var AES_opts = {mode: new Crypto.mode.ECB(Crypto.pad.NoPadding), asBytes: true};
+
+
   /**
    * Default parameters for scrypt key derivation
    *  -> N: cpu cost
@@ -10,8 +15,11 @@ Bitcoin.BIP38 = (function () {
    */
   BIP38.scryptParams = { N: 16384, r: 8, p: 8 };
 
+
+
   /**
    * Private key encoded per BIP-38 (password encrypted, checksum,  base58)
+   * @author scintill
    */
   BIP38.encode = function (eckey, passphrase) {
     var privKeyBytes = eckey.getPrivateKeyByteArray();
@@ -21,8 +29,6 @@ Bitcoin.BIP38 = (function () {
     var salt = Bitcoin.Util.dsha256(address).slice(0, 4);
   
     // derive key using scrypt
-    var AES_opts = {mode: new Crypto.mode.ECB(Crypto.pad.NoPadding), asBytes: true};
-  
     var derivedBytes = scrypt(passphrase, salt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 64);
     for(var i = 0; i < 32; ++i) {
       privKeyBytes[i] ^= derivedBytes[i];
@@ -41,6 +47,7 @@ Bitcoin.BIP38 = (function () {
 
   /**
    * Parse a wallet import format private key contained in a string.
+   * @author scintill
    */
   BIP38.decode = function (base58Encrypted, passphrase) {
     var hex;
@@ -85,8 +92,6 @@ Bitcoin.BIP38 = (function () {
     }
   
     var decrypted;
-    var AES_opts = {mode: new Crypto.mode.ECB(Crypto.pad.NoPadding), asBytes: true};
-  
     var verifyHashAndReturn = function() {
       var tmpkey = new Bitcoin.ECKey(decrypted);
       tmpkey.setCompressed(isCompPoint);
@@ -122,25 +127,24 @@ Bitcoin.BIP38 = (function () {
       var kp = new Bitcoin.ECKey(passfactor);
       var passpoint = kp.getPubCompressed();
   
-      var encryptedpart2 = hex.slice(23, 23+16);
+      var encryptedPart2 = hex.slice(23, 23+16);
   
-      var addresshashplusownerentropy = hex.slice(3, 3+12);
-      var derived = scrypt(passpoint, addresshashplusownerentropy, 1024, 1, 1, 64);
+      var addressHashPlusOnwerEntropy = hex.slice(3, 3+12);
+      var derived = scrypt(passpoint, addressHashPlusOnwerEntropy, 1024, 1, 1, 64);
       var k = derived.slice(32);
   
-      var unencryptedpart2 = Crypto.AES.decrypt(encryptedpart2, k, AES_opts);
-      for (var i = 0; i < 16; i++) { unencryptedpart2[i] ^= derived[i+16]; }
+      var unencryptedPart2 = Crypto.AES.decrypt(encryptedPart2, k, AES_opts);
+      for (var i = 0; i < 16; i++) { unencryptedPart2[i] ^= derived[i+16]; }
   
-      var encryptedpart1 = hex.slice(15, 15+8).concat(unencryptedpart2.slice(0, 0+8));
+      var encryptedpart1 = hex.slice(15, 15+8).concat(unencryptedPart2.slice(0, 0+8));
       var unencryptedpart1 = Crypto.AES.decrypt(encryptedpart1, k, AES_opts);
       for (var i = 0; i < 16; i++) { unencryptedpart1[i] ^= derived[i]; }
   
-      var seedb = unencryptedpart1.slice(0, 0+16).concat(unencryptedpart2.slice(8, 8+8));
+      var seedb = unencryptedpart1.slice(0, 0+16).concat(unencryptedPart2.slice(8, 8+8));
   
       var factorb = Bitcoin.Util.dsha256(seedb);
   
-      var ps = EllipticCurve.getSECCurveByName("secp256k1");
-      var privateKey = BigInteger.fromByteArrayUnsigned(passfactor).multiply(BigInteger.fromByteArrayUnsigned(factorb)).remainder(ps.getN());
+      var privateKey = BigInteger.fromByteArrayUnsigned(passfactor).multiply(BigInteger.fromByteArrayUnsigned(factorb)).remainder(ecparams.getN());
   
       decrypted = privateKey.toByteArrayUnsigned();
       return verifyHashAndReturn();
@@ -154,6 +158,8 @@ Bitcoin.BIP38 = (function () {
     return (/^6P[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{56}$/.test(string));
   };
 
+
   return BIP38;
+
 })();
 
