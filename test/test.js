@@ -166,3 +166,32 @@ test("Compression, no EC multiply #2", function () {
   equal(Bitcoin.ECKey.decodeEncryptedFormat(encrypted, pw).getWalletImportFormat(), wif, "Key decrypted successfully.");
 });
 
+
+// NOTE: Testing BIP38 keys generated with EC-multiply is difficult due to their non-deterministic nature.
+//       This test only verifies that a new address/key can be generated with a password and later decrypted
+//       with the same password.
+
+test("EC multiply, no compression, no lot/sequence numbers", function () {
+  expect(2);
+
+  var pw = "TestingOneTwoThree";
+  var intermediate = Bitcoin.BIP38.generateIntermediate(pw);
+  var encryptedKey = Bitcoin.BIP38.newAddressFromIntermediate(intermediate, false);
+  var decryptedKey = Bitcoin.BIP38.decode(encryptedKey.bip38PrivateKey, pw);
+
+  ok(Bitcoin.ECKey.isBIP38Format(encryptedKey.bip38PrivateKey), "New EC-multiplied key appears to be valid BIP38 format.");
+  equal(encryptedKey.address.toString(), decryptedKey.getAddress().toString(), "Address of new EC-multiplied key matches address after decryption with password.");
+});
+
+test("EC multiply, no compression, lot/sequence numbers", function () {
+  expect(2);
+
+  var pw = "MOLON LABE", lot = 263183, seq = 1;
+  var intermediate = Bitcoin.BIP38.generateIntermediate(pw, lot, seq);
+  var encryptedKey = Bitcoin.BIP38.newAddressFromIntermediate(intermediate, false);
+  var decryptedKey = Bitcoin.BIP38.decode(encryptedKey.bip38PrivateKey, pw);
+
+  ok(Bitcoin.ECKey.isBIP38Format(encryptedKey.bip38PrivateKey), "New EC-multiplied key appears to be valid BIP38 format.");
+  equal(encryptedKey.address.toString(), decryptedKey.getAddress().toString(), "Address of new EC-multiplied key matches address after decryption with password.");
+});
+

@@ -125,7 +125,8 @@ Bitcoin.BIP38 = (function () {
         passfactor = Bitcoin.Util.dsha256(prefactorB);
       }
       var kp = new Bitcoin.ECKey(passfactor);
-      var passpoint = kp.getPubCompressed();
+      kp.compressed = true;
+      var passpoint = kp.getPub();
   
       var encryptedPart2 = hex.slice(23, 23+16);
   
@@ -150,6 +151,120 @@ Bitcoin.BIP38 = (function () {
       return verifyHashAndReturn();
     }
   }
+
+  /**
+   * Generates an intermediate point based on a password which can later be used
+   * to directly generate new BIP38-encrypted private keys without actually knowing
+   * the password.
+   * @author Zeilap
+   */
+  BIP38.generateIntermediate = function(passphrase, lotNum, sequenceNum) {
+    var noNumbers = lotNum == null || sequenceNum == null;
+    var ownerEntropy, ownerSalt;
+
+    if(noNumbers) {
+      ownerSalt = ownerEntropy = new Array(8);
+      rng.nextBytes(ownerEntropy);
+    } else {
+      // 1) generate 4 random bytes
+      var ownerSalt = Array(4);
+
+      rng.nextBytes(ownerSalt);
+
+      // 2)  Encode the lot and sequence numbers as a 4 byte quantity (big-endian):
+      // lotnumber * 4096 + sequencenumber. Call these four bytes lotsequence.
+      var lotSequence = nbv(4096*lotNum + sequenceNum).toByteArrayUnsigned();
+
+      // 3) Concatenate ownersalt + lotsequence and call this ownerentropy.
+      var ownerEntropy = ownerSalt.concat(lotSequence);
+    }
+
+    // 4) Derive a key from the passphrase using scrypt
+    var prefactor = scrypt(passphrase, ownerSalt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 32);
+ 
+    // Take SHA256(SHA256(prefactor + ownerentropy)) and call this passfactor
+    var passfactorBytes = noNumbers? prefactor : Bitcoin.Util.dsha256(prefactor.concat(ownerEntropy));
+    var passfactor = BigInteger.fromByteArrayUnsigned(passfactorBytes);
+
+    // 5) Compute the elliptic curve point G * passfactor, and convert the result to compressed notation (33 bytes)
+    var passpoint = ecparams.getG().multiply(passfactor).getEncoded(1);
+
+    // 6) Convey ownersalt and passpoint to the party generating the keys, along with a checksum to ensure integrity.
+    // magic bytes "2C E9 B3 E1 FF 39 E2 51" followed by ownerentropy, and then passpoint
+    var magicBytes = [0x2C, 0xE9, 0xB3, 0xE1, 0xFF, 0x39, 0xE2, 0x51];
+    if(noNumbers) magicBytes[7] = 0x53;
+
+    var intermediate = magicBytes.concat(ownerEntropy).concat(passpoint);
+
+    // base58check encode
+    intermediate = intermediate.concat(Bitcoin.Util.dsha256(intermediate).slice(0,4));
+    return Bitcoin.Base58.encode(intermediate);
+  };
+
+  /**
+   * Creates new private key using an intermediate EC point.
+   */
+  BIP38.newAddressFromIntermediate = function(intermediate, compressed) {
+    var result = {};
+
+    // decode IPS
+    var x = Bitcoin.Base58.decode(intermediate);
+    //TODO if(x.slice(49, 4) !== Bitcoin.Util.dsha256(x.slice(0,49)).slice(0,4)) {
+    //  throw new Error("Invalid intermediate passphrase string");
+    //}
+    var noNumbers = (x[7] === 0x53);
+    var ownerEntropy = x.slice(8, 8+8);
+    var passpoint = x.slice(16, 16+33);
+
+    // 1) Set flagbyte.
+    // set bit 0x20 for compressed key
+    // set bit 0x04 if ownerentropy contains a value for lotsequence
+    var flagByte = (compressed? 0x20 : 0x00) | (noNumbers? 0x00 : 0x04);
+
+    // 2) Generate 24 random bytes, call this seedb.
+    var seedB = new Array(24);
+    rng.nextBytes(seedB);
+
+    // Take SHA256(SHA256(seedb)) to yield 32 bytes, call this factorb.
+    var factorB = Bitcoin.Util.dsha256(seedB);
+
+    // 3) ECMultiply passpoint by factorb. Use the resulting EC point as a public key and hash it into a Bitcoin
+    // address using either compressed or uncompressed public key methodology (specify which methodology is used
+    // inside flagbyte). This is the generated Bitcoin address, call it generatedAddress.
+    var ec = ecparams.getCurve();
+    var generatedPoint = ec.decodePointHex(Crypto.util.bytesToHex(passpoint));
+    var generatedBytes = generatedPoint.multiply(BigInteger.fromByteArrayUnsigned(factorB)).getEncoded(compressed);
+    var generatedAddress = new Bitcoin.Address(Bitcoin.Util.sha256ripe160(generatedBytes));
+
+    // 4) Take the first four bytes of SHA256(SHA256(generatedaddress)) and call it addresshash.
+    var addressHash = Bitcoin.Util.dsha256(generatedAddress.toString()).slice(0,4);
+
+    // 5) Now we will encrypt seedb. Derive a second key from passpoint using scrypt
+    var derivedBytes = scrypt(passpoint, addressHash.concat(ownerEntropy), 1024, 1, 1, 64);
+
+    // 6) Do AES256Encrypt(seedb[0...15]] xor derivedhalf1[0...15], derivedhalf2), call the 16-byte result encryptedpart1
+    for(var i = 0; i < 16; ++i) {
+      seedB[i] ^= derivedBytes[i];
+    }
+    var encryptedPart1 = Crypto.AES.encrypt(seedB.slice(0,16), derivedBytes.slice(32), AES_opts);
+
+    // 7) Do AES256Encrypt((encryptedpart1[8...15] + seedb[16...23]) xor derivedhalf1[16...31], derivedhalf2), call the 16-byte result encryptedseedb.
+    var message2 = encryptedPart1.slice(8, 8+8).concat(seedB.slice(16, 16+8));
+    for(var i = 0; i < 16; ++i) {
+      message2[i] ^= derivedBytes[i+16];
+    }
+    var encryptedSeedB = Crypto.AES.encrypt(message2, derivedBytes.slice(32), AES_opts);
+
+    // 0x01 0x43 + flagbyte + addresshash + ownerentropy + encryptedpart1[0...7] + encryptedPart2
+    var encryptedKey = [ 0x01, 0x43, flagByte ].concat(addressHash).concat(ownerEntropy).concat(encryptedPart1.slice(0,8)).concat(encryptedSeedB);
+
+    // base58check encode
+    encryptedKey = encryptedKey.concat(Bitcoin.Util.dsha256(encryptedKey).slice(0,4));
+
+    result.address = generatedAddress;
+    result.bip38PrivateKey = Bitcoin.Base58.encode(encryptedKey);
+    return result;
+  };
 
   /**
    * Detects keys encrypted according to BIP-38 (58 base58 characters starting with 6P)
