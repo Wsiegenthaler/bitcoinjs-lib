@@ -2742,14 +2742,29 @@ function curveFpFromBigInteger(x) {
     return new ECFieldElementFp(this.q, x);
 }
 
+function curveFpDecompressPoint(yOdd, X) {
+    if (this.q.mod(BigInteger.valueOf(4)).equals(BigInteger.valueOf(3))) {
+        var ySquared = X.multiply(X.square().add(this.a)).add(this.b);
+        var Y = ySquared.x.modPow(this.q.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), this.q);
+        if (Y.testBit(0) !== yOdd) {
+            Y = this.q.subtract(Y);
+        }
+        return new ECPointFp(this, X, this.fromBigInteger(Y));
+    } else {
+        throw new Error("point decompression only implements sqrt for q = 3 mod 4");
+    }
+}
+
 function curveFpDecodePointHex(s) {
     switch (parseInt(s.substr(0, 2), 16)) {
       case 0:
         return this.infinity;
 
       case 2:
+        return this.decompressPoint(false, this.fromBigInteger(new BigInteger(s.substr(2), 16)));
+
       case 3:
-        return null;
+        return this.decompressPoint(true, this.fromBigInteger(new BigInteger(s.substr(2), 16)));
 
       case 4:
       case 6:
@@ -2777,6 +2792,8 @@ ECCurveFp.prototype.getInfinity = curveFpGetInfinity;
 ECCurveFp.prototype.fromBigInteger = curveFpFromBigInteger;
 
 ECCurveFp.prototype.decodePointHex = curveFpDecodePointHex;
+
+ECCurveFp.prototype.decompressPoint = curveFpDecompressPoint;
 
 function X9ECParameters(curve, g, n, h) {
     this.curve = curve;
@@ -4245,6 +4262,12 @@ Bitcoin.ECKey = function() {
 
 Bitcoin.BIP38 = function() {
     var BIP38 = function() {};
+    var ecparams = getSECCurveByName("secp256k1");
+    var rng = new SecureRandom();
+    var AES_opts = {
+        mode: new Crypto.mode.ECB(Crypto.pad.NoPadding),
+        asBytes: true
+    };
     BIP38.scryptParams = {
         N: 16384,
         r: 8,
@@ -4254,10 +4277,6 @@ Bitcoin.BIP38 = function() {
         var privKeyBytes = eckey.getPrivateKeyByteArray();
         var address = eckey.getAddress().toString();
         var salt = Bitcoin.Util.dsha256(address).slice(0, 4);
-        var AES_opts = {
-            mode: new Crypto.mode.ECB(Crypto.pad.NoPadding),
-            asBytes: true
-        };
         var derivedBytes = scrypt(passphrase, salt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 64);
         for (var i = 0; i < 32; ++i) {
             privKeyBytes[i] ^= derivedBytes[i];
@@ -4306,10 +4325,6 @@ Bitcoin.BIP38 = function() {
             throw new Error("Invalid BIP38-encrypted private key. Unknown validation error.");
         }
         var decrypted;
-        var AES_opts = {
-            mode: new Crypto.mode.ECB(Crypto.pad.NoPadding),
-            asBytes: true
-        };
         var verifyHashAndReturn = function() {
             var tmpkey = new Bitcoin.ECKey(decrypted);
             tmpkey.setCompressed(isCompPoint);
@@ -4339,27 +4354,82 @@ Bitcoin.BIP38 = function() {
                 passfactor = Bitcoin.Util.dsha256(prefactorB);
             }
             var kp = new Bitcoin.ECKey(passfactor);
-            var passpoint = kp.getPubCompressed();
-            var encryptedpart2 = hex.slice(23, 23 + 16);
-            var addresshashplusownerentropy = hex.slice(3, 3 + 12);
-            var derived = scrypt(passpoint, addresshashplusownerentropy, 1024, 1, 1, 64);
+            kp.compressed = true;
+            var passpoint = kp.getPub();
+            var encryptedPart2 = hex.slice(23, 23 + 16);
+            var addressHashPlusOnwerEntropy = hex.slice(3, 3 + 12);
+            var derived = scrypt(passpoint, addressHashPlusOnwerEntropy, 1024, 1, 1, 64);
             var k = derived.slice(32);
-            var unencryptedpart2 = Crypto.AES.decrypt(encryptedpart2, k, AES_opts);
+            var unencryptedPart2 = Crypto.AES.decrypt(encryptedPart2, k, AES_opts);
             for (var i = 0; i < 16; i++) {
-                unencryptedpart2[i] ^= derived[i + 16];
+                unencryptedPart2[i] ^= derived[i + 16];
             }
-            var encryptedpart1 = hex.slice(15, 15 + 8).concat(unencryptedpart2.slice(0, 0 + 8));
+            var encryptedpart1 = hex.slice(15, 15 + 8).concat(unencryptedPart2.slice(0, 0 + 8));
             var unencryptedpart1 = Crypto.AES.decrypt(encryptedpart1, k, AES_opts);
             for (var i = 0; i < 16; i++) {
                 unencryptedpart1[i] ^= derived[i];
             }
-            var seedb = unencryptedpart1.slice(0, 0 + 16).concat(unencryptedpart2.slice(8, 8 + 8));
+            var seedb = unencryptedpart1.slice(0, 0 + 16).concat(unencryptedPart2.slice(8, 8 + 8));
             var factorb = Bitcoin.Util.dsha256(seedb);
-            var ps = EllipticCurve.getSECCurveByName("secp256k1");
-            var privateKey = BigInteger.fromByteArrayUnsigned(passfactor).multiply(BigInteger.fromByteArrayUnsigned(factorb)).remainder(ps.getN());
+            var privateKey = BigInteger.fromByteArrayUnsigned(passfactor).multiply(BigInteger.fromByteArrayUnsigned(factorb)).remainder(ecparams.getN());
             decrypted = privateKey.toByteArrayUnsigned();
             return verifyHashAndReturn();
         }
+    };
+    BIP38.generateIntermediate = function(passphrase, lotNum, sequenceNum) {
+        var noNumbers = lotNum == null || sequenceNum == null;
+        var ownerEntropy, ownerSalt;
+        if (noNumbers) {
+            ownerSalt = ownerEntropy = new Array(8);
+            rng.nextBytes(ownerEntropy);
+        } else {
+            var ownerSalt = Array(4);
+            rng.nextBytes(ownerSalt);
+            var lotSequence = nbv(4096 * lotNum + sequenceNum).toByteArrayUnsigned();
+            var ownerEntropy = ownerSalt.concat(lotSequence);
+        }
+        var prefactor = scrypt(passphrase, ownerSalt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 32);
+        var passfactorBytes = noNumbers ? prefactor : Bitcoin.Util.dsha256(prefactor.concat(ownerEntropy));
+        var passfactor = BigInteger.fromByteArrayUnsigned(passfactorBytes);
+        var passpoint = ecparams.getG().multiply(passfactor).getEncoded(1);
+        var magicBytes = [ 44, 233, 179, 225, 255, 57, 226, 81 ];
+        if (noNumbers) magicBytes[7] = 83;
+        var intermediate = magicBytes.concat(ownerEntropy).concat(passpoint);
+        intermediate = intermediate.concat(Bitcoin.Util.dsha256(intermediate).slice(0, 4));
+        return Bitcoin.Base58.encode(intermediate);
+    };
+    BIP38.newAddressFromIntermediate = function(intermediate, compressed) {
+        var result = {};
+        var x = Bitcoin.Base58.decode(intermediate);
+        var noNumbers = x[7] === 83;
+        var ownerEntropy = x.slice(8, 8 + 8);
+        var passpoint = x.slice(16, 16 + 33);
+        var flagByte = (compressed ? 32 : 0) | (noNumbers ? 0 : 4);
+        var seedB = new Array(24);
+        rng.nextBytes(seedB);
+        var factorB = Bitcoin.Util.dsha256(seedB);
+        var ec = ecparams.getCurve();
+        var generatedPoint = ec.decodePointHex(Crypto.util.bytesToHex(passpoint));
+        var generatedBytes = generatedPoint.multiply(BigInteger.fromByteArrayUnsigned(factorB)).getEncoded(compressed);
+        var generatedAddress = new Bitcoin.Address(Bitcoin.Util.sha256ripe160(generatedBytes));
+        var addressHash = Bitcoin.Util.dsha256(generatedAddress.toString()).slice(0, 4);
+        var derivedBytes = scrypt(passpoint, addressHash.concat(ownerEntropy), 1024, 1, 1, 64);
+        for (var i = 0; i < 16; ++i) {
+            seedB[i] ^= derivedBytes[i];
+        }
+        var encryptedPart1 = Crypto.AES.encrypt(seedB.slice(0, 16), derivedBytes.slice(32), AES_opts);
+        var message2 = encryptedPart1.slice(8, 8 + 8).concat(seedB.slice(16, 16 + 8));
+        for (var i = 0; i < 16; ++i) {
+            message2[i] ^= derivedBytes[i + 16];
+        }
+        var encryptedSeedB = Crypto.AES.encrypt(message2, derivedBytes.slice(32), AES_opts);
+        var encryptedKey = [ 1, 67, flagByte ].concat(addressHash).concat(ownerEntropy).concat(encryptedPart1.slice(0, 8)).concat(encryptedSeedB);
+        encryptedKey = encryptedKey.concat(Bitcoin.Util.dsha256(encryptedKey).slice(0, 4));
+        result.generatedBytes = generatedBytes;
+        result.derivedBytes = derivedBytes;
+        result.address = generatedAddress;
+        result.bip38PrivateKey = Bitcoin.Base58.encode(encryptedKey);
+        return result;
     };
     BIP38.isBIP38Format = function(string) {
         return /^6P[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{56}$/.test(string);
