@@ -208,27 +208,31 @@ Bitcoin.BIP38 = (function () {
     var magicBytes = [0x2C, 0xE9, 0xB3, 0xE1, 0xFF, 0x39, 0xE2, 0x51];
     if(noNumbers) magicBytes[7] = 0x53;
 
-    var intermediate = magicBytes.concat(ownerEntropy).concat(passpoint);
+    var intermediatePreChecksum = magicBytes.concat(ownerEntropy).concat(passpoint);
+    var intermediateBytes = intermediatePreChecksum.concat(Bitcoin.Util.dsha256(intermediatePreChecksum).slice(0,4));
+    var intermediate = Bitcoin.Base58.encode(intermediateBytes);
 
-    // base58check encode
-    intermediate = intermediate.concat(Bitcoin.Util.dsha256(intermediate).slice(0,4));
-    return Bitcoin.Base58.encode(intermediate);
+    return intermediate;
   };
 
   /**
    * Creates new private key using an intermediate EC point.
    */
   BIP38.newAddressFromIntermediate = function(intermediate, compressed) {
-    var result = {};
-
     // decode IPS
-    var x = Bitcoin.Base58.decode(intermediate);
-    //TODO if(x.slice(49, 4) !== Bitcoin.Util.dsha256(x.slice(0,49)).slice(0,4)) {
-    //  throw new Error("Invalid intermediate passphrase string");
-    //}
-    var noNumbers = (x[7] === 0x53);
-    var ownerEntropy = x.slice(8, 8+8);
-    var passpoint = x.slice(16, 16+33);
+    var intermediateBytes = Bitcoin.Base58.decode(intermediate);
+    var expectedChecksum = intermediateBytes.slice(49,53)
+    var checksum = Bitcoin.Util.dsha256(intermediateBytes.slice(0, 49)).slice(0, 4)
+    if (expectedChecksum[0] != checksum[0] ||
+        expectedChecksum[1] != checksum[1] ||
+        expectedChecksum[2] != checksum[2] ||
+        expectedChecksum[3] != checksum[3]) {
+          throw new Error("Invalid intermediate passphrase string");
+    }
+
+    var noNumbers = (intermediateBytes[7] === 0x53);
+    var ownerEntropy = intermediateBytes.slice(8, 8+8);
+    var passpoint = intermediateBytes.slice(16, 16+33);
 
     // 1) Set flagbyte.
     // set bit 0x20 for compressed key
