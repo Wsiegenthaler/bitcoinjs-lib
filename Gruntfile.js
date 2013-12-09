@@ -37,7 +37,12 @@ module.exports = function(grunt) {
 
             'src/crypto-js-etc/ripemd160.js',
 
-            'src/node-scrypt-js/scrypt.js',
+            // node-scrypt-js (native javascript implementation)
+            //'src/node-scrypt-js/scrypt.js',
+
+            // js-scrypt (llvm to javascript via emscripten)
+            'src/js-scrypt/browser/scrypt.js',
+            'src/js-scrypt-wrapper.js',
 
             'src/jsbn/prng4.js',
             'src/jsbn/rng.js',

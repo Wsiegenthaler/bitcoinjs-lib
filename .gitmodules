@@ -2,3 +2,6 @@
 	path = src/crypto-js
 	url = https://github.com/scintill/crypto-js.git
 	branch = 2.x
+[submodule "src/js-scrypt"]
+	path = src/js-scrypt
+	url = https://github.com/tonyg/js-scrypt.git
