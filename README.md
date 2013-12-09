@@ -35,6 +35,9 @@ http://code.google.com/p/crypto-js/
 node-scrypt-js (c) 2010-2011 Intalio Pte, All Rights Reserved
 Released under MIT license  
 https://github.com/cheongwy/node-scrypt-js
+js-scrypt (c) 2013 Tony Garnock-Jones
+Release under 2-clause BSD license
+http://github.com/tonyg/js-scrypt
 
 bitaddress.org (c) 2011-2012 bitaddress.org
 Released under MIT license  
