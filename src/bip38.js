@@ -279,11 +279,125 @@ Bitcoin.BIP38 = (function () {
     // base58check encode
     encryptedKey = encryptedKey.concat(Bitcoin.Util.dsha256(encryptedKey).slice(0,4));
 
-    result.address = generatedAddress;
-    result.bip38PrivateKey = Bitcoin.Base58.encode(encryptedKey);
-    return result;
+    // Generate confirmation code for the new address
+    var confirmation = newAddressConfirmation(addressHash, factorB, derivedBytes, flagByte, ownerEntropy);
+
+    return { address: generatedAddress,
+             bip38PrivateKey: Bitcoin.Base58.encode(encryptedKey),
+             confirmation: confirmation };
   };
 
+  /**
+   * Generates a confirmation code for a key/address generated using an intermediate
+   * ec point (see BIP38.newAddressFromIntermediate).  This certifies that the address
+   * truly corresponds to the password from which the intermediate ec point was derived
+   * (see BIP38.verifyNewAddressConfirmation).
+   */
+  var newAddressConfirmation = function(addressHash, factorB, derivedBytes, flagByte, ownerEntropy) {
+    // 1) ECMultiply factorb by G, call the result pointb. The result is 33 bytes.
+    var pointb = ecparams.getG().multiply(BigInteger.fromByteArrayUnsigned(factorB)).getEncoded(1);
+
+    // 2) he first byte is 0x02 or 0x03. XOR it by (derivedhalf2[31] & 0x01), call the resulting byte pointbprefix.
+    var pointbprefix = pointb[0] ^ (derivedBytes[63] & 0x01);
+
+    // 3) Do AES256Encrypt(pointb[1...16] xor derivedhalf1[0...15], derivedhalf2) and call the result pointbx1.
+    for(var i = 0; i < 16; ++i) {
+      pointb[i + 1] ^= derivedBytes[i];
+    }
+    var pointbx1 = Crypto.AES.encrypt(pointb.slice(1,17), derivedBytes.slice(32), AES_opts);
+                        
+    // 4) Do AES256Encrypt(pointb[17...32] xor derivedhalf1[16...31], derivedhalf2) and call the result pointbx2.
+    for(var i = 16; i < 32; ++i) {
+      pointb[i + 1] ^= derivedBytes[i];
+    }
+    var pointbx2 = Crypto.AES.encrypt(pointb.slice(17,33), derivedBytes.slice(32), AES_opts);
+
+    var encryptedpointb = [ pointbprefix ].concat(pointbx1).concat(pointbx2);
+
+    var confirmationPreChecksum =
+      [ 0x64, 0x3B, 0xF6, 0xA8, 0x9A, flagByte ]
+        .concat(addressHash)
+        .concat(ownerEntropy)
+        .concat(encryptedpointb);
+    var confirmationBytes = confirmationPreChecksum.concat(Bitcoin.Util.dsha256(confirmationPreChecksum).slice(0,4));
+    var confirmation = Bitcoin.Base58.encode(confirmationBytes);
+
+    return confirmation;
+  };
+
+  /**
+   * Certifies that the given address was generated using an intermediate ec point derived
+   * from the given password (see BIP38.newAddressFromIntermediate).
+   */
+  BIP38.verifyNewAddressConfirmation = function(expectedAddressStr, confirmation, passphrase) {
+    var confirmationResults = BIP38.verifyConfirmation(confirmation, passphrase);
+    return (confirmationResults.address == expectedAddressStr);
+  };
+
+  /**
+   * Certifies that the given BIP38 confirmation code matches the password and
+   * returns the address the confirmation corresponds to (see BIP38.newAddressFromIntermediate).
+   */
+  BIP38.verifyConfirmation = function(confirmation, passphrase) {
+    var bytes = Bitcoin.Base58.decode(confirmation);
+                
+    // Get the flag byte (tells us whether address compression is used and whether lot/sequence values are present).
+    var flagByte = bytes[5];
+                
+    // Get the address hash.
+    var addressHash = bytes.slice(6, 10);
+
+    // Get the owner entropy (tells us the lot/sequence values when applicable).
+    var ownerEntropy = bytes.slice(10, 18);
+
+    // Get encryptedpointb
+    var encryptedpointb = bytes.slice(18, 51);
+
+    var compressed = (flagByte & 0x20) == 0x20;
+    var lotSequencePresent = (flagByte & 0x04) == 0x04;
+    var ownerSalt = ownerEntropy.slice(0, lotSequencePresent ? 4 : 8)
+
+    var prefactor = scrypt(passphrase, ownerSalt, scryptParams.passphrase.N, scryptParams.passphrase.r, scryptParams.passphrase.p, 32);
+
+    // Take SHA256(SHA256(prefactor + ownerentropy)) and call this passfactor
+    var passfactorBytes = !lotSequencePresent? prefactor : Bitcoin.Util.dsha256(prefactor.concat(ownerEntropy));
+    var passfactor = BigInteger.fromByteArrayUnsigned(passfactorBytes);
+
+    var passpoint = ecparams.getG().multiply(passfactor).getEncoded(1);
+
+    var addresshashplusownerentropy = addressHash.concat(ownerEntropy);
+
+    var derivedBytes = scrypt(passpoint, addresshashplusownerentropy, scryptParams.passpoint.N, scryptParams.passpoint.r, scryptParams.passpoint.p, 64);
+
+    // recover the 0x02 or 0x03 prefix
+    var unencryptedpubkey = [];
+    unencryptedpubkey[0] = encryptedpointb[0] ^ (derivedBytes[63] & 0x01);
+
+    decrypted1 = Crypto.AES.decrypt(encryptedpointb.slice(1,17), derivedBytes.slice(32), AES_opts);
+    decrypted2 = Crypto.AES.decrypt(encryptedpointb.slice(17,33), derivedBytes.slice(32), AES_opts);
+    decrypted = unencryptedpubkey.concat(decrypted1).concat(decrypted2);
+
+    for (var x = 0; x < 32; x++) { 
+      decrypted[x+1] ^= derivedBytes[x];
+    }
+
+    var ec = ecparams.getCurve();
+    var generatedPoint = ec.decodePointHex(Crypto.util.bytesToHex(decrypted).toString().toUpperCase());
+    var generatedBytes = generatedPoint.multiply(BigInteger.fromByteArrayUnsigned(passfactor)).getEncoded(compressed);
+    var generatedAddress = (new Bitcoin.Address(Bitcoin.Util.sha256ripe160(generatedBytes))).toString();
+
+    var generatedAddressHash = Bitcoin.Util.dsha256(generatedAddress).slice(0,4);
+
+    var valid = true;
+    for (var i = 0; i < 4; i++) {
+      if (addressHash[i] != generatedAddressHash[i]) {
+        valid = false;
+      }
+    }
+   
+    return { valid: valid, address: generatedAddress };
+  }
+ 
   /**
    * Detects keys encrypted according to BIP-38 (58 base58 characters starting with 6P)
    */
