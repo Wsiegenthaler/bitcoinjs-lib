@@ -2,10 +2,16 @@ Bitcoin.BIP38 = (function () {
 
   var BIP38 = function() {};
 
-  var ecparams = getSECCurveByName("secp256k1");
-  var rng = new SecureRandom();
-  var AES_opts = {mode: new Crypto.mode.ECB(Crypto.pad.NoPadding), asBytes: true};
 
+  /**
+   * Standard bitcoin curve - secp256k1
+   */
+  var ecparams = getSECCurveByName("secp256k1");
+
+  /**
+   * Random number generator
+   */
+  var rng = new SecureRandom();
 
   /**
    * Default parameters for scrypt key derivation
@@ -13,7 +19,15 @@ Bitcoin.BIP38 = (function () {
    *  -> r: memory cost
    *  -> p: parallelization cost
    */
-  BIP38.scryptParams = { N: 16384, r: 8, p: 8 };
+  var scryptParams = {
+    passphrase: { N: 16384, r: 8, p: 8 },
+    passpoint: { N: 1024, r: 1, p: 1 }
+  };
+
+  /**
+   * Default parameters for AES
+   */
+  var AES_opts = {mode: new Crypto.mode.ECB(Crypto.pad.NoPadding), asBytes: true};
 
 
 
@@ -29,7 +43,7 @@ Bitcoin.BIP38 = (function () {
     var salt = Bitcoin.Util.dsha256(address).slice(0, 4);
   
     // derive key using scrypt
-    var derivedBytes = scrypt(passphrase, salt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 64);
+    var derivedBytes = scrypt(passphrase, salt, scryptParams.passphrase.N, scryptParams.passphrase.r, scryptParams.passphrase.p, 64);
     for(var i = 0; i < 32; ++i) {
       privKeyBytes[i] ^= derivedBytes[i];
     }
@@ -108,7 +122,7 @@ Bitcoin.BIP38 = (function () {
   
     if (!isECMult) {
       var addresshash = hex.slice(3, 7);
-      var derivedBytes = scrypt(passphrase, addresshash, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 64);
+      var derivedBytes = scrypt(passphrase, addresshash, scryptParams.passphrase.N, scryptParams.passphrase.r, scryptParams.passphrase.p, 64);
       var k = derivedBytes.slice(32, 32+32);
       decrypted = Crypto.AES.decrypt(hex.slice(7, 7+32), k, AES_opts);
       for (var x = 0; x < 32; x++) decrypted[x] ^= derivedBytes[x];
@@ -116,7 +130,7 @@ Bitcoin.BIP38 = (function () {
     } else {
       var ownerentropy = hex.slice(7, 7+8);
       var ownersalt = !hasLotSeq ? ownerentropy : ownerentropy.slice(0, 4);
-      var prefactorA = scrypt(passphrase, ownersalt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 32);
+      var prefactorA = scrypt(passphrase, ownersalt, scryptParams.passphrase.N, scryptParams.passphrase.r, scryptParams.passphrase.p, 32);
       var passfactor;
       if (!hasLotSeq) {
         passfactor = prefactorA;
@@ -131,7 +145,7 @@ Bitcoin.BIP38 = (function () {
       var encryptedPart2 = hex.slice(23, 23+16);
   
       var addressHashPlusOnwerEntropy = hex.slice(3, 3+12);
-      var derived = scrypt(passpoint, addressHashPlusOnwerEntropy, 1024, 1, 1, 64);
+      var derived = scrypt(passpoint, addressHashPlusOnwerEntropy, scryptParams.passpoint.N, scryptParams.passpoint.r, scryptParams.passpoint.p, 64);
       var k = derived.slice(32);
   
       var unencryptedPart2 = Crypto.AES.decrypt(encryptedPart2, k, AES_opts);
@@ -180,7 +194,7 @@ Bitcoin.BIP38 = (function () {
     }
 
     // 4) Derive a key from the passphrase using scrypt
-    var prefactor = scrypt(passphrase, ownerSalt, BIP38.scryptParams.N, BIP38.scryptParams.r, BIP38.scryptParams.p, 32);
+    var prefactor = scrypt(passphrase, ownerSalt, scryptParams.passphrase.N, scryptParams.passphrase.r, scryptParams.passphrase.p, 32);
  
     // Take SHA256(SHA256(prefactor + ownerentropy)) and call this passfactor
     var passfactorBytes = noNumbers? prefactor : Bitcoin.Util.dsha256(prefactor.concat(ownerEntropy));
@@ -240,7 +254,7 @@ Bitcoin.BIP38 = (function () {
     var addressHash = Bitcoin.Util.dsha256(generatedAddress.toString()).slice(0,4);
 
     // 5) Now we will encrypt seedb. Derive a second key from passpoint using scrypt
-    var derivedBytes = scrypt(passpoint, addressHash.concat(ownerEntropy), 1024, 1, 1, 64);
+    var derivedBytes = scrypt(passpoint, addressHash.concat(ownerEntropy), scryptParams.passpoint.N, scryptParams.passpoint.r, scryptParams.passpoint.p, 64);
 
     // 6) Do AES256Encrypt(seedb[0...15]] xor derivedhalf1[0...15], derivedhalf2), call the 16-byte result encryptedpart1
     for(var i = 0; i < 16; ++i) {
