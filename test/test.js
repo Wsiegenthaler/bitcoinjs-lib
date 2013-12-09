@@ -184,14 +184,30 @@ test("EC multiply, no compression, no lot/sequence numbers", function () {
 });
 
 test("EC multiply, no compression, lot/sequence numbers", function () {
-  expect(2);
+  expect(6);
 
   var pw = "MOLON LABE", lot = 263183, seq = 1;
+  var wrongAddress = '1Lurmih3KruL4xDB5FmHof38yawNtP9oGf', wrongPw = "MOLON LABIA", wrongConf = 'cfrm38V8G4qq2ywYEFfWLD5Cc6msj9UwsG2Mj4Z6QdGJAFQpdatZLavkgRd1i4iBMdRngDqDs51';
+
+  // Generate intermediate
   var intermediate = Bitcoin.BIP38.generateIntermediate(pw, lot, seq);
+
+  // Encrypt then decrypt
   var encryptedKey = Bitcoin.BIP38.newAddressFromIntermediate(intermediate, false);
   var decryptedKey = Bitcoin.BIP38.decode(encryptedKey.bip38PrivateKey, pw);
 
   ok(Bitcoin.ECKey.isBIP38Format(encryptedKey.bip38PrivateKey), "New EC-multiplied key appears to be valid BIP38 format.");
   equal(encryptedKey.address.toString(), decryptedKey.getAddress().toString(), "Address of new EC-multiplied key matches address after decryption with password.");
+
+  // Confirm
+  var confirmTrue = Bitcoin.BIP38.verifyNewAddressConfirmation(encryptedKey.address, encryptedKey.confirmation, pw);
+  var confirmFalse1 = Bitcoin.BIP38.verifyNewAddressConfirmation(wrongAddress, encryptedKey.confirmation, pw);
+  var confirmFalse2 = Bitcoin.BIP38.verifyNewAddressConfirmation(encryptedKey.address.toString(), wrongConf, pw);
+  var confirmFalse3 = Bitcoin.BIP38.verifyNewAddressConfirmation(encryptedKey.address.toString(), encryptedKey.confirmation, wrongPw);
+
+  ok(confirmTrue, "Confirmation successful with good address, confirmation code, and password.");
+  ok(!confirmFalse1, "Confirmation unsuccessful when given wrong address.");
+  ok(!confirmFalse2, "Confirmation unsuccessful when given wrong confirmation code.");
+  ok(!confirmFalse3, "Confirmation unsuccessful when given wrong password.");
 });
 
