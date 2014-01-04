@@ -219,17 +219,13 @@ Bitcoin.BIP38 = (function () {
    * Creates new private key using an intermediate EC point.
    */
   BIP38.newAddressFromIntermediate = function(intermediate, compressed) {
-    // decode IPS
-    var intermediateBytes = Bitcoin.Base58.decode(intermediate);
-    var expectedChecksum = intermediateBytes.slice(49,53)
-    var checksum = Bitcoin.Util.dsha256(intermediateBytes.slice(0, 49)).slice(0, 4)
-    if (expectedChecksum[0] != checksum[0] ||
-        expectedChecksum[1] != checksum[1] ||
-        expectedChecksum[2] != checksum[2] ||
-        expectedChecksum[3] != checksum[3]) {
-          throw new Error("Invalid intermediate passphrase string");
+    // validate intermediate code
+    if (!BIP38.verifyIntermediate(intermediate)) {
+      throw new Error("Invalid intermediate passphrase string");
     }
 
+    // decode IPS
+    var intermediateBytes = Bitcoin.Base58.decode(intermediate);
     var noNumbers = (intermediateBytes[7] === 0x53);
     var ownerEntropy = intermediateBytes.slice(8, 8+8);
     var passpoint = intermediateBytes.slice(16, 16+33);
@@ -396,6 +392,31 @@ Bitcoin.BIP38 = (function () {
     }
    
     return { valid: valid, address: generatedAddress };
+  }
+
+  /**
+   * Checks the validity of an intermediate code.
+   */
+  BIP38.verifyIntermediate = function (intermediate) {
+    // Simple regex check
+    var regexValid = (/^passphrase[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(intermediate));
+    if (!regexValid) return false;
+
+    // Correct bytelen
+    var intermediateBytes = Bitcoin.Base58.decode(intermediate);
+    if (intermediateBytes.length != 53)  return false;
+
+    // Checksum check
+    var expectedChecksum = intermediateBytes.slice(49,53);
+    var checksum = Bitcoin.Util.dsha256(intermediateBytes.slice(0, 49)).slice(0, 4);
+    if (expectedChecksum[0] != checksum[0] ||
+        expectedChecksum[1] != checksum[1] ||
+        expectedChecksum[2] != checksum[2] ||
+        expectedChecksum[3] != checksum[3]) {
+          return false;
+    }
+
+    return true;
   }
  
   /**
